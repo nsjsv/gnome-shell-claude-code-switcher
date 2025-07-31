@@ -235,9 +235,9 @@ export default class IndicatorExampleExtension extends Extension {
     }
     
     /**
-     * 读取现有的settings.json文件
+     * 读取现有的settings.json文件 (异步)
      */
-    _readExistingConfig() {
+    async _readExistingConfig() {
         const configPath = this._getClaudeConfigPath();
         const file = Gio.File.new_for_path(configPath);
         
@@ -246,12 +246,24 @@ export default class IndicatorExampleExtension extends Extension {
         }
         
         try {
-            const [success, contents] = file.load_contents(null);
-            if (success) {
-                const decoder = new TextDecoder('utf-8');
-                const jsonString = decoder.decode(contents);
-                return JSON.parse(jsonString);
-            }
+            const [contents] = await new Promise((resolve, reject) => {
+                file.load_contents_async(null, (file, result) => {
+                    try {
+                        const [success, contents] = file.load_contents_finish(result);
+                        if (success) {
+                            resolve([contents]);
+                        } else {
+                            reject(new Error('Failed to read file'));
+                        }
+                    } catch (e) {
+                        reject(e);
+                    }
+                });
+            });
+            
+            const decoder = new TextDecoder('utf-8');
+            const jsonString = decoder.decode(contents);
+            return JSON.parse(jsonString);
         } catch (e) {
             console.error('读取Claude配置文件失败:', e);
         }
@@ -280,9 +292,9 @@ export default class IndicatorExampleExtension extends Extension {
     }
     
     /**
-     * 生成标准的Claude配置对象
+     * 生成标准的Claude配置对象 (异步)
      */
-    _generateClaudeConfig() {
+    async _generateClaudeConfig() {
         const currentProvider = this._getCurrentProviderInfo();
         const autoUpdate = this._settings.get_boolean('auto-update');
         const proxyHost = this._settings.get_string('proxy-host');
@@ -298,7 +310,7 @@ export default class IndicatorExampleExtension extends Extension {
         }
         
         // 读取现有配置以保留其他字段
-        const existingConfig = this._readExistingConfig() || {};
+        const existingConfig = await this._readExistingConfig() || {};
         
         const config = {
             env: {
@@ -323,15 +335,15 @@ export default class IndicatorExampleExtension extends Extension {
     }
     
     /**
-     * 同步配置到本地Claude配置文件
+     * 同步配置到本地Claude配置文件 (异步)
      */
-    syncToLocalFile() {
+    async syncToLocalFile() {
         if (!this._ensureClaudeDir()) {
             return;
         }
         
         const configPath = this._getClaudeConfigPath();
-        const config = this._generateClaudeConfig();
+        const config = await this._generateClaudeConfig();
         
         try {
             const jsonString = JSON.stringify(config, null, 2);

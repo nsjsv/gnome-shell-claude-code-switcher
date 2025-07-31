@@ -7,22 +7,46 @@ import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Ex
 
 export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
+        // 快速初始化基础UI
+        this._setupBasicUI(window);
+        
+        // 异步加载复杂内容
+        GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
+            this._loadComplexContent();
+            return GLib.SOURCE_REMOVE;
+        });
+    }
+    
+    _setupBasicUI(window) {
         // 初始化设置
         this._settings = this.getSettings();
+        this._window = window;
         
         // 创建主设置页面
-        const page = new Adw.PreferencesPage({
+        this._page = new Adw.PreferencesPage({
             title: _('General'),
             icon_name: 'preferences-system-symbolic',
         });
-        window.add(page);
+        window.add(this._page);
 
+        // 显示加载提示
+        this._loadingGroup = new Adw.PreferencesGroup({
+            title: _('正在加载...'),
+            description: _('请稍候，正在初始化设置界面'),
+        });
+        this._page.add(this._loadingGroup);
+    }
+    
+    _loadComplexContent() {
+        // 移除加载提示
+        this._page.remove(this._loadingGroup);
+        
         // API提供商组
         this.apiGroup = new Adw.PreferencesGroup({
             title: _('API 提供商'),
             description: _('添加和管理自定义 API 提供商'),
         });
-        page.add(this.apiGroup);
+        this._page.add(this.apiGroup);
 
         // 添加新提供商按钮
         const addProviderRow = new Adw.ActionRow({
@@ -41,18 +65,21 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
         // 添加按钮点击事件
         addButton.connect('clicked', () => {
-            this._showAddProviderDialog(window);
+            this._showAddProviderDialog(this._window, this._settings);
         });
 
-        // 加载已保存的提供商
-        this._loadSavedProviders();
+        // 延迟加载已保存的提供商以提升响应性
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+            this._loadSavedProviders(this._settings);
+            return GLib.SOURCE_REMOVE;
+        });
 
         // 全局设置组
         const globalGroup = new Adw.PreferencesGroup({
             title: _('全局设置'),
             description: _('配置扩展的全局选项'),
         });
-        page.add(globalGroup);
+        this._page.add(globalGroup);
 
         // 自动更新开关
         const autoUpdateRow = new Adw.SwitchRow({
@@ -65,6 +92,29 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         this._settings.bind('auto-update', autoUpdateRow, 'active',
             Gio.SettingsBindFlags.DEFAULT);
 
+        // 使用延迟加载代理设置UI以提升性能
+        this._setupProxySettings(globalGroup);
+
+        // 添加窗口关闭清理事件
+        this._window.connect('close-request', () => {
+            this._cleanup();
+            return false;
+        });
+
+        // 关于组
+        const aboutGroup = new Adw.PreferencesGroup({
+            title: _('关于'),
+        });
+        this._page.add(aboutGroup);
+
+        const aboutRow = new Adw.ActionRow({
+            title: _('Claude Code Switcher'),
+            subtitle: _('快速切换 Claude Code API 提供商'),
+        });
+        aboutGroup.add(aboutRow);
+    }
+    
+    _setupProxySettings(globalGroup) {
         // 代理设置展开行
         const proxyRow = new Adw.ExpanderRow({
             title: _('代理设置'),
@@ -72,6 +122,26 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         });
         globalGroup.add(proxyRow);
 
+        // 当展开时才创建子项以提升性能
+        let proxyContentCreated = false;
+        proxyRow.connect('notify::expanded', () => {
+            if (proxyRow.expanded && !proxyContentCreated) {
+                this._createProxyContent(proxyRow);
+                proxyContentCreated = true;
+            }
+        });
+        
+        // 初始化代理展开行的副标题
+        const currentHost = this._settings.get_string('proxy-host');
+        const currentPort = this._settings.get_string('proxy-port');
+        if (currentHost && currentPort) {
+            proxyRow.set_subtitle(_(`已配置: ${currentHost}:${currentPort}`));
+        } else if (currentHost) {
+            proxyRow.set_subtitle(_(`已配置: ${currentHost}`));
+        }
+    }
+    
+    _createProxyContent(proxyRow) {
         // 代理主机输入
         const proxyHostRow = new Adw.EntryRow({
             title: _('代理服务器'),
@@ -122,8 +192,6 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         proxyCancelButton.connect('clicked', () => {
             proxyHostRow.set_text(proxyOriginalValues.host);
             proxyPortRow.set_text(proxyOriginalValues.port);
-            
-            // 自动收起展开行
             proxyRow.set_expanded(false);
         });
 
@@ -132,15 +200,12 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             const newHost = proxyHostRow.get_text();
             const newPort = proxyPortRow.get_text();
 
-            // 保存代理设置
             this._settings.set_string('proxy-host', newHost);
             this._settings.set_string('proxy-port', newPort);
             
-            // 更新原始值
             proxyOriginalValues.host = newHost;
             proxyOriginalValues.port = newPort;
             
-            // 更新展开行的副标题显示
             if (newHost && newPort) {
                 proxyRow.set_subtitle(_(`已配置: ${newHost}:${newPort}`));
             } else if (newHost) {
@@ -149,38 +214,22 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                 proxyRow.set_subtitle(_('配置网络代理服务器'));
             }
             
-            // 自动收起展开行
             proxyRow.set_expanded(false);
-            
-            // 同步到本地文件
-            this._syncToLocalFile();
+            this._syncToLocalFile(this._settings);
             
             console.log(`保存代理设置: ${newHost}:${newPort}`);
         });
-
-        // 初始化代理展开行的副标题
-        const currentHost = this._settings.get_string('proxy-host');
-        const currentPort = this._settings.get_string('proxy-port');
-        if (currentHost && currentPort) {
-            proxyRow.set_subtitle(_(`已配置: ${currentHost}:${currentPort}`));
-        } else if (currentHost) {
-            proxyRow.set_subtitle(_(`已配置: ${currentHost}`));
-        }
-
-        // 关于组
-        const aboutGroup = new Adw.PreferencesGroup({
-            title: _('关于'),
-        });
-        page.add(aboutGroup);
-
-        const aboutRow = new Adw.ActionRow({
-            title: _('Claude Code Switcher'),
-            subtitle: _('快速切换 Claude Code API 提供商'),
-        });
-        aboutGroup.add(aboutRow);
+    }
+    
+    _cleanup() {
+        // 清理引用以避免内存泄漏
+        this._settings = null;
+        this._window = null;
+        this._page = null;
+        this.apiGroup = null;
     }
 
-    _showAddProviderDialog(parentWindow) {
+    _showAddProviderDialog(parentWindow, settings) {
         const dialog = new Adw.MessageDialog({
             transient_for: parentWindow,
             heading: _('添加新的 API 提供商'),
@@ -242,11 +291,11 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                 
                 if (name && url && key) {
                     // 保存到设置中
-                    this._saveProvider(name, url, key, largeModel, smallModel);
+                    this._saveProvider(name, url, key, largeModel, smallModel, settings);
                     // 动态添加新的提供商到界面
-                    this._addProviderToUI(name, url, key, largeModel, smallModel);
+                    this._addProviderToUI(name, url, key, largeModel, smallModel, settings);
                     // 同步到本地文件
-                    this._syncToLocalFile();
+                    this._syncToLocalFile(settings);
                     console.log(`添加提供商: ${name}, URL: ${url}, Key: ${key}, 大模型: ${largeModel}, 小模型: ${smallModel}`);
                 }
             }
@@ -256,7 +305,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         dialog.present();
     }
 
-    _addProviderToUI(name, url, key, largeModel = '', smallModel = '') {
+    _addProviderToUI(name, url, key, largeModel = '', smallModel = '', settings) {
         // 创建新的提供商展开行
         const providerRow = new Adw.ExpanderRow({
             title: name,
@@ -362,7 +411,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
             if (newName && newUrl && newKey) {
                 // 更新保存的配置
-                this._updateProvider(originalValues.name, newName, newUrl, newKey, newLargeModel, newSmallModel);
+                this._updateProvider(originalValues.name, newName, newUrl, newKey, newLargeModel, newSmallModel, settings);
                 
                 // 更新界面标题和副标题
                 providerRow.set_title(newName);
@@ -376,7 +425,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                 originalValues.smallModel = newSmallModel;
                 
                 // 同步到本地文件
-                this._syncToLocalFile();
+                this._syncToLocalFile(settings);
                 
                 // 可选：显示保存成功的提示
                 console.log(`保存提供商配置: ${newName}`);
@@ -395,7 +444,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         });
         
         deleteButton.connect('clicked', () => {
-            this._showDeleteConfirmDialog(name, providerRow);
+            this._showDeleteConfirmDialog(name, providerRow, settings);
         });
         
         providerRow.add_suffix(deleteButton);
@@ -404,42 +453,55 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         this.apiGroup.add(providerRow);
     }
 
-    _loadSavedProviders() {
+    _loadSavedProviders(settings) {
         try {
-            const providersJson = this._settings.get_string('api-providers');
+            const providersJson = settings.get_string('api-providers');
             const providers = JSON.parse(providersJson);
             
-            providers.forEach(provider => {
-                this._addProviderToUI(
-                    provider.name, 
-                    provider.url, 
-                    provider.key,
-                    provider.largeModel || '',
-                    provider.smallModel || ''
-                );
-            });
+            // 分批加载提供商UI以避免阻塞
+            let index = 0;
+            const loadNextProvider = () => {
+                if (index < providers.length) {
+                    const provider = providers[index];
+                    this._addProviderToUI(
+                        provider.name, 
+                        provider.url, 
+                        provider.key,
+                        provider.largeModel || '',
+                        provider.smallModel || '',
+                        settings
+                    );
+                    index++;
+                    // 使用idle回调分批处理
+                    GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
+                        loadNextProvider();
+                        return GLib.SOURCE_REMOVE;
+                    });
+                }
+            };
+            loadNextProvider();
         } catch (e) {
             console.log('没有找到已保存的提供商或解析失败:', e);
         }
     }
 
-    _saveProvider(name, url, key, largeModel = '', smallModel = '') {
+    _saveProvider(name, url, key, largeModel = '', smallModel = '', settings) {
         try {
-            const providersJson = this._settings.get_string('api-providers');
+            const providersJson = settings.get_string('api-providers');
             const providers = JSON.parse(providersJson);
             
             providers.push({ name, url, key, largeModel, smallModel });
             
-            this._settings.set_string('api-providers', JSON.stringify(providers));
+            settings.set_string('api-providers', JSON.stringify(providers));
         } catch (e) {
             // 如果解析失败，创建新数组
-            this._settings.set_string('api-providers', JSON.stringify([{ name, url, key, largeModel, smallModel }]));
+            settings.set_string('api-providers', JSON.stringify([{ name, url, key, largeModel, smallModel }]));
         }
     }
 
-    _updateProvider(oldName, newName, newUrl, newKey, newLargeModel = '', newSmallModel = '') {
+    _updateProvider(oldName, newName, newUrl, newKey, newLargeModel = '', newSmallModel = '', settings) {
         try {
-            const providersJson = this._settings.get_string('api-providers');
+            const providersJson = settings.get_string('api-providers');
             const providers = JSON.parse(providersJson);
             
             const index = providers.findIndex(p => p.name === oldName);
@@ -451,26 +513,26 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                     largeModel: newLargeModel, 
                     smallModel: newSmallModel 
                 };
-                this._settings.set_string('api-providers', JSON.stringify(providers));
+                settings.set_string('api-providers', JSON.stringify(providers));
             }
         } catch (e) {
             console.log('更新提供商失败:', e);
         }
     }
 
-    _removeProvider(name) {
+    _removeProvider(name, settings) {
         try {
-            const providersJson = this._settings.get_string('api-providers');
+            const providersJson = settings.get_string('api-providers');
             const providers = JSON.parse(providersJson);
             
             const filteredProviders = providers.filter(p => p.name !== name);
-            this._settings.set_string('api-providers', JSON.stringify(filteredProviders));
+            settings.set_string('api-providers', JSON.stringify(filteredProviders));
         } catch (e) {
             console.log('删除提供商失败:', e);
         }
     }
 
-    _showDeleteConfirmDialog(providerName, providerRow) {
+    _showDeleteConfirmDialog(providerName, providerRow, settings) {
         const dialog = new Adw.MessageDialog({
             transient_for: this.apiGroup.get_root(),
             heading: _('确认删除'),
@@ -485,7 +547,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
         dialog.connect('response', (dialog, response) => {
             if (response === 'delete') {
-                this._removeProvider(providerName);
+                this._removeProvider(providerName, settings);
                 this.apiGroup.remove(providerRow);
             }
             dialog.destroy();
@@ -551,11 +613,11 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
     /**
      * 获取当前选中的提供商信息
      */
-    _getCurrentProviderInfo() {
+    _getCurrentProviderInfo(settings) {
         try {
-            const providersJson = this._settings.get_string('api-providers');
+            const providersJson = settings.get_string('api-providers');
             const providers = JSON.parse(providersJson);
-            const currentProviderName = this._settings.get_string('current-provider');
+            const currentProviderName = settings.get_string('current-provider');
             
             if (!currentProviderName) {
                 return null;
@@ -571,11 +633,11 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
     /**
      * 生成标准的Claude配置对象
      */
-    _generateClaudeConfig() {
-        const currentProvider = this._getCurrentProviderInfo();
-        const autoUpdate = this._settings.get_boolean('auto-update');
-        const proxyHost = this._settings.get_string('proxy-host');
-        const proxyPort = this._settings.get_string('proxy-port');
+    _generateClaudeConfig(settings) {
+        const currentProvider = this._getCurrentProviderInfo(settings);
+        const autoUpdate = settings.get_boolean('auto-update');
+        const proxyHost = settings.get_string('proxy-host');
+        const proxyPort = settings.get_string('proxy-port');
         
         // 构建代理URL
         let proxyUrl = '';
@@ -614,13 +676,13 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
     /**
      * 同步配置到本地Claude配置文件
      */
-    _syncToLocalFile() {
+    _syncToLocalFile(settings) {
         if (!this._ensureClaudeDir()) {
             return;
         }
         
         const configPath = this._getClaudeConfigPath();
-        const config = this._generateClaudeConfig();
+        const config = this._generateClaudeConfig(settings);
         
         try {
             const jsonString = JSON.stringify(config, null, 2);
