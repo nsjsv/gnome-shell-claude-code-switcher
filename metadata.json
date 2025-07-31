@@ -1,0 +1,8 @@
+{
+  "name": "Claude Code Switcher",
+  "description": "A GNOME shell extension for quickly switching Claude Code API providers.",
+  "uuid": "claude-code-switcher@nsjsv.github.io",
+  "shell-version": [
+    "48"
+  ]
+}
