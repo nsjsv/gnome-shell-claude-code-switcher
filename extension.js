@@ -27,8 +27,9 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 const Indicator = GObject.registerClass(
 class Indicator extends PanelMenu.Button {
-    _init() {
+    _init(extension) {
         super._init(0.0, _('My Shiny Indicator'));
+        this._extension = extension;
 
         this.add_child(new St.Icon({
             icon_name: 'face-smile-symbolic',
@@ -40,12 +41,29 @@ class Indicator extends PanelMenu.Button {
             Main.notify(_('Whatʼs up, folks?'));
         });
         this.menu.addMenuItem(item);
+
+        // 添加分隔符
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+        // 添加"Add more.."按钮
+        let addMoreItem = new PopupMenu.PopupMenuItem(_('Add more..'));
+        addMoreItem.connect('activate', () => {
+            // 打开扩展设置界面
+            this._openPreferences();
+        });
+        this.menu.addMenuItem(addMoreItem);
+    }
+
+    _openPreferences() {
+        if (this._extension && this._extension.openPreferences) {
+            this._extension.openPreferences();
+        }
     }
 });
 
 export default class IndicatorExampleExtension extends Extension {
     enable() {
-        this._indicator = new Indicator();
+        this._indicator = new Indicator(this);
         Main.panel.addToStatusArea(this.uuid, this._indicator);
     }
 
