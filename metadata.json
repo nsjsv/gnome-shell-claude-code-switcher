@@ -4,5 +4,6 @@
   "uuid": "claude-code-switcher@nsjsv.github.io",
   "shell-version": [
     "48"
-  ]
+  ],
+  "settings-schema": "org.gnome.shell.extensions.claude-code-switcher"
 }

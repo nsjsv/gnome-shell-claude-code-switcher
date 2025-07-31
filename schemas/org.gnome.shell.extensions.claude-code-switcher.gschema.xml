@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.claude-code-switcher" path="/org/gnome/shell/extensions/claude-code-switcher/">
+    <key name="api-providers" type="s">
+      <default>'[]'</default>
+      <summary>API Providers</summary>
+      <description>JSON string containing API provider configurations</description>
+    </key>
+    <key name="show-indicator" type="b">
+      <default>true</default>
+      <summary>Show Panel Indicator</summary>
+      <description>Whether to show the panel indicator</description>
+    </key>
+  </schema>
+</schemalist>
