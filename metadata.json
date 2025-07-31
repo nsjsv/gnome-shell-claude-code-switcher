@@ -5,5 +5,7 @@
   "shell-version": [
     "48"
   ],
-  "settings-schema": "org.gnome.shell.extensions.claude-code-switcher"
+  "version-name": "1.0.0",
+  "settings-schema": "org.gnome.shell.extensions.claude-code-switcher",
+  "url": "https://github.com/nsjsv/gnome-shell-claude-code-switcher"
 }

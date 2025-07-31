@@ -1,6 +1,7 @@
 import Adw from 'gi://Adw';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk';
+import GLib from 'gi://GLib';
 
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
@@ -150,6 +151,10 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             
             // 自动收起展开行
             proxyRow.set_expanded(false);
+            
+            // 同步到本地文件
+            this._syncToLocalFile();
+            
             console.log(`保存代理设置: ${newHost}:${newPort}`);
         });
 
@@ -240,6 +245,8 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                     this._saveProvider(name, url, key, largeModel, smallModel);
                     // 动态添加新的提供商到界面
                     this._addProviderToUI(name, url, key, largeModel, smallModel);
+                    // 同步到本地文件
+                    this._syncToLocalFile();
                     console.log(`添加提供商: ${name}, URL: ${url}, Key: ${key}, 大模型: ${largeModel}, 小模型: ${smallModel}`);
                 }
             }
@@ -368,6 +375,9 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                 originalValues.largeModel = newLargeModel;
                 originalValues.smallModel = newSmallModel;
                 
+                // 同步到本地文件
+                this._syncToLocalFile();
+                
                 // 可选：显示保存成功的提示
                 console.log(`保存提供商配置: ${newName}`);
             } else {
@@ -482,6 +492,155 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         });
 
         dialog.present();
+    }
+
+    /**
+     * 获取Claude配置文件路径 ~/.claude/settings.json
+     */
+    _getClaudeConfigPath() {
+        const homeDir = GLib.get_home_dir();
+        const claudeDir = GLib.build_filenamev([homeDir, '.claude']);
+        return GLib.build_filenamev([claudeDir, 'settings.json']);
+    }
+    
+    /**
+     * 确保Claude配置目录存在
+     */
+    _ensureClaudeDir() {
+        const homeDir = GLib.get_home_dir();
+        const claudeDir = GLib.build_filenamev([homeDir, '.claude']);
+        const dir = Gio.File.new_for_path(claudeDir);
+        
+        if (!dir.query_exists(null)) {
+            try {
+                dir.make_directory(null);
+                console.log('创建Claude配置目录:', claudeDir);
+            } catch (e) {
+                console.error('创建Claude配置目录失败:', e);
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * 读取现有的settings.json文件
+     */
+    _readExistingConfig() {
+        const configPath = this._getClaudeConfigPath();
+        const file = Gio.File.new_for_path(configPath);
+        
+        if (!file.query_exists(null)) {
+            return null;
+        }
+        
+        try {
+            const [success, contents] = file.load_contents(null);
+            if (success) {
+                const decoder = new TextDecoder('utf-8');
+                const jsonString = decoder.decode(contents);
+                return JSON.parse(jsonString);
+            }
+        } catch (e) {
+            console.error('读取Claude配置文件失败:', e);
+        }
+        
+        return null;
+    }
+    
+    /**
+     * 获取当前选中的提供商信息
+     */
+    _getCurrentProviderInfo() {
+        try {
+            const providersJson = this._settings.get_string('api-providers');
+            const providers = JSON.parse(providersJson);
+            const currentProviderName = this._settings.get_string('current-provider');
+            
+            if (!currentProviderName) {
+                return null;
+            }
+            
+            return providers.find(p => p.name === currentProviderName);
+        } catch (e) {
+            console.error('获取当前提供商信息失败:', e);
+            return null;
+        }
+    }
+    
+    /**
+     * 生成标准的Claude配置对象
+     */
+    _generateClaudeConfig() {
+        const currentProvider = this._getCurrentProviderInfo();
+        const autoUpdate = this._settings.get_boolean('auto-update');
+        const proxyHost = this._settings.get_string('proxy-host');
+        const proxyPort = this._settings.get_string('proxy-port');
+        
+        // 构建代理URL
+        let proxyUrl = '';
+        if (proxyHost) {
+            proxyUrl = proxyPort ? `${proxyHost}:${proxyPort}` : proxyHost;
+            if (!proxyUrl.startsWith('http://') && !proxyUrl.startsWith('https://')) {
+                proxyUrl = `http://${proxyUrl}`;
+            }
+        }
+        
+        // 读取现有配置以保留其他字段
+        const existingConfig = this._readExistingConfig() || {};
+        
+        const config = {
+            env: {
+                ANTHROPIC_AUTH_TOKEN: currentProvider ? currentProvider.key : '',
+                ANTHROPIC_BASE_URL: currentProvider ? currentProvider.url : '',
+                ANTHROPIC_MODEL: currentProvider ? (currentProvider.largeModel || '') : '',
+                ANTHROPIC_SMALL_FAST_MODEL: currentProvider ? (currentProvider.smallModel || '') : '',
+                DISABLE_AUTOUPDATER: autoUpdate ? '0' : '1', // 注意：0表示不禁用，1表示禁用
+                HTTPS_PROXY: proxyUrl,
+                HTTP_PROXY: proxyUrl
+            },
+            permissions: existingConfig.permissions || {
+                allow: [],
+                deny: []
+            },
+            feedbackSurveyState: existingConfig.feedbackSurveyState || {
+                lastShownTime: Date.now()
+            }
+        };
+        
+        return config;
+    }
+    
+    /**
+     * 同步配置到本地Claude配置文件
+     */
+    _syncToLocalFile() {
+        if (!this._ensureClaudeDir()) {
+            return;
+        }
+        
+        const configPath = this._getClaudeConfigPath();
+        const config = this._generateClaudeConfig();
+        
+        try {
+            const jsonString = JSON.stringify(config, null, 2);
+            const file = Gio.File.new_for_path(configPath);
+            
+            const encoder = new TextEncoder();
+            const bytes = encoder.encode(jsonString);
+            
+            file.replace_contents(
+                bytes,
+                null, // etag
+                false, // make_backup
+                Gio.FileCreateFlags.REPLACE_DESTINATION,
+                null // cancellable
+            );
+            
+            console.log('已同步配置到Claude配置文件:', configPath);
+        } catch (e) {
+            console.error('写入Claude配置文件失败:', e);
+        }
     }
 
 }
