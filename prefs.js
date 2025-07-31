@@ -187,6 +187,18 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         });
         box.append(keyEntry);
 
+        // 大模型输入（非必填）
+        const largeModelEntry = new Gtk.Entry({
+            placeholder_text: _('大模型（可选，例如：claude-3-5-sonnet-20241022）'),
+        });
+        box.append(largeModelEntry);
+
+        // 小模型输入（非必填）
+        const smallModelEntry = new Gtk.Entry({
+            placeholder_text: _('小模型（可选，例如：claude-3-haiku-20240307）'),
+        });
+        box.append(smallModelEntry);
+
         dialog.set_extra_child(box);
         dialog.add_response('cancel', _('取消'));
         dialog.add_response('add', _('添加'));
@@ -197,13 +209,15 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                 const name = nameEntry.get_text();
                 const url = urlEntry.get_text();
                 const key = keyEntry.get_text();
+                const largeModel = largeModelEntry.get_text() || ''; // 非必填，默认为空
+                const smallModel = smallModelEntry.get_text() || ''; // 非必填，默认为空
                 
                 if (name && url && key) {
                     // 保存到设置中
-                    this._saveProvider(name, url, key);
+                    this._saveProvider(name, url, key, largeModel, smallModel);
                     // 动态添加新的提供商到界面
-                    this._addProviderToUI(name, url, key);
-                    console.log(`添加提供商: ${name}, URL: ${url}, Key: ${key}`);
+                    this._addProviderToUI(name, url, key, largeModel, smallModel);
+                    console.log(`添加提供商: ${name}, URL: ${url}, Key: ${key}, 大模型: ${largeModel}, 小模型: ${smallModel}`);
                 }
             }
             dialog.destroy();
@@ -212,7 +226,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         dialog.present();
     }
 
-    _addProviderToUI(name, url, key) {
+    _addProviderToUI(name, url, key, largeModel = '', smallModel = '') {
         // 创建新的提供商展开行
         const providerRow = new Adw.ExpanderRow({
             title: name,
@@ -220,7 +234,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         });
 
         // 保存原始值用于取消操作
-        const originalValues = { name, url, key };
+        const originalValues = { name, url, key, largeModel, smallModel };
 
         // 添加提供商名称编辑框
         const nameRow = new Adw.EntryRow({
@@ -245,6 +259,22 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         });
         
         providerRow.add_row(apiKeyRow);
+
+        // 添加大模型编辑框
+        const largeModelRow = new Adw.EntryRow({
+            title: _('大模型'),
+            text: largeModel,
+        });
+        
+        providerRow.add_row(largeModelRow);
+
+        // 添加小模型编辑框
+        const smallModelRow = new Adw.EntryRow({
+            title: _('小模型'),
+            text: smallModel,
+        });
+        
+        providerRow.add_row(smallModelRow);
 
         // 添加操作按钮行
         const actionRow = new Adw.ActionRow({
@@ -281,6 +311,8 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             nameRow.set_text(originalValues.name);
             urlRow.set_text(originalValues.url);
             apiKeyRow.set_text(originalValues.key);
+            largeModelRow.set_text(originalValues.largeModel);
+            smallModelRow.set_text(originalValues.smallModel);
             
             // 更新标题和副标题
             providerRow.set_title(originalValues.name);
@@ -295,10 +327,12 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             const newName = nameRow.get_text();
             const newUrl = urlRow.get_text();
             const newKey = apiKeyRow.get_text();
+            const newLargeModel = largeModelRow.get_text();
+            const newSmallModel = smallModelRow.get_text();
 
             if (newName && newUrl && newKey) {
                 // 更新保存的配置
-                this._updateProvider(originalValues.name, newName, newUrl, newKey);
+                this._updateProvider(originalValues.name, newName, newUrl, newKey, newLargeModel, newSmallModel);
                 
                 // 更新界面标题和副标题
                 providerRow.set_title(newName);
@@ -308,12 +342,14 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                 originalValues.name = newName;
                 originalValues.url = newUrl;
                 originalValues.key = newKey;
+                originalValues.largeModel = newLargeModel;
+                originalValues.smallModel = newSmallModel;
                 
                 // 可选：显示保存成功的提示
                 console.log(`保存提供商配置: ${newName}`);
             } else {
                 // 显示错误提示
-                console.log('所有字段都必须填写');
+                console.log('名称、URL和API密钥都必须填写');
             }
         });
 
@@ -341,35 +377,47 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             const providers = JSON.parse(providersJson);
             
             providers.forEach(provider => {
-                this._addProviderToUI(provider.name, provider.url, provider.key);
+                this._addProviderToUI(
+                    provider.name, 
+                    provider.url, 
+                    provider.key,
+                    provider.largeModel || '',
+                    provider.smallModel || ''
+                );
             });
         } catch (e) {
             console.log('没有找到已保存的提供商或解析失败:', e);
         }
     }
 
-    _saveProvider(name, url, key) {
+    _saveProvider(name, url, key, largeModel = '', smallModel = '') {
         try {
             const providersJson = this._settings.get_string('api-providers');
             const providers = JSON.parse(providersJson);
             
-            providers.push({ name, url, key });
+            providers.push({ name, url, key, largeModel, smallModel });
             
             this._settings.set_string('api-providers', JSON.stringify(providers));
         } catch (e) {
             // 如果解析失败，创建新数组
-            this._settings.set_string('api-providers', JSON.stringify([{ name, url, key }]));
+            this._settings.set_string('api-providers', JSON.stringify([{ name, url, key, largeModel, smallModel }]));
         }
     }
 
-    _updateProvider(oldName, newName, newUrl, newKey) {
+    _updateProvider(oldName, newName, newUrl, newKey, newLargeModel = '', newSmallModel = '') {
         try {
             const providersJson = this._settings.get_string('api-providers');
             const providers = JSON.parse(providersJson);
             
             const index = providers.findIndex(p => p.name === oldName);
             if (index !== -1) {
-                providers[index] = { name: newName, url: newUrl, key: newKey };
+                providers[index] = { 
+                    name: newName, 
+                    url: newUrl, 
+                    key: newKey, 
+                    largeModel: newLargeModel, 
+                    smallModel: newSmallModel 
+                };
                 this._settings.set_string('api-providers', JSON.stringify(providers));
             }
         } catch (e) {
