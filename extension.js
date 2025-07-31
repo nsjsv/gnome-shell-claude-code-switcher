@@ -18,6 +18,7 @@
 
 import GObject from 'gi://GObject';
 import St from 'gi://St';
+import Gio from 'gi://Gio';
 
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
@@ -28,19 +29,33 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 const Indicator = GObject.registerClass(
 class Indicator extends PanelMenu.Button {
     _init(extension) {
-        super._init(0.0, _('My Shiny Indicator'));
+        super._init(0.0, _('Claude Code Switcher'));
         this._extension = extension;
+        this._settings = extension.getSettings();
 
         this.add_child(new St.Icon({
             icon_name: 'face-smile-symbolic',
             style_class: 'system-status-icon',
         }));
 
-        let item = new PopupMenu.PopupMenuItem(_('Show Notification'));
-        item.connect('activate', () => {
-            Main.notify(_('Whatʼs up, folks?'));
+        // 构建菜单
+        this._buildMenu();
+
+        // 监听设置变化
+        this._settings.connect('changed::api-providers', () => {
+            this._rebuildMenu();
         });
-        this.menu.addMenuItem(item);
+        this._settings.connect('changed::current-provider', () => {
+            this._updateCurrentProvider();
+        });
+    }
+
+    _buildMenu() {
+        // 清空现有菜单
+        this.menu.removeAll();
+
+        // 添加API提供商列表
+        this._addProviderMenuItems();
 
         // 添加分隔符
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
@@ -48,10 +63,87 @@ class Indicator extends PanelMenu.Button {
         // 添加"Add more.."按钮
         let addMoreItem = new PopupMenu.PopupMenuItem(_('Add more..'));
         addMoreItem.connect('activate', () => {
-            // 打开扩展设置界面
             this._openPreferences();
         });
         this.menu.addMenuItem(addMoreItem);
+    }
+
+    _addProviderMenuItems() {
+        try {
+            const providersJson = this._settings.get_string('api-providers');
+            const providers = JSON.parse(providersJson);
+            const currentProvider = this._settings.get_string('current-provider');
+
+            if (providers.length === 0) {
+                // 如果没有配置提供商，显示提示
+                let noProvidersItem = new PopupMenu.PopupMenuItem(_('暂无配置的提供商'));
+                noProvidersItem.setSensitive(false);
+                this.menu.addMenuItem(noProvidersItem);
+                return;
+            }
+
+            // 为每个提供商创建菜单项
+            providers.forEach(provider => {
+                let item = new PopupMenu.PopupMenuItem(provider.name);
+                
+                // 如果是当前选中的提供商，添加勾选标记
+                if (provider.name === currentProvider) {
+                    item.setOrnament(PopupMenu.Ornament.CHECK);
+                }
+
+                item.connect('activate', () => {
+                    this._selectProvider(provider.name);
+                });
+
+                this.menu.addMenuItem(item);
+            });
+        } catch (e) {
+            console.log('加载API提供商失败:', e);
+            let errorItem = new PopupMenu.PopupMenuItem(_('加载提供商失败'));
+            errorItem.setSensitive(false);
+            this.menu.addMenuItem(errorItem);
+        }
+    }
+
+    _selectProvider(providerName) {
+        // 检查提供商是否有API密钥
+        if (this._checkProviderKey(providerName)) {
+            this._settings.set_string('current-provider', providerName);
+            Main.notify(_(`已切换到: ${providerName}`));
+        } else {
+            // 显示配置API密钥的提示
+            this._showConfigureKeyNotification(providerName);
+        }
+    }
+
+    _checkProviderKey(providerName) {
+        try {
+            const providersJson = this._settings.get_string('api-providers');
+            const providers = JSON.parse(providersJson);
+            
+            const provider = providers.find(p => p.name === providerName);
+            return provider && provider.key && provider.key.trim() !== '';
+        } catch (e) {
+            console.log('检查API密钥失败:', e);
+            return false;
+        }
+    }
+
+    _showConfigureKeyNotification(providerName) {
+        if (providerName.includes('Anthropic') || providerName.includes('默认')) {
+            Main.notify(_('请先配置 Anthropic API 密钥'), _('点击"Add more.."按钮打开设置界面，为 Anthropic 提供商配置官方 API 密钥后即可使用。'));
+        } else {
+            Main.notify(_(`请先配置 ${providerName} API 密钥`), _('点击"Add more.."按钮打开设置界面，为此提供商配置 API 密钥后即可使用。'));
+        }
+    }
+
+    _rebuildMenu() {
+        this._buildMenu();
+    }
+
+    _updateCurrentProvider() {
+        // 重新构建菜单以更新勾选状态
+        this._rebuildMenu();
     }
 
     _openPreferences() {

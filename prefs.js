@@ -38,99 +38,6 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         addProviderRow.set_activatable_widget(addButton);
         this.apiGroup.add(addProviderRow);
 
-        // 默认提供商列表
-        const defaultProviderRow = new Adw.ExpanderRow({
-            title: _('Anthropic (默认)'),
-            subtitle: _('api.anthropic.com'),
-        });
-        
-        // 保存默认提供商的原始值
-        const defaultOriginalValues = {
-            name: 'Anthropic (默认)',
-            url: 'api.anthropic.com',
-            key: ''
-        };
-        
-        // 默认提供商名称编辑框
-        const defaultNameRow = new Adw.EntryRow({
-            title: _('提供商名称'),
-            text: 'Anthropic (默认)',
-        });
-        
-        defaultProviderRow.add_row(defaultNameRow);
-
-        // 默认提供商URL编辑框
-        const defaultUrlRow = new Adw.EntryRow({
-            title: _('API URL'),
-            text: 'api.anthropic.com',
-        });
-        
-        defaultProviderRow.add_row(defaultUrlRow);
-        
-        // 默认提供商的API密钥输入
-        const defaultApiKeyRow = new Adw.PasswordEntryRow({
-            title: _('API 密钥'),
-        });
-        defaultProviderRow.add_row(defaultApiKeyRow);
-
-        // 默认提供商操作按钮
-        const defaultActionRow = new Adw.ActionRow({
-            title: _('操作'),
-        });
-
-        const defaultButtonBox = new Gtk.Box({
-            orientation: Gtk.Orientation.HORIZONTAL,
-            spacing: 6,
-            halign: Gtk.Align.END,
-        });
-
-        const defaultCancelButton = new Gtk.Button({
-            label: _('取消'),
-            css_classes: ['flat'],
-        });
-
-        const defaultSaveButton = new Gtk.Button({
-            label: _('保存'),
-            css_classes: ['suggested-action'],
-        });
-
-        defaultButtonBox.append(defaultCancelButton);
-        defaultButtonBox.append(defaultSaveButton);
-        defaultActionRow.add_suffix(defaultButtonBox);
-        defaultProviderRow.add_row(defaultActionRow);
-
-        // 默认提供商取消按钮逻辑
-        defaultCancelButton.connect('clicked', () => {
-            defaultNameRow.set_text(defaultOriginalValues.name);
-            defaultUrlRow.set_text(defaultOriginalValues.url);
-            defaultApiKeyRow.set_text(defaultOriginalValues.key);
-            defaultProviderRow.set_title(defaultOriginalValues.name);
-            defaultProviderRow.set_subtitle(defaultOriginalValues.url);
-            
-            // 自动收起展开行
-            defaultProviderRow.set_expanded(false);
-        });
-
-        // 默认提供商保存按钮逻辑
-        defaultSaveButton.connect('clicked', () => {
-            const newName = defaultNameRow.get_text();
-            const newUrl = defaultUrlRow.get_text();
-            const newKey = defaultApiKeyRow.get_text();
-
-            if (newName && newUrl && newKey) {
-                defaultProviderRow.set_title(newName);
-                defaultProviderRow.set_subtitle(newUrl);
-                defaultOriginalValues.name = newName;
-                defaultOriginalValues.url = newUrl;
-                defaultOriginalValues.key = newKey;
-                console.log(`保存默认提供商配置: ${newName}`);
-            } else {
-                console.log('所有字段都必须填写');
-            }
-        });
-        
-        this.apiGroup.add(defaultProviderRow);
-
         // 添加按钮点击事件
         addButton.connect('clicked', () => {
             this._showAddProviderDialog(window);
@@ -460,4 +367,5 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
         dialog.present();
     }
+
 }
