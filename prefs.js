@@ -10,11 +10,8 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         // 快速初始化基础UI
         this._setupBasicUI(window);
         
-        // 异步加载复杂内容
-        GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
-            this._loadComplexContent();
-            return GLib.SOURCE_REMOVE;
-        });
+        // 直接加载复杂内容
+        this._loadComplexContent();
     }
     
     _setupBasicUI(window) {
@@ -472,8 +469,8 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                         settings
                     );
                     index++;
-                    // 使用idle回调分批处理
-                    GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
+                    // 使用timeout分批处理
+                    GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
                         loadNextProvider();
                         return GLib.SOURCE_REMOVE;
                     });
