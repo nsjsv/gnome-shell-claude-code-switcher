@@ -66,7 +66,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         });
 
         // 延迟加载已保存的提供商以提升响应性
-        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+        GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
             this._loadSavedProviders(this._settings);
             return GLib.SOURCE_REMOVE;
         });
@@ -469,8 +469,8 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                         settings
                     );
                     index++;
-                    // 使用timeout分批处理
-                    GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
+                    // 使用idle_add分批处理
+                    GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
                         loadNextProvider();
                         return GLib.SOURCE_REMOVE;
                     });
