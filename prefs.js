@@ -46,6 +46,122 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         // 加载已保存的提供商
         this._loadSavedProviders();
 
+        // 全局设置组
+        const globalGroup = new Adw.PreferencesGroup({
+            title: _('全局设置'),
+            description: _('配置扩展的全局选项'),
+        });
+        page.add(globalGroup);
+
+        // 自动更新开关
+        const autoUpdateRow = new Adw.SwitchRow({
+            title: _('自动更新'),
+            subtitle: _('启用扩展的自动更新功能'),
+        });
+        globalGroup.add(autoUpdateRow);
+
+        // 绑定自动更新设置
+        this._settings.bind('auto-update', autoUpdateRow, 'active',
+            Gio.SettingsBindFlags.DEFAULT);
+
+        // 代理设置展开行
+        const proxyRow = new Adw.ExpanderRow({
+            title: _('代理设置'),
+            subtitle: _('配置网络代理服务器'),
+        });
+        globalGroup.add(proxyRow);
+
+        // 代理主机输入
+        const proxyHostRow = new Adw.EntryRow({
+            title: _('代理服务器'),
+            text: this._settings.get_string('proxy-host'),
+        });
+        proxyRow.add_row(proxyHostRow);
+
+        // 代理端口输入
+        const proxyPortRow = new Adw.EntryRow({
+            title: _('端口'),
+            text: this._settings.get_string('proxy-port'),
+        });
+        proxyRow.add_row(proxyPortRow);
+
+        // 代理设置操作按钮
+        const proxyActionRow = new Adw.ActionRow({
+            title: _('操作'),
+        });
+
+        const proxyButtonBox = new Gtk.Box({
+            orientation: Gtk.Orientation.HORIZONTAL,
+            spacing: 6,
+            halign: Gtk.Align.END,
+        });
+
+        const proxyCancelButton = new Gtk.Button({
+            label: _('取消'),
+            css_classes: ['flat'],
+        });
+
+        const proxySaveButton = new Gtk.Button({
+            label: _('保存'),
+            css_classes: ['suggested-action'],
+        });
+
+        proxyButtonBox.append(proxyCancelButton);
+        proxyButtonBox.append(proxySaveButton);
+        proxyActionRow.add_suffix(proxyButtonBox);
+        proxyRow.add_row(proxyActionRow);
+
+        // 保存代理设置的原始值
+        const proxyOriginalValues = {
+            host: this._settings.get_string('proxy-host'),
+            port: this._settings.get_string('proxy-port'),
+        };
+
+        // 代理取消按钮逻辑
+        proxyCancelButton.connect('clicked', () => {
+            proxyHostRow.set_text(proxyOriginalValues.host);
+            proxyPortRow.set_text(proxyOriginalValues.port);
+            
+            // 自动收起展开行
+            proxyRow.set_expanded(false);
+        });
+
+        // 代理保存按钮逻辑
+        proxySaveButton.connect('clicked', () => {
+            const newHost = proxyHostRow.get_text();
+            const newPort = proxyPortRow.get_text();
+
+            // 保存代理设置
+            this._settings.set_string('proxy-host', newHost);
+            this._settings.set_string('proxy-port', newPort);
+            
+            // 更新原始值
+            proxyOriginalValues.host = newHost;
+            proxyOriginalValues.port = newPort;
+            
+            // 更新展开行的副标题显示
+            if (newHost && newPort) {
+                proxyRow.set_subtitle(_(`已配置: ${newHost}:${newPort}`));
+            } else if (newHost) {
+                proxyRow.set_subtitle(_(`已配置: ${newHost}`));
+            } else {
+                proxyRow.set_subtitle(_('配置网络代理服务器'));
+            }
+            
+            // 自动收起展开行
+            proxyRow.set_expanded(false);
+            console.log(`保存代理设置: ${newHost}:${newPort}`);
+        });
+
+        // 初始化代理展开行的副标题
+        const currentHost = this._settings.get_string('proxy-host');
+        const currentPort = this._settings.get_string('proxy-port');
+        if (currentHost && currentPort) {
+            proxyRow.set_subtitle(_(`已配置: ${currentHost}:${currentPort}`));
+        } else if (currentHost) {
+            proxyRow.set_subtitle(_(`已配置: ${currentHost}`));
+        }
+
         // 关于组
         const aboutGroup = new Adw.PreferencesGroup({
             title: _('关于'),

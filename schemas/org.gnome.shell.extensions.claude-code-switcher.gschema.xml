@@ -16,5 +16,20 @@
       <summary>Show Panel Indicator</summary>
       <description>Whether to show the panel indicator</description>
     </key>
+    <key name="auto-update" type="b">
+      <default>true</default>
+      <summary>Auto Update</summary>
+      <description>Whether to automatically update the extension</description>
+    </key>
+    <key name="proxy-host" type="s">
+      <default>''</default>
+      <summary>Proxy Host</summary>
+      <description>Proxy server hostname or IP address</description>
+    </key>
+    <key name="proxy-port" type="s">
+      <default>''</default>
+      <summary>Proxy Port</summary>
+      <description>Proxy server port number</description>
+    </key>
   </schema>
 </schemalist>
