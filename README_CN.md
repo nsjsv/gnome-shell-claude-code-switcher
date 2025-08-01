@@ -65,7 +65,7 @@
 
 ## 许可证
 
-此项目采用 MIT 许可证 - 详情请查看 [LICENSE](LICENSE) 文件。
+此项目采用 GPL-3.0 许可证 - 详情请查看 [LICENSE](LICENSE) 文件。
 
 ## 贡献
 
