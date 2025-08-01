@@ -2,6 +2,9 @@
 
 A GNOME Shell extension for quickly switching Claude Code API providers.
 
+![Home](img/Home.png)
+![Add](img/Add.png)
+
 ## Features
 
 - Quick provider switching from the top panel
