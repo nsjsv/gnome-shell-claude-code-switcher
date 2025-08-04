@@ -56,7 +56,7 @@
 
 ## 系统要求
 
-- GNOME Shell 48+
+- GNOME Shell 45+（支持版本 45、46、47、48）
 - Claude Code CLI 工具
 
 ## 开发

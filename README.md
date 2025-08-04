@@ -56,7 +56,7 @@ This extension requires API providers that are compatible with Anthropic's API f
 
 ## Requirements
 
-- GNOME Shell 48+
+- GNOME Shell 45+ (supports versions 45, 46, 47, 48)
 - Claude Code CLI tool
 
 ## Development
