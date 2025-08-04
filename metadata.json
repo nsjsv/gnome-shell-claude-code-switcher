@@ -8,7 +8,8 @@
     "47",
     "48"
   ],
-  "version-name": "1.1.0",
+  "version-name": "1.2.0",
   "settings-schema": "org.gnome.shell.extensions.claude-code-switcher",
+  "gettext-domain": "claude-code-switcher@nsjsv.github.io",
   "url": "https://github.com/nsjsv/gnome-shell-claude-code-switcher"
 }

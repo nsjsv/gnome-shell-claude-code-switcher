@@ -28,8 +28,8 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
         // 显示加载提示
         this._loadingGroup = new Adw.PreferencesGroup({
-            title: _('正在加载...'),
-            description: _('请稍候，正在初始化设置界面'),
+            title: _('Loading...'),
+            description: _('Please wait, initializing settings interface'),
         });
         this._page.add(this._loadingGroup);
     }
@@ -40,15 +40,14 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         
         // API提供商组
         this.apiGroup = new Adw.PreferencesGroup({
-            title: _('API 提供商'),
-            description: _('添加和管理自定义 API 提供商'),
+            title: _('API Providers'),
+            description: _('Add and manage custom API providers'),
         });
         this._page.add(this.apiGroup);
 
-        // 添加新提供商按钮
         const addProviderRow = new Adw.ActionRow({
-            title: _('添加新提供商'),
-            subtitle: _('添加自定义 API 端点和密钥'),
+            title: _('Add New Provider'),
+            subtitle: _('Add custom API endpoint and key'),
         });
         
         const addButton = new Gtk.Button({
@@ -73,15 +72,15 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
         // 全局设置组
         const globalGroup = new Adw.PreferencesGroup({
-            title: _('全局设置'),
-            description: _('配置扩展的全局选项'),
+            title: _('Global Settings'),
+            description: _('Configure global extension options'),
         });
         this._page.add(globalGroup);
 
         // 自动更新开关
         const autoUpdateRow = new Adw.SwitchRow({
-            title: _('自动更新'),
-            subtitle: _('启用扩展的自动更新功能'),
+            title: _('Auto Update'),
+            subtitle: _('Enable automatic updates for the extension'),
         });
         globalGroup.add(autoUpdateRow);
 
@@ -100,13 +99,13 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
         // 关于组
         const aboutGroup = new Adw.PreferencesGroup({
-            title: _('关于'),
+            title: _('About'),
         });
         this._page.add(aboutGroup);
 
         const aboutRow = new Adw.ActionRow({
             title: _('Claude Code Switcher'),
-            subtitle: _('快速切换 Claude Code API 提供商'),
+            subtitle: _('Quickly switch Claude Code API providers'),
         });
         aboutGroup.add(aboutRow);
     }
@@ -114,8 +113,8 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
     _setupProxySettings(globalGroup) {
         // 代理设置展开行
         const proxyRow = new Adw.ExpanderRow({
-            title: _('代理设置'),
-            subtitle: _('配置网络代理服务器'),
+            title: _('Proxy Settings'),
+            subtitle: _('Configure network proxy server'),
         });
         globalGroup.add(proxyRow);
 
@@ -132,30 +131,30 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         const currentHost = this._settings.get_string('proxy-host');
         const currentPort = this._settings.get_string('proxy-port');
         if (currentHost && currentPort) {
-            proxyRow.set_subtitle(_(`已配置: ${currentHost}:${currentPort}`));
+            proxyRow.set_subtitle(_('Configured: ') + currentHost + ':' + currentPort);
         } else if (currentHost) {
-            proxyRow.set_subtitle(_(`已配置: ${currentHost}`));
+            proxyRow.set_subtitle(_('Configured: ') + currentHost);
         }
     }
     
     _createProxyContent(proxyRow) {
         // 代理主机输入
         const proxyHostRow = new Adw.EntryRow({
-            title: _('代理服务器'),
+            title: _('Proxy Server'),
             text: this._settings.get_string('proxy-host'),
         });
         proxyRow.add_row(proxyHostRow);
 
         // 代理端口输入
         const proxyPortRow = new Adw.EntryRow({
-            title: _('端口'),
+            title: _('Port'),
             text: this._settings.get_string('proxy-port'),
         });
         proxyRow.add_row(proxyPortRow);
 
         // 代理设置操作按钮
         const proxyActionRow = new Adw.ActionRow({
-            title: _('操作'),
+            title: _('Actions'),
         });
 
         const proxyButtonBox = new Gtk.Box({
@@ -165,12 +164,12 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         });
 
         const proxyCancelButton = new Gtk.Button({
-            label: _('取消'),
+            label: _('Cancel'),
             css_classes: ['flat'],
         });
 
         const proxySaveButton = new Gtk.Button({
-            label: _('保存'),
+            label: _('Save'),
             css_classes: ['suggested-action'],
         });
 
@@ -204,17 +203,17 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             proxyOriginalValues.port = newPort;
             
             if (newHost && newPort) {
-                proxyRow.set_subtitle(_(`已配置: ${newHost}:${newPort}`));
+                proxyRow.set_subtitle(_('Configured: ') + newHost + ':' + newPort);
             } else if (newHost) {
-                proxyRow.set_subtitle(_(`已配置: ${newHost}`));
+                proxyRow.set_subtitle(_('Configured: ') + newHost);
             } else {
-                proxyRow.set_subtitle(_('配置网络代理服务器'));
+                proxyRow.set_subtitle(_('Configure network proxy server'));
             }
             
             proxyRow.set_expanded(false);
             this._syncToLocalFile(this._settings);
             
-            console.log(`保存代理设置: ${newHost}:${newPort}`);
+            console.log('Saved proxy settings: ' + newHost + ':' + newPort);
         });
     }
     
@@ -229,8 +228,8 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
     _showAddProviderDialog(parentWindow, settings) {
         const dialog = new Adw.MessageDialog({
             transient_for: parentWindow,
-            heading: _('添加新的 API 提供商'),
-            body: _('请输入自定义 API 提供商的详细信息'),
+            heading: _('Add New API Provider'),
+            body: _('Please enter the details for the custom API provider'),
         });
 
         // 创建输入框容器
@@ -245,37 +244,37 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
         // 提供商名称输入
         const nameEntry = new Gtk.Entry({
-            placeholder_text: _('提供商名称（例如：OpenAI）'),
+            placeholder_text: _('Provider name (e.g.: OpenAI)'),
         });
         box.append(nameEntry);
 
         // API URL输入
         const urlEntry = new Gtk.Entry({
-            placeholder_text: _('API URL（例如：https://api.openai.com）'),
+            placeholder_text: _('API URL (e.g.: https://api.openai.com)'),
         });
         box.append(urlEntry);
 
         // API密钥输入
         const keyEntry = new Gtk.PasswordEntry({
-            placeholder_text: _('API 密钥'),
+            placeholder_text: _('API Key'),
         });
         box.append(keyEntry);
 
         // 大模型输入（非必填）
         const largeModelEntry = new Gtk.Entry({
-            placeholder_text: _('大模型（可选，例如：claude-3-5-sonnet-20241022）'),
+            placeholder_text: _('Large Model (optional, e.g.: claude-3-5-sonnet-20241022)'),
         });
         box.append(largeModelEntry);
 
         // 小模型输入（非必填）
         const smallModelEntry = new Gtk.Entry({
-            placeholder_text: _('小模型（可选，例如：claude-3-haiku-20240307）'),
+            placeholder_text: _('Small Model (optional, e.g.: claude-3-haiku-20240307)'),
         });
         box.append(smallModelEntry);
 
         dialog.set_extra_child(box);
-        dialog.add_response('cancel', _('取消'));
-        dialog.add_response('add', _('添加'));
+        dialog.add_response('cancel', _('Cancel'));
+        dialog.add_response('add', _('Add'));
         dialog.set_response_appearance('add', Adw.ResponseAppearance.SUGGESTED);
 
         dialog.connect('response', (dialog, response) => {
@@ -283,8 +282,8 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                 const name = nameEntry.get_text();
                 const url = urlEntry.get_text();
                 const key = keyEntry.get_text();
-                const largeModel = largeModelEntry.get_text() || ''; // 非必填，默认为空
-                const smallModel = smallModelEntry.get_text() || ''; // 非必填，默认为空
+                const largeModel = largeModelEntry.get_text() || '';
+                const smallModel = smallModelEntry.get_text() || '';
                 
                 if (name && url && key) {
                     // 保存到设置中
@@ -293,7 +292,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                     this._addProviderToUI(name, url, key, largeModel, smallModel, settings);
                     // 同步到本地文件
                     this._syncToLocalFile(settings);
-                    console.log(`添加提供商: ${name}, URL: ${url}, Key: ${key}, 大模型: ${largeModel}, 小模型: ${smallModel}`);
+                    console.log('Added provider: ' + name + ', URL: ' + url + ', Key: ' + key + ', Large Model: ' + largeModel + ', Small Model: ' + smallModel);
                 }
             }
             dialog.destroy();
@@ -314,7 +313,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
         // 添加提供商名称编辑框
         const nameRow = new Adw.EntryRow({
-            title: _('提供商名称'),
+            title: _('Provider Name'),
             text: name,
         });
         
@@ -330,7 +329,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
         // 添加API密钥显示（已预填）
         const apiKeyRow = new Adw.PasswordEntryRow({
-            title: _('API 密钥'),
+            title: _('API Key'),
             text: key,
         });
         
@@ -338,7 +337,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
         // 添加大模型编辑框
         const largeModelRow = new Adw.EntryRow({
-            title: _('大模型'),
+            title: _('Large Model'),
             text: largeModel,
         });
         
@@ -346,7 +345,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
         // 添加小模型编辑框
         const smallModelRow = new Adw.EntryRow({
-            title: _('小模型'),
+            title: _('Small Model'),
             text: smallModel,
         });
         
@@ -354,7 +353,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
         // 添加操作按钮行
         const actionRow = new Adw.ActionRow({
-            title: _('操作'),
+            title: _('Actions'),
         });
 
         // 创建按钮容器
@@ -366,13 +365,13 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
         // 取消按钮
         const cancelButton = new Gtk.Button({
-            label: _('取消'),
+            label: _('Cancel'),
             css_classes: ['flat'],
         });
 
         // 保存按钮
         const saveButton = new Gtk.Button({
-            label: _('保存'),
+            label: _('Save'),
             css_classes: ['suggested-action'],
         });
 
@@ -423,12 +422,11 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                 
                 // 同步到本地文件
                 this._syncToLocalFile(settings);
-                
                 // 可选：显示保存成功的提示
-                console.log(`保存提供商配置: ${newName}`);
+                console.log('Saved provider configuration: ' + newName);
             } else {
                 // 显示错误提示
-                console.log('名称、URL和API密钥都必须填写');
+                console.log('Name, URL and API key are all required');
             }
         });
 
@@ -437,7 +435,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             icon_name: 'user-trash-symbolic',
             valign: Gtk.Align.CENTER,
             css_classes: ['flat', 'destructive-action'],
-            tooltip_text: _('删除此提供商'),
+            tooltip_text: _('Delete this provider'),
         });
         
         deleteButton.connect('clicked', () => {
@@ -478,7 +476,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             };
             loadNextProvider();
         } catch (e) {
-            console.log('没有找到已保存的提供商或解析失败:', e);
+            console.log('No saved providers found or parsing failed:', e);
         }
     }
 
@@ -513,7 +511,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                 settings.set_string('api-providers', JSON.stringify(providers));
             }
         } catch (e) {
-            console.log('更新提供商失败:', e);
+            console.log('Failed to update provider:', e);
         }
     }
 
@@ -525,19 +523,19 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             const filteredProviders = providers.filter(p => p.name !== name);
             settings.set_string('api-providers', JSON.stringify(filteredProviders));
         } catch (e) {
-            console.log('删除提供商失败:', e);
+            console.log('Failed to remove provider:', e);
         }
     }
 
     _showDeleteConfirmDialog(providerName, providerRow, settings) {
         const dialog = new Adw.MessageDialog({
             transient_for: this.apiGroup.get_root(),
-            heading: _('确认删除'),
-            body: _(`确定要删除提供商"${providerName}"吗？\n\n此操作无法撤销。`),
+            heading: _('Confirm Delete'),
+            body: _('Are you sure you want to delete provider "') + providerName + _('"\n\nThis action cannot be undone.'),
         });
 
-        dialog.add_response('cancel', _('取消'));
-        dialog.add_response('delete', _('删除'));
+        dialog.add_response('cancel', _('Cancel'));
+        dialog.add_response('delete', _('Delete'));
         dialog.set_response_appearance('delete', Adw.ResponseAppearance.DESTRUCTIVE);
         dialog.set_default_response('cancel');
         dialog.set_close_response('cancel');
@@ -573,9 +571,9 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         if (!dir.query_exists(null)) {
             try {
                 dir.make_directory(null);
-                console.log('创建Claude配置目录:', claudeDir);
+                console.log('Created Claude config directory:', claudeDir);
             } catch (e) {
-                console.error('创建Claude配置目录失败:', e);
+                console.error('Failed to create Claude config directory:', e);
                 return false;
             }
         }
@@ -601,7 +599,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                 return JSON.parse(jsonString);
             }
         } catch (e) {
-            console.error('读取Claude配置文件失败:', e);
+            console.error('Failed to read Claude config file:', e);
         }
         
         return null;
@@ -622,7 +620,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             
             return providers.find(p => p.name === currentProviderName);
         } catch (e) {
-            console.error('获取当前提供商信息失败:', e);
+            console.error('Failed to get current provider info:', e);
             return null;
         }
     }
@@ -654,7 +652,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                 ANTHROPIC_BASE_URL: currentProvider ? currentProvider.url : '',
                 ANTHROPIC_MODEL: currentProvider ? (currentProvider.largeModel || '') : '',
                 ANTHROPIC_SMALL_FAST_MODEL: currentProvider ? (currentProvider.smallModel || '') : '',
-                DISABLE_AUTOUPDATER: autoUpdate ? '0' : '1', // 注意：0表示不禁用，1表示禁用
+                DISABLE_AUTOUPDATER: autoUpdate ? '0' : '1',
                 HTTPS_PROXY: proxyUrl,
                 HTTP_PROXY: proxyUrl
             },
@@ -690,15 +688,15 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             
             file.replace_contents(
                 bytes,
-                null, // etag
-                false, // make_backup
+                null,
+                false,
                 Gio.FileCreateFlags.REPLACE_DESTINATION,
-                null // cancellable
+                null
             );
             
-            console.log('已同步配置到Claude配置文件:', configPath);
+            console.log('Synced config to Claude config file:', configPath);
         } catch (e) {
-            console.error('写入Claude配置文件失败:', e);
+            console.error('Failed to write Claude config file:', e);
         }
     }
 

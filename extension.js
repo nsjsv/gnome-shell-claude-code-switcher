@@ -77,7 +77,7 @@ class Indicator extends PanelMenu.Button {
 
             if (providers.length === 0) {
                 // 如果没有配置提供商，显示提示
-                let noProvidersItem = new PopupMenu.PopupMenuItem(_('暂无配置的提供商'));
+                let noProvidersItem = new PopupMenu.PopupMenuItem(_('No configured providers'));
                 noProvidersItem.setSensitive(false);
                 this.menu.addMenuItem(noProvidersItem);
                 return;
@@ -99,8 +99,8 @@ class Indicator extends PanelMenu.Button {
                 this.menu.addMenuItem(item);
             });
         } catch (e) {
-            console.log('加载API提供商失败:', e);
-            let errorItem = new PopupMenu.PopupMenuItem(_('加载提供商失败'));
+            console.log('Failed to load API providers:', e);
+            let errorItem = new PopupMenu.PopupMenuItem(_('Failed to load providers'));
             errorItem.setSensitive(false);
             this.menu.addMenuItem(errorItem);
         }
@@ -112,7 +112,7 @@ class Indicator extends PanelMenu.Button {
             this._settings.set_string('current-provider', providerName);
             // 同步配置到本地文件
             this._extension.syncToLocalFile();
-            Main.notify(_(`已切换到: ${providerName}`));
+            Main.notify(_('Switched to: ') + providerName);
         } else {
             // 显示配置API密钥的提示
             this._showConfigureKeyNotification(providerName);
@@ -127,16 +127,16 @@ class Indicator extends PanelMenu.Button {
             const provider = providers.find(p => p.name === providerName);
             return provider && provider.key && provider.key.trim() !== '';
         } catch (e) {
-            console.log('检查API密钥失败:', e);
+            console.log('Failed to check API key:', e);
             return false;
         }
     }
 
     _showConfigureKeyNotification(providerName) {
         if (providerName.includes('Anthropic') || providerName.includes('默认')) {
-            Main.notify(_('请先配置 Anthropic API 密钥'), _('点击"Add more.."按钮打开设置界面，为 Anthropic 提供商配置官方 API 密钥后即可使用。'));
+            Main.notify(_('Please configure Anthropic API key first'), _('Click "Add more.." button to open settings and configure the official API key for Anthropic provider.'));
         } else {
-            Main.notify(_(`请先配置 ${providerName} API 密钥`), _('点击"Add more.."按钮打开设置界面，为此提供商配置 API 密钥后即可使用。'));
+            Main.notify(_('Please configure API key for ') + providerName + _(' first'), _('Click "Add more.." button to open settings and configure the API key for this provider.'));
         }
     }
 
@@ -225,9 +225,9 @@ export default class IndicatorExampleExtension extends Extension {
         if (!dir.query_exists(null)) {
             try {
                 dir.make_directory(null);
-                console.log('创建Claude配置目录:', claudeDir);
+                console.log('Created Claude config directory:', claudeDir);
             } catch (e) {
-                console.error('创建Claude配置目录失败:', e);
+                console.error('Failed to create Claude config directory:', e);
                 return false;
             }
         }
@@ -265,7 +265,7 @@ export default class IndicatorExampleExtension extends Extension {
             const jsonString = decoder.decode(contents);
             return JSON.parse(jsonString);
         } catch (e) {
-            console.error('读取Claude配置文件失败:', e);
+            console.error('Failed to read Claude config file:', e);
         }
         
         return null;
@@ -286,7 +286,7 @@ export default class IndicatorExampleExtension extends Extension {
             
             return providers.find(p => p.name === currentProviderName);
         } catch (e) {
-            console.error('获取当前提供商信息失败:', e);
+            console.error('Failed to get current provider info:', e);
             return null;
         }
     }
@@ -360,9 +360,9 @@ export default class IndicatorExampleExtension extends Extension {
                 null // cancellable
             );
             
-            console.log('已同步配置到Claude配置文件:', configPath);
+            console.log('Synced config to Claude config file:', configPath);
         } catch (e) {
-            console.error('写入Claude配置文件失败:', e);
+            console.error('Failed to write Claude config file:', e);
         }
     }
 }
