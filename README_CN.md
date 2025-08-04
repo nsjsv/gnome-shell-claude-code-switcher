@@ -2,8 +2,8 @@
 
 一个用于快速切换 Claude Code API 提供商的 GNOME Shell 扩展。
 
-![Home](img/Home.png)
-![Add](img/Add.png)
+![Home](img/zh_CN/Home.png)
+![Add](img/zh_CN/Add.png)
 
 ## 功能特性
 
