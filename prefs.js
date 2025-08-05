@@ -4,8 +4,21 @@ import Gtk from 'gi://Gtk';
 import GLib from 'gi://GLib';
 
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import {TokenStatsManager, TokenStats} from './tokenStats.js';
 
 export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences {
+    constructor(metadata) {
+        super(metadata);
+        this.tokenStatsManager = new TokenStatsManager();
+        this.statsWidgets = {
+            totalCostLabel: null,
+            totalSessionsLabel: null,
+            totalTokensLabel: null,
+            lastUpdatedLabel: null,
+            refreshButton: null
+        };
+    }
+
     fillPreferencesWindow(window) {
         // 快速初始化基础UI
         this._setupBasicUI(window);
@@ -38,6 +51,9 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         // 移除加载提示
         this._page.remove(this._loadingGroup);
         
+        // Token 使用统计仪表盘
+        this._addTokenStatsGroup();
+
         // API提供商组
         this.apiGroup = new Adw.PreferencesGroup({
             title: _('API Providers'),
@@ -697,6 +713,190 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             console.log('Synced config to Claude config file:', configPath);
         } catch (e) {
             console.error('Failed to write Claude config file:', e);
+        }
+    }
+
+    /**
+     * 添加 Token 统计仪表盘组
+     */
+    _addTokenStatsGroup() {
+        const statsGroup = new Adw.PreferencesGroup({
+            title: _('INFO'),
+            description: _('View your Claude Code API usage and costs'),
+        });
+        this._page.add(statsGroup);
+
+        // 创建统计卡片的网格布局
+        const statsGrid = new Gtk.Grid({
+            row_spacing: 12,
+            column_spacing: 12,
+            column_homogeneous: true,
+            margin_top: 12,
+            margin_bottom: 12,
+            margin_start: 12,
+            margin_end: 12,
+        });
+
+        // 总成本卡片
+        const costBox = this._createStatsCard(
+            _('Total Cost'),
+            '$0.0000',
+            'img/icons/cash.svg'
+        );
+        this.statsWidgets.totalCostLabel = costBox.get_last_child().get_first_child().get_next_sibling();
+        statsGrid.attach(costBox, 0, 0, 1, 1);
+
+        // 总会话数卡片
+        const sessionsBox = this._createStatsCard(
+            _('Total Sessions'),
+            '0',
+            'img/icons/archive-fill.svg'
+        );
+        this.statsWidgets.totalSessionsLabel = sessionsBox.get_last_child().get_first_child().get_next_sibling();
+        statsGrid.attach(sessionsBox, 1, 0, 1, 1);
+
+        // 总令牌数卡片
+        const tokensBox = this._createStatsCard(
+            _('Total Tokens'),
+            '0',
+            'img/icons/claude.svg'
+        );
+        this.statsWidgets.totalTokensLabel = tokensBox.get_last_child().get_first_child().get_next_sibling();
+        statsGrid.attach(tokensBox, 2, 0, 1, 1);
+
+        // 创建一个包装器来居中显示网格
+        const statsWrapper = new Gtk.Box({
+            orientation: Gtk.Orientation.VERTICAL,
+            spacing: 12,
+        });
+        statsWrapper.append(statsGrid);
+
+        // 添加刷新按钮和最后更新时间
+        const controlsBox = new Gtk.Box({
+            orientation: Gtk.Orientation.HORIZONTAL,
+            spacing: 12,
+            halign: Gtk.Align.CENTER,
+        });
+
+        this.statsWidgets.refreshButton = new Gtk.Button({
+            label: _('Refresh Stats'),
+        });
+
+        this.statsWidgets.lastUpdatedLabel = new Gtk.Label({
+            label: _('Not loaded yet'),
+        });
+
+        controlsBox.append(this.statsWidgets.refreshButton);
+        controlsBox.append(this.statsWidgets.lastUpdatedLabel);
+        
+        statsWrapper.append(controlsBox);
+
+        // 创建包含统计内容的行
+        const statsRow = new Adw.ActionRow();
+        statsRow.set_child(statsWrapper);
+        statsGroup.add(statsRow);
+
+        // 连接刷新按钮事件
+        this.statsWidgets.refreshButton.connect('clicked', () => {
+            this._refreshTokenStats();
+        });
+
+        // 初始加载统计数据
+        this._refreshTokenStats();
+    }
+
+    /**
+     * 创建统计卡片
+     */
+    _createStatsCard(title, value, iconPath) {
+        const cardBox = new Gtk.Box({
+            orientation: Gtk.Orientation.HORIZONTAL,
+            spacing: 12,
+            margin_top: 8,
+            margin_bottom: 8,
+            margin_start: 8,
+            margin_end: 8,
+        });
+
+        // 图标
+        let icon;
+        if (iconPath.startsWith('img/')) {
+            // 自定义SVG文件路径
+            const fullPath = GLib.build_filenamev([this.path, iconPath]);
+            icon = new Gtk.Image({
+                gicon: Gio.icon_new_for_string(fullPath),
+                pixel_size: 32,
+            });
+        } else {
+            // 系统图标名称
+            icon = new Gtk.Image({
+                icon_name: iconPath,
+                pixel_size: 32,
+            });
+        }
+
+        // 文本容器
+        const textBox = new Gtk.Box({
+            orientation: Gtk.Orientation.VERTICAL,
+            valign: Gtk.Align.CENTER,
+            hexpand: true,
+        });
+
+        const titleLabel = new Gtk.Label({
+            label: title,
+            halign: Gtk.Align.START,
+        });
+
+        const valueLabel = new Gtk.Label({
+            label: value,
+            halign: Gtk.Align.START,
+        });
+
+        textBox.append(titleLabel);
+        textBox.append(valueLabel);
+
+        cardBox.append(icon);
+        cardBox.append(textBox);
+
+        return cardBox;
+    }
+
+    /**
+     * 刷新 Token 统计数据
+     */
+    async _refreshTokenStats() {
+        // 设置刷新按钮为加载状态
+        this.statsWidgets.refreshButton.set_sensitive(false);
+        this.statsWidgets.refreshButton.set_label(_('Loading...'));
+        this.statsWidgets.lastUpdatedLabel.set_label(_('Fetching data...'));
+
+        try {
+            // 异步获取统计数据
+            const stats = await this.tokenStatsManager.getTokenStatsAsync();
+            
+            // 更新界面
+            this.statsWidgets.totalCostLabel.set_label(TokenStats.formatCurrency(stats.totalCost));
+            this.statsWidgets.totalSessionsLabel.set_label(stats.totalSessions.toString());
+            this.statsWidgets.totalTokensLabel.set_label(TokenStats.formatNumber(stats.totalTokens));
+            
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            this.statsWidgets.lastUpdatedLabel.set_label(_('Last updated: ') + timeStr);
+
+            console.log('Token stats refreshed successfully');
+        } catch (error) {
+            console.error('Failed to refresh token stats:', error);
+            this.statsWidgets.totalCostLabel.set_label(_('Failed to load'));
+            this.statsWidgets.totalSessionsLabel.set_label(_('Error'));
+            this.statsWidgets.totalTokensLabel.set_label(_('Error'));
+            this.statsWidgets.lastUpdatedLabel.set_label(_('Failed to load'));
+        } finally {
+            // 恢复刷新按钮状态
+            this.statsWidgets.refreshButton.set_sensitive(true);
+            this.statsWidgets.refreshButton.set_label(_('Refresh Stats'));
         }
     }
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Claude Code Switcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-04 23:02+0800\n"
+"POT-Creation-Date: 2025-08-05 10:53+0800\n"
 "PO-Revision-Date: 2025-08-04 23:02+0800\n"
 "Last-Translator: Claude AI <claude@anthropic.com>\n"
 "Language-Team: Chinese\n"
@@ -16,16 +16,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: extension.js:33 prefs.js:91 prefs_old.js:108
+#: extension.js:33 prefs.js:123
 msgid "Claude Code Switcher"
 msgstr "Claude Code Switcher"
 
-#. 添加"Add more.."按钮
 #: extension.js:65
 msgid "Add more.."
 msgstr "添加更多.."
 
-#. 如果没有配置提供商，显示提示
 #: extension.js:80
 msgid "No configured providers"
 msgstr "暂无配置的提供商"
@@ -46,165 +44,254 @@ msgstr "请先配置 Anthropic API 密钥"
 msgid ""
 "Click \"Add more..\" button to open settings and configure the official API "
 "key for Anthropic provider."
-msgstr "点击\"添加更多..\"按钮打开设置界面，为 Anthropic 提供商配置官方 API 密钥后即可使用。"
+msgstr ""
+"点击\"添加更多..\"按钮打开设置界面，为 Anthropic 提供商配置官方 API 密钥后即"
+"可使用。"
+
+#: extension.js:139
+#, fuzzy
+msgid "Please configure API key for "
+msgstr "请先配置 Anthropic API 密钥"
+
+#: extension.js:139
+msgid " first"
+msgstr ""
 
 #: extension.js:139
 msgid ""
 "Click \"Add more..\" button to open settings and configure the API key for "
 "this provider."
-msgstr "点击\"添加更多..\"按钮打开设置界面，为此提供商配置 API 密钥后即可使用。"
+msgstr ""
+"点击\"添加更多..\"按钮打开设置界面，为此提供商配置 API 密钥后即可使用。"
 
-#: prefs.js:19 prefs_old.js:24
+#: prefs.js:37
 msgid "General"
 msgstr "常规"
 
-#: prefs.js:25 prefs_old.js:31
+#: prefs.js:44 prefs.js:859
 msgid "Loading..."
 msgstr "正在加载..."
 
-#: prefs.js:26
+#: prefs.js:45
 msgid "Please wait, initializing settings interface"
 msgstr "请稍候，正在初始化设置界面"
 
-#: prefs.js:35
+#: prefs.js:59
 msgid "API Providers"
 msgstr "API 提供商"
 
-#: prefs.js:36
+#: prefs.js:60
 msgid "Add and manage custom API providers"
 msgstr "添加和管理自定义 API 提供商"
 
-#: prefs.js:41
+#: prefs.js:65
 msgid "Add New Provider"
 msgstr "添加新提供商"
 
-#: prefs.js:42
+#: prefs.js:66
 msgid "Add custom API endpoint and key"
 msgstr "添加自定义 API 端点和密钥"
 
-#: prefs.js:64
+#: prefs.js:91
 msgid "Global Settings"
 msgstr "全局设置"
 
-#: prefs.js:65
+#: prefs.js:92
 msgid "Configure global extension options"
 msgstr "配置扩展的全局选项"
 
-#: prefs.js:70
+#: prefs.js:98
 msgid "Auto Update"
 msgstr "自动更新"
 
-#: prefs.js:71
+#: prefs.js:99
 msgid "Enable automatic updates for the extension"
 msgstr "启用扩展的自动更新功能"
 
-#: prefs.js:86
+#: prefs.js:118
 msgid "About"
 msgstr "关于"
 
-#: prefs.js:92
+#: prefs.js:124
 msgid "Quickly switch Claude Code API providers"
 msgstr "快速切换 Claude Code API 提供商"
 
-#: prefs.js:99
+#: prefs.js:132
 msgid "Proxy Settings"
 msgstr "代理设置"
 
-#: prefs.js:100 prefs.js:185
+#: prefs.js:133 prefs.js:226
 msgid "Configure network proxy server"
 msgstr "配置网络代理服务器"
 
-#: prefs.js:115 prefs.js:117 prefs.js:181 prefs.js:183
+#: prefs.js:150 prefs.js:152 prefs.js:222 prefs.js:224
 msgid "Configured: "
 msgstr "已配置: "
 
-#: prefs.js:123
+#: prefs.js:159
 msgid "Proxy Server"
 msgstr "代理服务器"
 
-#: prefs.js:129
+#: prefs.js:166
 msgid "Port"
 msgstr "端口"
 
-#: prefs.js:135 prefs.js:313
+#: prefs.js:173 prefs.js:372
 msgid "Actions"
 msgstr "操作"
 
-#: prefs.js:145 prefs.js:244 prefs.js:323 prefs.js:476
+#: prefs.js:183 prefs.js:292 prefs.js:384 prefs.js:553
 msgid "Cancel"
 msgstr "取消"
 
-#: prefs.js:150 prefs.js:328
+#: prefs.js:188 prefs.js:390
 msgid "Save"
 msgstr "保存"
 
-#: prefs.js:205
+#: prefs.js:247
 msgid "Add New API Provider"
 msgstr "添加新的 API 提供商"
 
-#: prefs.js:206
+#: prefs.js:248
 msgid "Please enter the details for the custom API provider"
 msgstr "请输入自定义 API 提供商的详细信息"
 
-#: prefs.js:219
+#: prefs.js:263
 msgid "Provider name (e.g.: OpenAI)"
 msgstr "提供商名称（例如：OpenAI）"
 
-#: prefs.js:224
+#: prefs.js:269
 msgid "API URL (e.g.: https://api.openai.com)"
 msgstr "API URL（例如：https://api.openai.com）"
 
-#: prefs.js:229 prefs.js:292
+#: prefs.js:275 prefs.js:348
 msgid "API Key"
 msgstr "API 密钥"
 
-#: prefs.js:234
+#: prefs.js:281
 msgid "Large Model (optional, e.g.: claude-3-5-sonnet-20241022)"
 msgstr "大模型（可选，例如：claude-3-5-sonnet-20241022）"
 
-#: prefs.js:239
+#: prefs.js:287
 msgid "Small Model (optional, e.g.: claude-3-haiku-20240307)"
 msgstr "小模型（可选，例如：claude-3-haiku-20240307）"
 
-#: prefs.js:245
+#: prefs.js:293
 msgid "Add"
 msgstr "添加"
 
-#: prefs.js:278
+#: prefs.js:332
 msgid "Provider Name"
 msgstr "提供商名称"
 
-#: prefs.js:285 prefs_old.js:325
+#: prefs.js:340
 msgid "API URL"
 msgstr "API URL"
 
-#: prefs.js:299
+#: prefs.js:356
 msgid "Large Model"
 msgstr "大模型"
 
-#: prefs.js:306
+#: prefs.js:364
 msgid "Small Model"
 msgstr "小模型"
 
-#: prefs.js:381
+#: prefs.js:454
 msgid "Delete this provider"
 msgstr "删除此提供商"
 
-#: prefs.js:472
+#: prefs.js:549
 msgid "Confirm Delete"
 msgstr "确认删除"
 
-#: prefs.js:473
+#: prefs.js:550
 msgid "Are you sure you want to delete provider \""
 msgstr "确定要删除提供商\""
 
-#: prefs.js:473
+#: prefs.js:550
 msgid ""
 "\"\n"
 "\n"
 "This action cannot be undone."
 msgstr "\"吗？\\n\\n此操作无法撤销。"
 
-#: prefs.js:477
+#: prefs.js:554
 msgid "Delete"
 msgstr "删除"
+
+#: prefs.js:724
+msgid "INFO"
+msgstr "INFO"
+
+#: prefs.js:725
+msgid "View your Claude Code API usage and costs"
+msgstr "查看您的 Claude Code API 使用情况和成本"
+
+#: prefs.js:742
+msgid "Total Cost"
+msgstr "总成本"
+
+#: prefs.js:751
+msgid "Total Sessions"
+msgstr "总会话"
+
+#: prefs.js:760
+msgid "Total Tokens"
+msgstr "总令牌"
+
+#: prefs.js:782 prefs.js:888
+msgid "Refresh Stats"
+msgstr "刷新统计"
+
+#: prefs.js:786
+msgid "Not loaded yet"
+msgstr "暂未加载"
+
+#: prefs.js:860
+msgid "Fetching data..."
+msgstr "正在获取数据..."
+
+#: prefs.js:876
+msgid "Last updated: "
+msgstr "最后更新: "
+
+#: prefs.js:881 prefs.js:884
+msgid "Failed to load"
+msgstr "加载失败"
+
+#: prefs.js:882 prefs.js:883
+msgid "Error"
+msgstr "错误"
+
+#~ msgid "查看您的 Claude Code API 使用情况和成本"
+#~ msgstr "查看您的 Claude Code API 使用情况和成本"
+
+#~ msgid "总成本"
+#~ msgstr "总成本"
+
+#~ msgid "总会话"
+#~ msgstr "总会话"
+
+#~ msgid "总令牌"
+#~ msgstr "总令牌"
+
+#~ msgid "刷新统计"
+#~ msgstr "刷新统计"
+
+#~ msgid "暂未加载"
+#~ msgstr "暂未加载"
+
+#~ msgid "正在加载..."
+#~ msgstr "正在加载..."
+
+#~ msgid "正在获取数据..."
+#~ msgstr "正在获取数据..."
+
+#~ msgid "最后更新: "
+#~ msgstr "最后更新: "
+
+#~ msgid "加载失败"
+#~ msgstr "加载失败"
+
+#~ msgid "错误"
+#~ msgstr "错误"
