@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-05 10:53+0800\n"
+"POT-Creation-Date: 2025-08-06 11:17+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: extension.js:33 prefs.js:123
+#: extension.js:33 prefs.js:124
 msgid "Claude Code Switcher"
 msgstr ""
 
@@ -61,201 +61,305 @@ msgid ""
 "this provider."
 msgstr ""
 
-#: prefs.js:37
+#: prefs.js:38
 msgid "General"
 msgstr ""
 
-#: prefs.js:44 prefs.js:859
+#: prefs.js:45 prefs.js:1731
 msgid "Loading..."
 msgstr ""
 
-#: prefs.js:45
+#: prefs.js:46
 msgid "Please wait, initializing settings interface"
 msgstr ""
 
-#: prefs.js:59
+#: prefs.js:60
 msgid "API Providers"
 msgstr ""
 
-#: prefs.js:60
+#: prefs.js:61
 msgid "Add and manage custom API providers"
 msgstr ""
 
-#: prefs.js:65
+#: prefs.js:66
 msgid "Add New Provider"
 msgstr ""
 
-#: prefs.js:66
+#: prefs.js:67
 msgid "Add custom API endpoint and key"
 msgstr ""
 
-#: prefs.js:91
+#: prefs.js:92
 msgid "Global Settings"
 msgstr ""
 
-#: prefs.js:92
+#: prefs.js:93
 msgid "Configure global extension options"
 msgstr ""
 
-#: prefs.js:98
+#: prefs.js:99
 msgid "Auto Update"
 msgstr ""
 
-#: prefs.js:99
+#: prefs.js:100
 msgid "Enable automatic updates for the extension"
 msgstr ""
 
-#: prefs.js:118
+#: prefs.js:119
 msgid "About"
 msgstr ""
 
-#: prefs.js:124
+#: prefs.js:125
 msgid "Quickly switch Claude Code API providers"
 msgstr ""
 
-#: prefs.js:132
+#: prefs.js:133
 msgid "Proxy Settings"
 msgstr ""
 
-#: prefs.js:133 prefs.js:226
+#: prefs.js:134 prefs.js:227
 msgid "Configure network proxy server"
 msgstr ""
 
-#: prefs.js:150 prefs.js:152 prefs.js:222 prefs.js:224
+#: prefs.js:151 prefs.js:153 prefs.js:223 prefs.js:225
 msgid "Configured: "
 msgstr ""
 
-#: prefs.js:159
+#: prefs.js:160
 msgid "Proxy Server"
 msgstr ""
 
-#: prefs.js:166
+#: prefs.js:167
 msgid "Port"
 msgstr ""
 
-#: prefs.js:173 prefs.js:372
+#: prefs.js:174 prefs.js:373 prefs.js:1090
 msgid "Actions"
 msgstr ""
 
-#: prefs.js:183 prefs.js:292 prefs.js:384 prefs.js:553
+#: prefs.js:184 prefs.js:293 prefs.js:385 prefs.js:554
 msgid "Cancel"
 msgstr ""
 
-#: prefs.js:188 prefs.js:390
+#: prefs.js:189 prefs.js:391
 msgid "Save"
 msgstr ""
 
-#: prefs.js:247
+#: prefs.js:248
 msgid "Add New API Provider"
 msgstr ""
 
-#: prefs.js:248
+#: prefs.js:249
 msgid "Please enter the details for the custom API provider"
 msgstr ""
 
-#: prefs.js:263
+#: prefs.js:264
 msgid "Provider name (e.g.: OpenAI)"
 msgstr ""
 
-#: prefs.js:269
+#: prefs.js:270
 msgid "API URL (e.g.: https://api.openai.com)"
 msgstr ""
 
-#: prefs.js:275 prefs.js:348
+#: prefs.js:276 prefs.js:349
 msgid "API Key"
 msgstr ""
 
-#: prefs.js:281
+#: prefs.js:282
 msgid "Large Model (optional, e.g.: claude-3-5-sonnet-20241022)"
 msgstr ""
 
-#: prefs.js:287
+#: prefs.js:288
 msgid "Small Model (optional, e.g.: claude-3-haiku-20240307)"
 msgstr ""
 
-#: prefs.js:293
+#: prefs.js:294
 msgid "Add"
 msgstr ""
 
-#: prefs.js:332
+#: prefs.js:333
 msgid "Provider Name"
 msgstr ""
 
-#: prefs.js:340
+#: prefs.js:341
 msgid "API URL"
 msgstr ""
 
-#: prefs.js:356
+#: prefs.js:357
 msgid "Large Model"
 msgstr ""
 
-#: prefs.js:364
+#: prefs.js:365
 msgid "Small Model"
 msgstr ""
 
-#: prefs.js:454
+#: prefs.js:455
 msgid "Delete this provider"
 msgstr ""
 
-#: prefs.js:549
+#: prefs.js:550
 msgid "Confirm Delete"
 msgstr ""
 
-#: prefs.js:550
+#: prefs.js:551
 msgid "Are you sure you want to delete provider \""
 msgstr ""
 
-#: prefs.js:550
+#: prefs.js:551
 msgid ""
 "\"\n"
 "\n"
 "This action cannot be undone."
 msgstr ""
 
-#: prefs.js:554
+#: prefs.js:555
 msgid "Delete"
 msgstr ""
 
-#: prefs.js:724
+#: prefs.js:725
 msgid "INFO"
 msgstr ""
 
-#: prefs.js:725
+#: prefs.js:726
 msgid "View your Claude Code API usage and costs"
 msgstr ""
 
-#: prefs.js:742
+#: prefs.js:743
 msgid "Total Cost"
 msgstr ""
 
-#: prefs.js:751
+#: prefs.js:752
 msgid "Total Sessions"
 msgstr ""
 
-#: prefs.js:760
+#: prefs.js:763
 msgid "Total Tokens"
 msgstr ""
 
-#: prefs.js:782 prefs.js:888
+#: prefs.js:785 prefs.js:1760
 msgid "Refresh Stats"
 msgstr ""
 
-#: prefs.js:786
+#: prefs.js:789
 msgid "Not loaded yet"
 msgstr ""
 
-#: prefs.js:860
+#: prefs.js:944
+msgid "Sessions Detail (Beta)"
+msgstr ""
+
+#: prefs.js:988
+msgid "Loading session data..."
+msgstr ""
+
+#: prefs.js:1011
+msgid "No session data found"
+msgstr ""
+
+#: prefs.js:1039
+msgid "Failed to load session data"
+msgstr ""
+
+#: prefs.js:1062
+msgid "Session ID"
+msgstr ""
+
+#: prefs.js:1069
+msgid "Time Range"
+msgstr ""
+
+#: prefs.js:1076
+msgid "Models Used"
+msgstr ""
+
+#: prefs.js:1083
+msgid "Token Details"
+msgstr ""
+
+#: prefs.js:1094
+msgid "View Session"
+msgstr ""
+
+#: prefs.js:1119 prefs.js:1128
+msgid "Session Content"
+msgstr ""
+
+#: prefs.js:1174
+msgid "Loading session messages..."
+msgstr ""
+
+#: prefs.js:1206
+msgid "Failed to load session messages"
+msgstr ""
+
+#: prefs.js:1219
+msgid "Analyzing messages..."
+msgstr ""
+
+#: prefs.js:1227
+msgid "No messages found in this session"
+msgstr ""
+
+#: prefs.js:1238 prefs.js:1250
+msgid "Loading messages..."
+msgstr ""
+
+#: prefs.js:1264
+msgid "Loading complete"
+msgstr ""
+
+#: prefs.js:1404
+msgid "User"
+msgstr ""
+
+#: prefs.js:1405
+msgid "Assistant"
+msgstr ""
+
+#: prefs.js:1406
+msgid "System"
+msgstr ""
+
+#: prefs.js:1407
+msgid "Tool Result"
+msgstr ""
+
+#: prefs.js:1408
+msgid "Unknown"
+msgstr ""
+
+#: prefs.js:1493
+msgid "Message Content"
+msgstr ""
+
+#: prefs.js:1581
+msgid "Tool Name"
+msgstr ""
+
+#: prefs.js:1589 prefs.js:1643
+msgid "Tool Use ID"
+msgstr ""
+
+#: prefs.js:1601
+msgid "Parameters"
+msgstr ""
+
+#: prefs.js:1666
+msgid "Result Content"
+msgstr ""
+
+#: prefs.js:1732
 msgid "Fetching data..."
 msgstr ""
 
-#: prefs.js:876
+#: prefs.js:1748
 msgid "Last updated: "
 msgstr ""
 
-#: prefs.js:881 prefs.js:884
+#: prefs.js:1753 prefs.js:1756
 msgid "Failed to load"
 msgstr ""
 
-#: prefs.js:882 prefs.js:883
+#: prefs.js:1754 prefs.js:1755
 msgid "Error"
 msgstr ""
