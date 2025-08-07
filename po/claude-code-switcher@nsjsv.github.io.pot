@@ -8,13 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-06 11:17+0800\n"
+"POT-Creation-Date: 2025-08-06 22:19+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: extension.js:33 prefs.js:124
@@ -65,7 +65,7 @@ msgstr ""
 msgid "General"
 msgstr ""
 
-#: prefs.js:45 prefs.js:1731
+#: prefs.js:45 prefs.js:1871
 msgid "Loading..."
 msgstr ""
 
@@ -236,7 +236,7 @@ msgstr ""
 msgid "Total Tokens"
 msgstr ""
 
-#: prefs.js:785 prefs.js:1760
+#: prefs.js:785 prefs.js:1900
 msgid "Refresh Stats"
 msgstr ""
 
@@ -308,58 +308,74 @@ msgstr ""
 msgid "Loading complete"
 msgstr ""
 
-#: prefs.js:1404
+#: prefs.js:1407
+msgid "Previous version"
+msgstr ""
+
+#: prefs.js:1415
+msgid "Message version"
+msgstr ""
+
+#: prefs.js:1422
+msgid "Next version"
+msgstr ""
+
+#: prefs.js:1536
 msgid "User"
 msgstr ""
 
-#: prefs.js:1405
+#: prefs.js:1537
 msgid "Assistant"
 msgstr ""
 
-#: prefs.js:1406
+#: prefs.js:1538
 msgid "System"
 msgstr ""
 
-#: prefs.js:1407
+#: prefs.js:1539
 msgid "Tool Result"
 msgstr ""
 
-#: prefs.js:1408
+#: prefs.js:1540
 msgid "Unknown"
 msgstr ""
 
-#: prefs.js:1493
+#: prefs.js:1625
 msgid "Message Content"
 msgstr ""
 
-#: prefs.js:1581
+#: prefs.js:1713
 msgid "Tool Name"
 msgstr ""
 
-#: prefs.js:1589 prefs.js:1643
+#: prefs.js:1721 prefs.js:1775
 msgid "Tool Use ID"
 msgstr ""
 
-#: prefs.js:1601
+#: prefs.js:1733
 msgid "Parameters"
 msgstr ""
 
-#: prefs.js:1666
-msgid "Result Content"
+#: prefs.js:1766
+msgid "Tool Result⋅"
 msgstr ""
 
-#: prefs.js:1732
+#: prefs.js:1832 prefs.js:1840
+msgid "Unknown Tool"
+msgstr ""
+
+#: prefs.js:1872
 msgid "Fetching data..."
 msgstr ""
 
-#: prefs.js:1748
+#: prefs.js:1888
 msgid "Last updated: "
 msgstr ""
 
-#: prefs.js:1753 prefs.js:1756
+#: prefs.js:1893 prefs.js:1896
 msgid "Failed to load"
 msgstr ""
 
-#: prefs.js:1754 prefs.js:1755
+#: prefs.js:1894 prefs.js:1895
 msgid "Error"
 msgstr ""

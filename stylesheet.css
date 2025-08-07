@@ -1,0 +1,77 @@
+/* Claude Code Switcher Stylesheet */
+
+/* 版本控制样式 */
+.version-controls {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 4px 8px;
+    margin: 0 8px;
+}
+
+.version-indicator {
+    font-weight: bold;
+    color: #555;
+    min-width: 30px;
+    text-align: center;
+}
+
+/* 消息卡片样式 */
+.user-message {
+    background: rgba(100, 150, 255, 0.1);
+    border-left: 3px solid #6496ff;
+}
+
+.assistant-message {
+    background: rgba(100, 200, 100, 0.1);
+    border-left: 3px solid #64c864;
+}
+
+.tool-result-message {
+    background: rgba(255, 165, 0, 0.1);
+    border-left: 3px solid #ffa500;
+}
+
+.user-content {
+    background: rgba(100, 150, 255, 0.05);
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.assistant-content {
+    background: rgba(100, 200, 100, 0.05);
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/* 头部样式 */
+.heading {
+    font-weight: bold;
+}
+
+.caption {
+    font-size: 0.9em;
+}
+
+.dim-label {
+    opacity: 0.7;
+}
+
+.monospace {
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+/* 圆形按钮样式 */
+button.circular {
+    border-radius: 50%;
+    min-width: 24px;
+    min-height: 24px;
+}
+
+button.circular:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+button.circular:active {
+    background: rgba(0, 0, 0, 0.2);
+}

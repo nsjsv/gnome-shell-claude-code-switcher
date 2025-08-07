@@ -568,11 +568,107 @@ export class TokenStatsManager {
                 return timeA - timeB;
             });
 
+            // 分组相同时间戳和角色的消息为版本
+            const groupedMessages = this._groupMessageVersions(messages);
+            return groupedMessages;
+
         } catch (e) {
             console.error('Failed to get session messages:', e);
         }
 
         return messages;
+    }
+
+    /**
+     * 将相同时间戳和角色的消息分组为版本
+     */
+    _groupMessageVersions(messages) {
+        const grouped = [];
+        const messageGroups = new Map();
+        
+        // 按时间戳和角色分组
+        for (const message of messages) {
+            // 创建分组键：时间戳（精确到秒）+ 角色
+            const timestamp = new Date(message.timestamp);
+            const timestampKey = Math.floor(timestamp.getTime() / 1000); // 精确到秒
+            const groupKey = `${timestampKey}_${message.role}`;
+            
+            if (!messageGroups.has(groupKey)) {
+                messageGroups.set(groupKey, []);
+            }
+            messageGroups.get(groupKey).push(message);
+        }
+        
+        // 为每个分组创建版本化的消息对象
+        for (const [groupKey, versions] of messageGroups.entries()) {
+            if (versions.length === 1) {
+                // 只有一个版本的消息，直接添加
+                grouped.push(versions[0]);
+            } else {
+                // 有多个版本的消息，按内容长度去重（相同内容只保留一个）
+                const uniqueVersions = [];
+                const contentHashes = new Set();
+                
+                for (const version of versions) {
+                    const contentStr = JSON.stringify(version.content || []);
+                    const contentHash = this._simpleHash(contentStr);
+                    
+                    if (!contentHashes.has(contentHash)) {
+                        contentHashes.add(contentHash);
+                        uniqueVersions.push(version);
+                    }
+                }
+                
+                // 如果去重后只有一个版本，直接添加
+                if (uniqueVersions.length === 1) {
+                    grouped.push(uniqueVersions[0]);
+                } else {
+                    // 按时间排序版本
+                    uniqueVersions.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                    
+                    const versionedMessage = {
+                        ...uniqueVersions[0], // 使用第一个版本作为基础
+                        isVersioned: true,
+                        versions: uniqueVersions,
+                        currentVersion: 0,
+                        totalVersions: uniqueVersions.length,
+                        id: `versioned_${groupKey}` // 使用唯一的版本化ID
+                    };
+                    
+                    grouped.push(versionedMessage);
+                }
+            }
+        }
+        
+        // 重新按时间排序
+        grouped.sort((a, b) => {
+            const timeA = new Date(a.timestamp).getTime();
+            const timeB = new Date(b.timestamp).getTime();
+            
+            if (timeA === timeB) {
+                if (a.role === 'user' && b.role === 'assistant') return -1;
+                if (a.role === 'assistant' && b.role === 'user') return 1;
+                return 0;
+            }
+            
+            return timeA - timeB;
+        });
+        
+        return grouped;
+    }
+
+    /**
+     * 简单的字符串哈希函数
+     */
+    _simpleHash(str) {
+        let hash = 0;
+        if (str.length === 0) return hash;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // 转换为32位整数
+        }
+        return hash;
     }
 
     /**

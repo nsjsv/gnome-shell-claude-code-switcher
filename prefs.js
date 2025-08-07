@@ -1320,16 +1320,17 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             hexpand: true,
         });
 
-        // 消息头部（角色、时间、模型）
+        // 消息头部（角色、时间、版本控制）
         const headerBox = new Gtk.Box({
             orientation: Gtk.Orientation.HORIZONTAL,
             spacing: 12,
         });
 
         // 角色标签 - 为用户和助手使用不同的图标和样式
-        const roleIcon = this._getRoleIcon(message.role);
+        const currentMessage = message.isVersioned ? message.versions[message.currentVersion] : message;
+        const roleIcon = this._getRoleIcon(currentMessage.role);
         const roleLabel = new Gtk.Label({
-            label: `${roleIcon} ${this._formatRole(message.role)}`,
+            label: `${roleIcon} ${this._formatRole(currentMessage.role)}`,
             css_classes: ['heading'],
             halign: Gtk.Align.START,
             use_markup: true,
@@ -1337,20 +1338,27 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
         // 时间标签
         const timeLabel = new Gtk.Label({
-            label: new Date(message.timestamp).toLocaleString(),
+            label: new Date(currentMessage.timestamp).toLocaleString(),
             css_classes: ['dim-label'],
             halign: Gtk.Align.END,
             hexpand: true,
         });
 
         headerBox.append(roleLabel);
+
+        // 如果有多个版本，添加版本切换控制
+        if (message.isVersioned && message.totalVersions > 1) {
+            const versionBox = this._createVersionControls(message, messageCard, cardBox);
+            headerBox.append(versionBox);
+        }
+        
         headerBox.append(timeLabel);
         cardBox.append(headerBox);
 
         // 模型信息（只对助手消息显示）
-        if (message.model && message.role === 'assistant') {
+        if (currentMessage.model && currentMessage.role === 'assistant') {
             const modelLabel = new Gtk.Label({
-                label: `📋 Model: ${message.model}`,
+                label: `📋 Model: ${currentMessage.model}`,
                 css_classes: ['caption'],
                 halign: Gtk.Align.START,
                 use_markup: true,
@@ -1359,14 +1367,14 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         }
 
         // 消息内容
-        const contentInfo = this._extractMessageContentWithDetails(message.content);
+        const contentInfo = this._extractMessageContentWithDetails(currentMessage.content);
         if (contentInfo.text || contentInfo.hasComplexContent) {
-            this._addMessageContent(cardBox, message, contentInfo);
+            this._addMessageContent(cardBox, currentMessage, contentInfo);
         }
 
         // Token使用信息（只对助手消息显示）
-        if (message.usage && Object.keys(message.usage).length > 0 && message.role === 'assistant') {
-            const usageText = this._formatUsageInfo(message.usage);
+        if (currentMessage.usage && Object.keys(currentMessage.usage).length > 0 && currentMessage.role === 'assistant') {
+            const usageText = this._formatUsageInfo(currentMessage.usage);
             if (usageText) {
                 const usageLabel = new Gtk.Label({
                     label: `🔢 ${usageText}`,
@@ -1380,6 +1388,130 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
 
         messageCard.set_child(cardBox);
         return messageCard;
+    }
+
+    /**
+     * 创建版本控制按钮
+     */
+    _createVersionControls(message, messageCard, cardBox) {
+        const versionBox = new Gtk.Box({
+            orientation: Gtk.Orientation.HORIZONTAL,
+            spacing: 4,
+            css_classes: ['version-controls'],
+        });
+
+        // 上一个版本按钮
+        const prevButton = new Gtk.Button({
+            icon_name: 'go-previous-symbolic',
+            css_classes: ['flat', 'circular'],
+            tooltip_text: _('Previous version'),
+            sensitive: message.currentVersion > 0,
+        });
+
+        // 版本指示器
+        const versionLabel = new Gtk.Label({
+            label: `${message.currentVersion + 1}/${message.totalVersions}`,
+            css_classes: ['caption', 'version-indicator'],
+            tooltip_text: _('Message version'),
+        });
+
+        // 下一个版本按钮
+        const nextButton = new Gtk.Button({
+            icon_name: 'go-next-symbolic',
+            css_classes: ['flat', 'circular'],
+            tooltip_text: _('Next version'),
+            sensitive: message.currentVersion < message.totalVersions - 1,
+        });
+
+        // 上一个版本按钮点击事件
+        prevButton.connect('clicked', () => {
+            if (message.currentVersion > 0) {
+                message.currentVersion--;
+                this._updateMessageVersion(message, messageCard, cardBox, prevButton, nextButton, versionLabel);
+            }
+        });
+
+        // 下一个版本按钮点击事件
+        nextButton.connect('clicked', () => {
+            if (message.currentVersion < message.totalVersions - 1) {
+                message.currentVersion++;
+                this._updateMessageVersion(message, messageCard, cardBox, prevButton, nextButton, versionLabel);
+            }
+        });
+
+        versionBox.append(prevButton);
+        versionBox.append(versionLabel);
+        versionBox.append(nextButton);
+
+        return versionBox;
+    }
+
+    /**
+     * 更新消息版本显示
+     */
+    _updateMessageVersion(message, messageCard, cardBox, prevButton, nextButton, versionLabel) {
+        // 更新按钮状态
+        prevButton.set_sensitive(message.currentVersion > 0);
+        nextButton.set_sensitive(message.currentVersion < message.totalVersions - 1);
+        
+        // 更新版本指示器
+        versionLabel.set_label(`${message.currentVersion + 1}/${message.totalVersions}`);
+
+        // 重新创建消息内容
+        const currentMessage = message.versions[message.currentVersion];
+        
+        // 清除旧的内容（保留头部）
+        const children = [];
+        let child = cardBox.get_first_child();
+        while (child) {
+            children.push(child);
+            child = child.get_next_sibling();
+        }
+        
+        // 移除除头部以外的所有内容
+        for (let i = 1; i < children.length; i++) {
+            cardBox.remove(children[i]);
+        }
+
+        // 更新头部的角色标签和时间
+        const headerBox = children[0];
+        const roleLabel = headerBox.get_first_child();
+        const roleIcon = this._getRoleIcon(currentMessage.role);
+        roleLabel.set_label(`${roleIcon} ${this._formatRole(currentMessage.role)}`);
+        
+        const timeLabel = headerBox.get_last_child();
+        timeLabel.set_label(new Date(currentMessage.timestamp).toLocaleString());
+
+        // 添加模型信息（只对助手消息显示）
+        if (currentMessage.model && currentMessage.role === 'assistant') {
+            const modelLabel = new Gtk.Label({
+                label: `📋 Model: ${currentMessage.model}`,
+                css_classes: ['caption'],
+                halign: Gtk.Align.START,
+                use_markup: true,
+            });
+            cardBox.append(modelLabel);
+        }
+
+        // 重新添加消息内容
+        const contentInfo = this._extractMessageContentWithDetails(currentMessage.content);
+        if (contentInfo.text || contentInfo.hasComplexContent) {
+            this._addMessageContent(cardBox, currentMessage, contentInfo);
+        }
+
+        // Token使用信息（只对助手消息显示）
+        if (currentMessage.usage && Object.keys(currentMessage.usage).length > 0 && currentMessage.role === 'assistant') {
+            const usageText = this._formatUsageInfo(currentMessage.usage);
+            if (usageText) {
+                const usageLabel = new Gtk.Label({
+                    label: `🔢 ${usageText}`,
+                    css_classes: ['caption', 'dim-label'],
+                    halign: Gtk.Align.START,
+                    use_markup: true,
+                });
+                cardBox.append(usageLabel);
+            }
+        }
     }
 
     /**
@@ -1498,7 +1630,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             const detailGroup = new Adw.PreferencesGroup();
             
             for (const item of contentInfo.items) {
-                const itemRow = this._createContentItemRow(item);
+                const itemRow = this._createContentItemRow(item, contentInfo.items);
                 if (itemRow) {
                     detailGroup.add(itemRow);
                 }
@@ -1538,7 +1670,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
     /**
      * 创建内容项行
      */
-    _createContentItemRow(item) {
+    _createContentItemRow(item, allItems = []) {
         if (item.type === 'text' && item.text) {
             const textRow = new Adw.ExpanderRow({
                 title: '📝 Text Content',
@@ -1631,7 +1763,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             return toolRow;
         } else if (item.type === 'tool_result') {
             const resultRow = new Adw.ExpanderRow({
-                title: '🔧 Tool Result',
+                title: _('Tool Result⋅') + this._getToolNameFromResult(allItems, item),
                 subtitle: item.tool_use_id ? `ID: ${item.tool_use_id.substring(0, 12)}...` : 'Tool response',
             });
 
@@ -1662,11 +1794,6 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                 }
 
                 if (contentText) {
-                    const contentRow = new Adw.ExpanderRow({
-                        title: _('Result Content'),
-                        subtitle: `${contentText.substring(0, 100)}${contentText.length > 100 ? '...' : ''}`,
-                    });
-
                     const contentLabel = new Gtk.Label({
                         label: contentText.trim(),
                         wrap: true,
@@ -1684,12 +1811,9 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                     });
                     contentLabel.set_size_request(-1, -1);
 
-                    const contentGroup = new Adw.PreferencesGroup();
                     const contentActionRow = new Adw.ActionRow();
                     contentActionRow.set_child(contentLabel);
-                    contentGroup.add(contentActionRow);
-                    contentRow.add_row(contentGroup);
-                    resultGroup.add(contentRow);
+                    resultGroup.add(contentActionRow);
                 }
             }
 
@@ -1698,6 +1822,22 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         }
 
         return null;
+    }
+
+    /**
+     * 从tool_result中获取对应的工具名称
+     */
+    _getToolNameFromResult(items, resultItem) {
+        if (!resultItem.tool_use_id) {
+            return _('Unknown Tool');
+        }
+        
+        // 寻找对应的tool_use项目
+        const toolUseItem = items.find(item => 
+            item.type === 'tool_use' && item.tool_use_id === resultItem.tool_use_id
+        );
+        
+        return toolUseItem ? toolUseItem.name : _('Unknown Tool');
     }
 
     /**

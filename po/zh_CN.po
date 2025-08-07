@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Claude Code Switcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-06 11:17+0800\n"
+"POT-Creation-Date: 2025-08-06 22:19+0800\n"
 "PO-Revision-Date: 2025-08-04 23:02+0800\n"
 "Last-Translator: Claude AI <claude@anthropic.com>\n"
 "Language-Team: Chinese\n"
@@ -68,7 +68,7 @@ msgstr ""
 msgid "General"
 msgstr "常规"
 
-#: prefs.js:45 prefs.js:1731
+#: prefs.js:45 prefs.js:1871
 msgid "Loading..."
 msgstr "正在加载..."
 
@@ -239,7 +239,7 @@ msgstr "总会话"
 msgid "Total Tokens"
 msgstr "总令牌"
 
-#: prefs.js:785 prefs.js:1760
+#: prefs.js:785 prefs.js:1900
 msgid "Refresh Stats"
 msgstr "刷新统计"
 
@@ -313,61 +313,80 @@ msgstr "正在加载消息..."
 msgid "Loading complete"
 msgstr "加载完成"
 
-#: prefs.js:1404
+#: prefs.js:1407
+msgid "Previous version"
+msgstr "上一个版本"
+
+#: prefs.js:1415
+msgid "Message version"
+msgstr "消息版本"
+
+#: prefs.js:1422
+msgid "Next version"
+msgstr "下一个版本"
+
+#: prefs.js:1536
 msgid "User"
 msgstr "用户"
 
-#: prefs.js:1405
+#: prefs.js:1537
 msgid "Assistant"
 msgstr "助手"
 
-#: prefs.js:1406
+#: prefs.js:1538
 msgid "System"
 msgstr "系统"
 
-#: prefs.js:1407
+#: prefs.js:1539
 msgid "Tool Result"
 msgstr "工具结果"
 
-#: prefs.js:1408
+#: prefs.js:1540
 msgid "Unknown"
 msgstr "未知"
 
-#: prefs.js:1493
+#: prefs.js:1625
 msgid "Message Content"
 msgstr "消息内容"
 
-#: prefs.js:1581
+#: prefs.js:1713
 msgid "Tool Name"
 msgstr "工具名称"
 
-#: prefs.js:1589 prefs.js:1643
+#: prefs.js:1721 prefs.js:1775
 msgid "Tool Use ID"
 msgstr "工具使用ID"
 
-#: prefs.js:1601
+#: prefs.js:1733
 msgid "Parameters"
 msgstr "参数"
 
-#: prefs.js:1666
-msgid "Result Content"
-msgstr "结果内容"
+#: prefs.js:1766
+msgid "Tool Result⋅"
+msgstr "工具结果⋅"
 
-#: prefs.js:1732
+#: prefs.js:1832 prefs.js:1840
+msgid "Unknown Tool"
+msgstr "未知工具"
+
+#: prefs.js:1872
 msgid "Fetching data..."
 msgstr "正在获取数据..."
 
-#: prefs.js:1748
+#: prefs.js:1888
 msgid "Last updated: "
 msgstr "最后更新: "
 
-#: prefs.js:1753 prefs.js:1756
+#: prefs.js:1893 prefs.js:1896
 msgid "Failed to load"
 msgstr "加载失败"
 
-#: prefs.js:1754 prefs.js:1755
+#: prefs.js:1894 prefs.js:1895
 msgid "Error"
 msgstr "错误"
+
+#~ msgid "Result Content"
+#~ msgstr "结果内容"
 
 #~ msgid "View detailed information about your Claude Code sessions"
 #~ msgstr "查看您的 Claude Code 会话详细信息"
