@@ -460,9 +460,9 @@ export default class IndicatorExampleExtension extends Extension {
             }
         }
         
-        // 保留其他未知的配置字段
+        // 保留其他未知的配置字段，但排除Claude Code内部字段
         Object.keys(existingConfig).forEach(key => {
-            if (!['env', 'permissions', 'hooks'].includes(key)) {
+            if (!['env', 'permissions', 'hooks', 'feedbackSurveyState'].includes(key)) {
                 config[key] = existingConfig[key];
             }
         });

@@ -9,6 +9,9 @@ import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Ex
 import {StatsPanel} from './ui/statsPanel.js';
 import {ApiProviderManager} from './ui/apiProviderManager.js';
 import {SettingsManager} from './lib/settingsManager.js';
+import {GlobalSettingsGroup} from './ui/globalSettingsGroup.js';
+import {AboutGroup} from './ui/aboutGroup.js';
+import {NotificationsGroup} from './ui/notificationsGroup.js';
 
 /**
  * Claude Code Switcher 设置界面
@@ -22,6 +25,9 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         this.settingsManager = null;
         this.statsPanel = null;
         this.apiProviderManager = null;
+        this.globalSettingsGroup = null;
+        this.aboutGroup = null;
+        this.notificationsGroup = null;
     }
 
     fillPreferencesWindow(window) {
@@ -49,6 +55,9 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         this.settingsManager = new SettingsManager(this._settings);
         this.statsPanel = new StatsPanel(this.path);
         this.apiProviderManager = new ApiProviderManager(this._settings, this.settingsManager);
+        this.globalSettingsGroup = new GlobalSettingsGroup(this._settings, this.settingsManager);
+        this.aboutGroup = new AboutGroup(this.metadata);
+        this.notificationsGroup = new NotificationsGroup(this._settings);
     }
     
     /**
@@ -87,13 +96,16 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         this._page.add(apiGroup);
 
         // 3. 添加通知设置组
-        this._addNotificationsGroup();
+        const notificationsGroup = this.notificationsGroup.createNotificationsGroup();
+        this._page.add(notificationsGroup);
 
         // 4. 添加全局设置组
-        this._addGlobalSettingsGroup();
+        const globalGroup = this.globalSettingsGroup.createGlobalSettingsGroup();
+        this._page.add(globalGroup);
 
         // 5. 添加关于组
-        this._addAboutGroup();
+        const aboutGroup = this.aboutGroup.createAboutGroup();
+        this._page.add(aboutGroup);
 
         // 添加窗口关闭清理事件
         this._window.connect('close-request', () => {
@@ -102,208 +114,6 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         });
     }
 
-    /**
-     * 添加通知设置组
-     */
-    _addNotificationsGroup() {
-        const notificationsGroup = new Adw.PreferencesGroup({
-            title: _('Notifications'),
-            description: _('Configure Claude Code hooks notifications'),
-        });
-        this._page.add(notificationsGroup);
-
-        // 通知主开关（使用 ExpanderRow 实现展开/折叠）
-        const notificationsToggle = new Adw.ExpanderRow({
-            title: _('Enable Notifications'),
-            subtitle: _('Enable Claude Code hooks notifications'),
-            show_enable_switch: true,
-        });
-        notificationsGroup.add(notificationsToggle);
-
-        // 绑定主开关到设置
-        this._settings.bind('notifications-enabled', notificationsToggle, 'enable_expansion',
-            Gio.SettingsBindFlags.DEFAULT);
-
-        // 添加钩子事件开关
-        this._addHookEventSwitches(notificationsToggle);
-    }
-
-    /**
-     * 添加钩子事件开关
-     */
-    _addHookEventSwitches(notificationsToggle) {
-        const hookEvents = [
-            {
-                key: 'normal-exit',
-                title: _('Normal Exit Notifications'),
-                subtitle: _('Show notifications when Claude Code exits normally (exit code 0)'),
-            },
-            {
-                key: 'abnormal-exit',
-                title: _('Abnormal Exit Notifications'),
-                subtitle: _('Show notifications when Claude Code exits abnormally (non-zero exit codes)'),
-            },
-        ];
-
-        hookEvents.forEach(hook => {
-            const switchRow = new Adw.SwitchRow({
-                title: hook.title,
-                subtitle: hook.subtitle,
-            });
-            
-            this._settings.bind(`hook-${hook.key}`, switchRow, 'active',
-                Gio.SettingsBindFlags.DEFAULT);
-            
-            notificationsToggle.add_row(switchRow);
-        });
-    }
-
-    /**
-     * 添加全局设置组
-     */
-    _addGlobalSettingsGroup() {
-        const globalGroup = new Adw.PreferencesGroup({
-            title: _('Global Settings'),
-            description: _('Configure global extension options'),
-        });
-        this._page.add(globalGroup);
-
-        // 自动更新开关
-        const autoUpdateRow = new Adw.SwitchRow({
-            title: _('Auto Update'),
-            subtitle: _('Enable automatic updates for the extension'),
-        });
-        globalGroup.add(autoUpdateRow);
-
-        this._settings.bind('auto-update', autoUpdateRow, 'active',
-            Gio.SettingsBindFlags.DEFAULT);
-
-        // 代理设置
-        this._setupProxySettings(globalGroup);
-    }
-
-    /**
-     * 设置代理设置UI
-     */
-    _setupProxySettings(globalGroup) {
-        const proxyRow = new Adw.ExpanderRow({
-            title: _('Proxy Settings'),
-            subtitle: _('Configure network proxy server'),
-        });
-        globalGroup.add(proxyRow);
-
-        // 延迟创建代理内容以提升性能
-        let proxyContentCreated = false;
-        proxyRow.connect('notify::expanded', () => {
-            if (proxyRow.expanded && !proxyContentCreated) {
-                this._createProxyContent(proxyRow);
-                proxyContentCreated = true;
-            }
-        });
-        
-        // 初始化代理展开行的副标题
-        const {host, port} = this.settingsManager.getProxyInfo();
-        if (host && port) {
-            proxyRow.set_subtitle(_('Configured: ') + host + ':' + port);
-        } else if (host) {
-            proxyRow.set_subtitle(_('Configured: ') + host);
-        }
-    }
-
-    /**
-     * 创建代理设置内容
-     */
-    _createProxyContent(proxyRow) {
-        const {host, port} = this.settingsManager.getProxyInfo();
-
-        // 代理主机输入
-        const proxyHostRow = new Adw.EntryRow({
-            title: _('Proxy Server'),
-            text: host,
-        });
-        proxyRow.add_row(proxyHostRow);
-
-        // 代理端口输入
-        const proxyPortRow = new Adw.EntryRow({
-            title: _('Port'),
-            text: port,
-        });
-        proxyRow.add_row(proxyPortRow);
-
-        // 代理设置操作按钮
-        const proxyActionRow = new Adw.ActionRow({
-            title: _('Actions'),
-        });
-
-        const proxyButtonBox = new Gtk.Box({
-            orientation: Gtk.Orientation.HORIZONTAL,
-            spacing: 6,
-            halign: Gtk.Align.END,
-        });
-
-        const proxyCancelButton = new Gtk.Button({
-            label: _('Cancel'),
-            css_classes: ['flat'],
-        });
-
-        const proxySaveButton = new Gtk.Button({
-            label: _('Save'),
-            css_classes: ['suggested-action'],
-        });
-
-        proxyButtonBox.append(proxyCancelButton);
-        proxyButtonBox.append(proxySaveButton);
-        proxyActionRow.add_suffix(proxyButtonBox);
-        proxyRow.add_row(proxyActionRow);
-
-        // 保存原始值
-        const originalValues = {host, port};
-
-        // 取消按钮逻辑
-        proxyCancelButton.connect('clicked', () => {
-            proxyHostRow.set_text(originalValues.host);
-            proxyPortRow.set_text(originalValues.port);
-            proxyRow.set_expanded(false);
-        });
-
-        // 保存按钮逻辑
-        proxySaveButton.connect('clicked', () => {
-            const newHost = proxyHostRow.get_text();
-            const newPort = proxyPortRow.get_text();
-
-            this.settingsManager.setProxy(newHost, newPort);
-            
-            originalValues.host = newHost;
-            originalValues.port = newPort;
-            
-            if (newHost && newPort) {
-                proxyRow.set_subtitle(_('Configured: ') + newHost + ':' + newPort);
-            } else if (newHost) {
-                proxyRow.set_subtitle(_('Configured: ') + newHost);
-            } else {
-                proxyRow.set_subtitle(_('Configure network proxy server'));
-            }
-            
-            proxyRow.set_expanded(false);
-            console.log('Saved proxy settings: ' + newHost + ':' + newPort);
-        });
-    }
-
-    /**
-     * 添加关于组
-     */
-    _addAboutGroup() {
-        const aboutGroup = new Adw.PreferencesGroup({
-            title: _('About'),
-        });
-        this._page.add(aboutGroup);
-
-        const aboutRow = new Adw.ActionRow({
-            title: _('Claude Code Switcher'),
-            subtitle: _('Quickly switch Claude Code API providers'),
-        });
-        aboutGroup.add(aboutRow);
-    }
     
     /**
      * 清理资源
@@ -315,5 +125,8 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         this.settingsManager = null;
         this.statsPanel = null;
         this.apiProviderManager = null;
+        this.globalSettingsGroup = null;
+        this.aboutGroup = null;
+        this.notificationsGroup = null;
     }
 }
