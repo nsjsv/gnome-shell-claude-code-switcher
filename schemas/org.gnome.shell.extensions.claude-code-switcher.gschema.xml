@@ -31,5 +31,20 @@
       <summary>Proxy Port</summary>
       <description>Proxy server port number</description>
     </key>
+    <key name="notifications-enabled" type="b">
+      <default>false</default>
+      <summary>Enable Notifications</summary>
+      <description>Whether to enable Claude Code hooks notifications</description>
+    </key>
+    <key name="hook-normal-exit" type="b">
+      <default>false</default>
+      <summary>Normal Exit Notifications</summary>
+      <description>Show notifications when Claude Code exits normally (exit code 0)</description>
+    </key>
+    <key name="hook-abnormal-exit" type="b">
+      <default>true</default>
+      <summary>Abnormal Exit Notifications</summary>
+      <description>Show notifications when Claude Code exits abnormally (non-zero exit codes)</description>
+    </key>
   </schema>
 </schemalist>

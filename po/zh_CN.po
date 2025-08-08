@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Claude Code Switcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-06 22:19+0800\n"
+"POT-Creation-Date: 2025-08-08 10:50+0800\n"
 "PO-Revision-Date: 2025-08-04 23:02+0800\n"
 "Last-Translator: Claude AI <claude@anthropic.com>\n"
 "Language-Team: Chinese\n"
@@ -16,31 +16,31 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: extension.js:33 prefs.js:124
+#: extension.js:34 prefs.js:301
 msgid "Claude Code Switcher"
 msgstr "Claude Code Switcher"
 
-#: extension.js:65
+#: extension.js:66
 msgid "Add more.."
 msgstr "添加更多.."
 
-#: extension.js:80
+#: extension.js:81
 msgid "No configured providers"
 msgstr "暂无配置的提供商"
 
-#: extension.js:103
+#: extension.js:104
 msgid "Failed to load providers"
 msgstr "加载提供商失败"
 
-#: extension.js:115
+#: extension.js:116
 msgid "Switched to: "
 msgstr "已切换到: "
 
-#: extension.js:137
+#: extension.js:138
 msgid "Please configure Anthropic API key first"
 msgstr "请先配置 Anthropic API 密钥"
 
-#: extension.js:137
+#: extension.js:138
 msgid ""
 "Click \"Add more..\" button to open settings and configure the official API "
 "key for Anthropic provider."
@@ -48,342 +48,443 @@ msgstr ""
 "点击\"添加更多..\"按钮打开设置界面，为 Anthropic 提供商配置官方 API 密钥后即"
 "可使用。"
 
-#: extension.js:139
+#: extension.js:140
 #, fuzzy
 msgid "Please configure API key for "
 msgstr "请先配置 Anthropic API 密钥"
 
-#: extension.js:139
+#: extension.js:140
 msgid " first"
 msgstr ""
 
-#: extension.js:139
+#: extension.js:140
 msgid ""
 "Click \"Add more..\" button to open settings and configure the API key for "
 "this provider."
 msgstr ""
 "点击\"添加更多..\"按钮打开设置界面，为此提供商配置 API 密钥后即可使用。"
 
-#: prefs.js:38
+#: prefs.js:60
 msgid "General"
 msgstr "常规"
 
-#: prefs.js:45 prefs.js:1871
+#: prefs.js:67 ui/statsPanel.js:245
 msgid "Loading..."
 msgstr "正在加载..."
 
-#: prefs.js:46
+#: prefs.js:68
 msgid "Please wait, initializing settings interface"
 msgstr "请稍候，正在初始化设置界面"
 
-#: prefs.js:60
-msgid "API Providers"
-msgstr "API 提供商"
+#: prefs.js:109
+msgid "Notifications"
+msgstr "通知"
 
-#: prefs.js:61
-msgid "Add and manage custom API providers"
-msgstr "添加和管理自定义 API 提供商"
+#: prefs.js:110
+msgid "Configure Claude Code hooks notifications"
+msgstr "配置 Claude Code 钩子通知"
 
-#: prefs.js:66
-msgid "Add New Provider"
-msgstr "添加新提供商"
+#: prefs.js:116
+msgid "Enable Notifications"
+msgstr "启用通知"
 
-#: prefs.js:67
-msgid "Add custom API endpoint and key"
-msgstr "添加自定义 API 端点和密钥"
+#: prefs.js:117
+msgid "Enable Claude Code hooks notifications"
+msgstr "启用 Claude Code 钩子通知"
 
-#: prefs.js:92
+#: prefs.js:137
+#, fuzzy
+msgid "Normal Exit Notifications"
+msgstr "异常退出通知"
+
+#: prefs.js:138
+#, fuzzy
+msgid "Show notifications when Claude Code exits normally (exit code 0)"
+msgstr "当 Claude Code 异常退出时显示通知"
+
+#: prefs.js:142
+#, fuzzy
+msgid "Abnormal Exit Notifications"
+msgstr "启用通知"
+
+#: prefs.js:143
+#, fuzzy
+msgid ""
+"Show notifications when Claude Code exits abnormally (non-zero exit codes)"
+msgstr "当 Claude Code 异常退出时显示通知"
+
+#: prefs.js:165
 msgid "Global Settings"
 msgstr "全局设置"
 
-#: prefs.js:93
+#: prefs.js:166
 msgid "Configure global extension options"
 msgstr "配置扩展的全局选项"
 
-#: prefs.js:99
+#: prefs.js:172
 msgid "Auto Update"
 msgstr "自动更新"
 
-#: prefs.js:100
+#: prefs.js:173
 msgid "Enable automatic updates for the extension"
 msgstr "启用扩展的自动更新功能"
 
-#: prefs.js:119
-msgid "About"
-msgstr "关于"
-
-#: prefs.js:125
-msgid "Quickly switch Claude Code API providers"
-msgstr "快速切换 Claude Code API 提供商"
-
-#: prefs.js:133
+#: prefs.js:189
 msgid "Proxy Settings"
 msgstr "代理设置"
 
-#: prefs.js:134 prefs.js:227
+#: prefs.js:190 prefs.js:283
 msgid "Configure network proxy server"
 msgstr "配置网络代理服务器"
 
-#: prefs.js:151 prefs.js:153 prefs.js:223 prefs.js:225
+#: prefs.js:206 prefs.js:208 prefs.js:279 prefs.js:281
 msgid "Configured: "
 msgstr "已配置: "
 
-#: prefs.js:160
+#: prefs.js:220
 msgid "Proxy Server"
 msgstr "代理服务器"
 
-#: prefs.js:167
+#: prefs.js:227
 msgid "Port"
 msgstr "端口"
 
-#: prefs.js:174 prefs.js:373 prefs.js:1090
+#: prefs.js:234 ui/apiProviderManager.js:187 ui/sessionDialog.js:171
 msgid "Actions"
 msgstr "操作"
 
-#: prefs.js:184 prefs.js:293 prefs.js:385 prefs.js:554
+#: prefs.js:244 ui/apiProviderManager.js:109 ui/apiProviderManager.js:199
+#: ui/apiProviderManager.js:380
 msgid "Cancel"
 msgstr "取消"
 
-#: prefs.js:189 prefs.js:391
+#: prefs.js:249 ui/apiProviderManager.js:205
 msgid "Save"
 msgstr "保存"
 
-#: prefs.js:248
+#: prefs.js:296
+msgid "About"
+msgstr "关于"
+
+#: prefs.js:302
+msgid "Quickly switch Claude Code API providers"
+msgstr "快速切换 Claude Code API 提供商"
+
+#: ui/apiProviderManager.js:26
+msgid "API Providers"
+msgstr "API 提供商"
+
+#: ui/apiProviderManager.js:27
+msgid "Add and manage custom API providers"
+msgstr "添加和管理自定义 API 提供商"
+
+#: ui/apiProviderManager.js:31
+msgid "Add New Provider"
+msgstr "添加新提供商"
+
+#: ui/apiProviderManager.js:32
+msgid "Add custom API endpoint and key"
+msgstr "添加自定义 API 端点和密钥"
+
+#: ui/apiProviderManager.js:64
 msgid "Add New API Provider"
 msgstr "添加新的 API 提供商"
 
-#: prefs.js:249
+#: ui/apiProviderManager.js:65
 msgid "Please enter the details for the custom API provider"
 msgstr "请输入自定义 API 提供商的详细信息"
 
-#: prefs.js:264
+#: ui/apiProviderManager.js:80
 msgid "Provider name (e.g.: OpenAI)"
 msgstr "提供商名称（例如：OpenAI）"
 
-#: prefs.js:270
+#: ui/apiProviderManager.js:86
 msgid "API URL (e.g.: https://api.openai.com)"
 msgstr "API URL（例如：https://api.openai.com）"
 
-#: prefs.js:276 prefs.js:349
+#: ui/apiProviderManager.js:92 ui/apiProviderManager.js:166
 msgid "API Key"
 msgstr "API 密钥"
 
-#: prefs.js:282
+#: ui/apiProviderManager.js:98
 msgid "Large Model (optional, e.g.: claude-3-5-sonnet-20241022)"
 msgstr "大模型（可选，例如：claude-3-5-sonnet-20241022）"
 
-#: prefs.js:288
+#: ui/apiProviderManager.js:104
 msgid "Small Model (optional, e.g.: claude-3-haiku-20240307)"
 msgstr "小模型（可选，例如：claude-3-haiku-20240307）"
 
-#: prefs.js:294
+#: ui/apiProviderManager.js:110
 msgid "Add"
 msgstr "添加"
 
-#: prefs.js:333
+#: ui/apiProviderManager.js:152
 msgid "Provider Name"
 msgstr "提供商名称"
 
-#: prefs.js:341
+#: ui/apiProviderManager.js:159
 msgid "API URL"
 msgstr "API URL"
 
-#: prefs.js:357
+#: ui/apiProviderManager.js:173
 msgid "Large Model"
 msgstr "大模型"
 
-#: prefs.js:365
+#: ui/apiProviderManager.js:180
 msgid "Small Model"
 msgstr "小模型"
 
-#: prefs.js:455
+#: ui/apiProviderManager.js:267
 msgid "Delete this provider"
 msgstr "删除此提供商"
 
-#: prefs.js:550
+#: ui/apiProviderManager.js:376
 msgid "Confirm Delete"
 msgstr "确认删除"
 
-#: prefs.js:551
+#: ui/apiProviderManager.js:377
 msgid "Are you sure you want to delete provider \""
 msgstr "确定要删除提供商\""
 
-#: prefs.js:551
-msgid ""
-"\"\n"
-"\n"
-"This action cannot be undone."
+#: ui/apiProviderManager.js:377
+#, fuzzy
+msgid "\"\\n\\nThis action cannot be undone."
 msgstr "\"吗？\\n\\n此操作无法撤销。"
 
-#: prefs.js:555
+#: ui/apiProviderManager.js:381
 msgid "Delete"
 msgstr "删除"
 
-#: prefs.js:725
-msgid "INFO"
-msgstr "INFO"
-
-#: prefs.js:726
-msgid "View your Claude Code API usage and costs"
-msgstr "查看您的 Claude Code API 使用情况和成本"
-
-#: prefs.js:743
-msgid "Total Cost"
-msgstr "总成本"
-
-#: prefs.js:752
-msgid "Total Sessions"
-msgstr "总会话"
-
-#: prefs.js:763
-msgid "Total Tokens"
-msgstr "总令牌"
-
-#: prefs.js:785 prefs.js:1900
-msgid "Refresh Stats"
-msgstr "刷新统计"
-
-#: prefs.js:789
-msgid "Not loaded yet"
-msgstr "暂未加载"
-
-#: prefs.js:944
+#: ui/sessionDialog.js:27
 msgid "Sessions Detail (Beta)"
 msgstr "会话详情 (Beta)"
 
-#: prefs.js:988
+#: ui/sessionDialog.js:69
 #, fuzzy
 msgid "Loading session data..."
 msgstr "正在加载..."
 
-#: prefs.js:1011
+#: ui/sessionDialog.js:92
 msgid "No session data found"
 msgstr "未找到会话数据"
 
-#: prefs.js:1039
+#: ui/sessionDialog.js:120
 #, fuzzy
 msgid "Failed to load session data"
 msgstr "加载失败"
 
-#: prefs.js:1062
+#: ui/sessionDialog.js:143
 msgid "Session ID"
 msgstr "会话 ID"
 
-#: prefs.js:1069
+#: ui/sessionDialog.js:150
 msgid "Time Range"
 msgstr "时间范围"
 
-#: prefs.js:1076
+#: ui/sessionDialog.js:157
 msgid "Models Used"
 msgstr "使用的模型"
 
-#: prefs.js:1083
+#: ui/sessionDialog.js:164
 msgid "Token Details"
 msgstr "Token 详情"
 
-#: prefs.js:1094
+#: ui/sessionDialog.js:175
 msgid "View Session"
 msgstr "查看会话"
 
-#: prefs.js:1119 prefs.js:1128
+#: ui/sessionDialog.js:200 ui/sessionDialog.js:208
 msgid "Session Content"
 msgstr "会话内容"
 
-#: prefs.js:1174
+#: ui/sessionDialog.js:254
 msgid "Loading session messages..."
 msgstr "正在加载会话消息..."
 
-#: prefs.js:1206
+#: ui/sessionDialog.js:286
 msgid "Failed to load session messages"
 msgstr "加载会话消息失败"
 
-#: prefs.js:1219
+#: ui/sessionDialog.js:299
 msgid "Analyzing messages..."
 msgstr "正在分析消息..."
 
-#: prefs.js:1227
+#: ui/sessionDialog.js:307
 msgid "No messages found in this session"
 msgstr "此会话中未找到消息"
 
-#: prefs.js:1238 prefs.js:1250
+#: ui/sessionDialog.js:318 ui/sessionDialog.js:330
 msgid "Loading messages..."
 msgstr "正在加载消息..."
 
-#: prefs.js:1264
+#: ui/sessionDialog.js:344
 msgid "Loading complete"
 msgstr "加载完成"
 
-#: prefs.js:1407
-msgid "Previous version"
-msgstr "上一个版本"
-
-#: prefs.js:1415
-msgid "Message version"
-msgstr "消息版本"
-
-#: prefs.js:1422
-msgid "Next version"
-msgstr "下一个版本"
-
-#: prefs.js:1536
+#: ui/sessionDialog.js:478
 msgid "User"
 msgstr "用户"
 
-#: prefs.js:1537
+#: ui/sessionDialog.js:479
 msgid "Assistant"
 msgstr "助手"
 
-#: prefs.js:1538
+#: ui/sessionDialog.js:480
 msgid "System"
 msgstr "系统"
 
-#: prefs.js:1539
+#: ui/sessionDialog.js:481
 msgid "Tool Result"
 msgstr "工具结果"
 
-#: prefs.js:1540
+#: ui/sessionDialog.js:482
 msgid "Unknown"
 msgstr "未知"
 
-#: prefs.js:1625
+#: ui/sessionDialog.js:564
 msgid "Message Content"
 msgstr "消息内容"
 
-#: prefs.js:1713
-msgid "Tool Name"
-msgstr "工具名称"
+#: ui/statsPanel.js:31
+msgid "INFO"
+msgstr "INFO"
 
-#: prefs.js:1721 prefs.js:1775
-msgid "Tool Use ID"
-msgstr "工具使用ID"
+#: ui/statsPanel.js:32
+msgid "View your Claude Code API usage and costs"
+msgstr "查看您的 Claude Code API 使用情况和成本"
 
-#: prefs.js:1733
-msgid "Parameters"
-msgstr "参数"
+#: ui/statsPanel.js:48
+msgid "Total Cost"
+msgstr "总成本"
 
-#: prefs.js:1766
-msgid "Tool Result⋅"
-msgstr "工具结果⋅"
+#: ui/statsPanel.js:57
+msgid "Total Sessions"
+msgstr "总会话"
 
-#: prefs.js:1832 prefs.js:1840
-msgid "Unknown Tool"
-msgstr "未知工具"
+#: ui/statsPanel.js:67
+msgid "Total Tokens"
+msgstr "总令牌"
 
-#: prefs.js:1872
+#: ui/statsPanel.js:89 ui/statsPanel.js:274
+msgid "Refresh Stats"
+msgstr "刷新统计"
+
+#: ui/statsPanel.js:93
+msgid "Not loaded yet"
+msgstr "暂未加载"
+
+#: ui/statsPanel.js:246
 msgid "Fetching data..."
 msgstr "正在获取数据..."
 
-#: prefs.js:1888
+#: ui/statsPanel.js:262
 msgid "Last updated: "
 msgstr "最后更新: "
 
-#: prefs.js:1893 prefs.js:1896
+#: ui/statsPanel.js:267 ui/statsPanel.js:270
 msgid "Failed to load"
 msgstr "加载失败"
 
-#: prefs.js:1894 prefs.js:1895
+#: ui/statsPanel.js:268 ui/statsPanel.js:269
 msgid "Error"
 msgstr "错误"
+
+#~ msgid "Previous version"
+#~ msgstr "上一个版本"
+
+#~ msgid "Message version"
+#~ msgstr "消息版本"
+
+#~ msgid "Next version"
+#~ msgstr "下一个版本"
+
+#~ msgid "Tool Name"
+#~ msgstr "工具名称"
+
+#~ msgid "Tool Use ID"
+#~ msgstr "工具使用ID"
+
+#~ msgid "Parameters"
+#~ msgstr "参数"
+
+#~ msgid "Tool Result⋅"
+#~ msgstr "工具结果⋅"
+
+#~ msgid "Unknown Tool"
+#~ msgstr "未知工具"
+
+#, fuzzy
+#~ msgid "Task Completion"
+#~ msgstr "任务完成通知"
+
+#~ msgid "Show notifications when tasks are completed successfully"
+#~ msgstr "当任务成功完成时显示通知"
+
+#~ msgid "Provider configured successfully"
+#~ msgstr "提供商配置成功"
+
+#~ msgid "No provider configured"
+#~ msgstr "未配置提供商"
+
+#~ msgid "Provider configured but missing API key"
+#~ msgstr "提供商已配置但缺少API密钥"
+
+#~ msgid "Unknown provider status"
+#~ msgstr "未知提供商状态"
+
+#~ msgid "Claude Code encountered an error"
+#~ msgstr "Claude Code 遇到错误"
+
+#~ msgid "Claude Code was interrupted"
+#~ msgstr "Claude Code 被中断"
+
+#~ msgid "Claude Code was terminated"
+#~ msgstr "Claude Code 被终止"
+
+#~ msgid "Claude Code exited with code "
+#~ msgstr "Claude Code 以代码 "
+
+#~ msgid "Block tool usage, show stderr to Claude"
+#~ msgstr "阻止工具调用，向Claude显示stderr"
+
+#~ msgid "Show stderr to Claude (tool completed)"
+#~ msgstr "向Claude显示stderr（工具已运行）"
+
+#~ msgid "Not applicable, show stderr to user only"
+#~ msgstr "不适用，仅向用户显示stderr"
+
+#~ msgid "Block prompt processing, show stderr to user only"
+#~ msgstr "阻止提示处理，仅向用户显示stderr"
+
+#~ msgid "Block stop, show stderr to Claude"
+#~ msgstr "阻止停止，向Claude显示stderr"
+
+#~ msgid "Block stop, show stderr to Claude subagent"
+#~ msgstr "阻止停止，向Claude子代理显示stderr"
+
+#~ msgid "Before tool execution"
+#~ msgstr "工具执行前"
+
+#~ msgid "Shell commands"
+#~ msgstr "Shell 命令"
+
+#~ msgid "File pattern matching"
+#~ msgstr "文件模式匹配"
+
+#~ msgid "Content search"
+#~ msgstr "内容搜索"
+
+#~ msgid "File reading"
+#~ msgstr "文件读取"
+
+#~ msgid "File editing"
+#~ msgstr "文件编辑"
+
+#~ msgid "File writing"
+#~ msgstr "文件写入"
+
+#~ msgid "Web operations"
+#~ msgstr "Web 操作"
 
 #~ msgid "Result Content"
 #~ msgstr "结果内容"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Claude Code Switcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-06 22:19+0800\n"
+"POT-Creation-Date: 2025-08-08 10:50+0800\n"
 "PO-Revision-Date: 2025-08-04 23:02+0800\n"
 "Last-Translator: Claude AI <claude@anthropic.com>\n"
 "Language-Team: English\n"
@@ -16,31 +16,31 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: extension.js:33 prefs.js:124
+#: extension.js:34 prefs.js:301
 msgid "Claude Code Switcher"
 msgstr "Claude Code Switcher"
 
-#: extension.js:65
+#: extension.js:66
 msgid "Add more.."
 msgstr "Add more.."
 
-#: extension.js:80
+#: extension.js:81
 msgid "No configured providers"
 msgstr "No configured providers"
 
-#: extension.js:103
+#: extension.js:104
 msgid "Failed to load providers"
 msgstr "Failed to load providers"
 
-#: extension.js:115
+#: extension.js:116
 msgid "Switched to: "
 msgstr "Switched to: "
 
-#: extension.js:137
+#: extension.js:138
 msgid "Please configure Anthropic API key first"
 msgstr "Please configure Anthropic API key first"
 
-#: extension.js:137
+#: extension.js:138
 msgid ""
 "Click \"Add more..\" button to open settings and configure the official API "
 "key for Anthropic provider."
@@ -48,16 +48,16 @@ msgstr ""
 "Click \"Add more..\" button to open settings and configure the official API "
 "key for Anthropic provider."
 
-#: extension.js:139
+#: extension.js:140
 #, fuzzy
 msgid "Please configure API key for "
 msgstr "Please configure Anthropic API key first"
 
-#: extension.js:139
+#: extension.js:140
 msgid " first"
 msgstr " first"
 
-#: extension.js:139
+#: extension.js:140
 msgid ""
 "Click \"Add more..\" button to open settings and configure the API key for "
 "this provider."
@@ -65,330 +65,393 @@ msgstr ""
 "Click \"Add more..\" button to open settings and configure the API key for "
 "this provider."
 
-#: prefs.js:38
+#: prefs.js:60
 msgid "General"
 msgstr "General"
 
-#: prefs.js:45 prefs.js:1871
+#: prefs.js:67 ui/statsPanel.js:245
 msgid "Loading..."
 msgstr "Loading..."
 
-#: prefs.js:46
+#: prefs.js:68
 msgid "Please wait, initializing settings interface"
 msgstr "Please wait, initializing settings interface"
 
-#: prefs.js:60
-msgid "API Providers"
-msgstr "API Providers"
+#: prefs.js:109
+#, fuzzy
+msgid "Notifications"
+msgstr "Actions"
 
-#: prefs.js:61
-msgid "Add and manage custom API providers"
-msgstr "Add and manage custom API providers"
+#: prefs.js:110
+msgid "Configure Claude Code hooks notifications"
+msgstr ""
 
-#: prefs.js:66
-msgid "Add New Provider"
-msgstr "Add New Provider"
+#: prefs.js:116
+msgid "Enable Notifications"
+msgstr ""
 
-#: prefs.js:67
-msgid "Add custom API endpoint and key"
-msgstr "Add custom API endpoint and key"
+#: prefs.js:117
+msgid "Enable Claude Code hooks notifications"
+msgstr ""
 
-#: prefs.js:92
+#: prefs.js:137
+#, fuzzy
+msgid "Normal Exit Notifications"
+msgstr "Error Notifications"
+
+#: prefs.js:138
+#, fuzzy
+msgid "Show notifications when Claude Code exits normally (exit code 0)"
+msgstr "Show notifications when Claude Code exits with errors"
+
+#: prefs.js:142
+#, fuzzy
+msgid "Abnormal Exit Notifications"
+msgstr "Error Notifications"
+
+#: prefs.js:143
+#, fuzzy
+msgid ""
+"Show notifications when Claude Code exits abnormally (non-zero exit codes)"
+msgstr "Show notifications when Claude Code exits with errors"
+
+#: prefs.js:165
 msgid "Global Settings"
 msgstr "Global Settings"
 
-#: prefs.js:93
+#: prefs.js:166
 msgid "Configure global extension options"
 msgstr "Configure global extension options"
 
-#: prefs.js:99
+#: prefs.js:172
 msgid "Auto Update"
 msgstr "Auto Update"
 
-#: prefs.js:100
+#: prefs.js:173
 msgid "Enable automatic updates for the extension"
 msgstr "Enable automatic updates for the extension"
 
-#: prefs.js:119
-msgid "About"
-msgstr "About"
-
-#: prefs.js:125
-msgid "Quickly switch Claude Code API providers"
-msgstr "Quickly switch Claude Code API providers"
-
-#: prefs.js:133
+#: prefs.js:189
 msgid "Proxy Settings"
 msgstr "Proxy Settings"
 
-#: prefs.js:134 prefs.js:227
+#: prefs.js:190 prefs.js:283
 msgid "Configure network proxy server"
 msgstr "Configure network proxy server"
 
-#: prefs.js:151 prefs.js:153 prefs.js:223 prefs.js:225
+#: prefs.js:206 prefs.js:208 prefs.js:279 prefs.js:281
 msgid "Configured: "
 msgstr "Configured: "
 
-#: prefs.js:160
+#: prefs.js:220
 msgid "Proxy Server"
 msgstr "Proxy Server"
 
-#: prefs.js:167
+#: prefs.js:227
 msgid "Port"
 msgstr "Port"
 
-#: prefs.js:174 prefs.js:373 prefs.js:1090
+#: prefs.js:234 ui/apiProviderManager.js:187 ui/sessionDialog.js:171
 msgid "Actions"
 msgstr "Actions"
 
-#: prefs.js:184 prefs.js:293 prefs.js:385 prefs.js:554
+#: prefs.js:244 ui/apiProviderManager.js:109 ui/apiProviderManager.js:199
+#: ui/apiProviderManager.js:380
 msgid "Cancel"
 msgstr "Cancel"
 
-#: prefs.js:189 prefs.js:391
+#: prefs.js:249 ui/apiProviderManager.js:205
 msgid "Save"
 msgstr "Save"
 
-#: prefs.js:248
+#: prefs.js:296
+msgid "About"
+msgstr "About"
+
+#: prefs.js:302
+msgid "Quickly switch Claude Code API providers"
+msgstr "Quickly switch Claude Code API providers"
+
+#: ui/apiProviderManager.js:26
+msgid "API Providers"
+msgstr "API Providers"
+
+#: ui/apiProviderManager.js:27
+msgid "Add and manage custom API providers"
+msgstr "Add and manage custom API providers"
+
+#: ui/apiProviderManager.js:31
+msgid "Add New Provider"
+msgstr "Add New Provider"
+
+#: ui/apiProviderManager.js:32
+msgid "Add custom API endpoint and key"
+msgstr "Add custom API endpoint and key"
+
+#: ui/apiProviderManager.js:64
 msgid "Add New API Provider"
 msgstr "Add New API Provider"
 
-#: prefs.js:249
+#: ui/apiProviderManager.js:65
 msgid "Please enter the details for the custom API provider"
 msgstr "Please enter the details for the custom API provider"
 
-#: prefs.js:264
+#: ui/apiProviderManager.js:80
 msgid "Provider name (e.g.: OpenAI)"
 msgstr "Provider name (e.g.: OpenAI)"
 
-#: prefs.js:270
+#: ui/apiProviderManager.js:86
 msgid "API URL (e.g.: https://api.openai.com)"
 msgstr "API URL (e.g.: https://api.openai.com)"
 
-#: prefs.js:276 prefs.js:349
+#: ui/apiProviderManager.js:92 ui/apiProviderManager.js:166
 msgid "API Key"
 msgstr "API Key"
 
-#: prefs.js:282
+#: ui/apiProviderManager.js:98
 msgid "Large Model (optional, e.g.: claude-3-5-sonnet-20241022)"
 msgstr "Large Model (optional, e.g.: claude-3-5-sonnet-20241022)"
 
-#: prefs.js:288
+#: ui/apiProviderManager.js:104
 msgid "Small Model (optional, e.g.: claude-3-haiku-20240307)"
 msgstr "Small Model (optional, e.g.: claude-3-haiku-20240307)"
 
-#: prefs.js:294
+#: ui/apiProviderManager.js:110
 msgid "Add"
 msgstr "Add"
 
-#: prefs.js:333
+#: ui/apiProviderManager.js:152
 msgid "Provider Name"
 msgstr "Provider Name"
 
-#: prefs.js:341
+#: ui/apiProviderManager.js:159
 msgid "API URL"
 msgstr "API URL"
 
-#: prefs.js:357
+#: ui/apiProviderManager.js:173
 msgid "Large Model"
 msgstr "Large Model"
 
-#: prefs.js:365
+#: ui/apiProviderManager.js:180
 msgid "Small Model"
 msgstr "Small Model"
 
-#: prefs.js:455
+#: ui/apiProviderManager.js:267
 msgid "Delete this provider"
 msgstr "Delete this provider"
 
-#: prefs.js:550
+#: ui/apiProviderManager.js:376
 msgid "Confirm Delete"
 msgstr "Confirm Delete"
 
-#: prefs.js:551
+#: ui/apiProviderManager.js:377
 msgid "Are you sure you want to delete provider \""
 msgstr "Are you sure you want to delete provider \""
 
-#: prefs.js:551
-msgid ""
-"\"\n"
-"\n"
-"This action cannot be undone."
+#: ui/apiProviderManager.js:377
+#, fuzzy
+msgid "\"\\n\\nThis action cannot be undone."
 msgstr ""
 "\"\n"
 "\n"
 "This action cannot be undone."
 
-#: prefs.js:555
+#: ui/apiProviderManager.js:381
 msgid "Delete"
 msgstr "Delete"
 
-#: prefs.js:725
-msgid "INFO"
-msgstr "INFO"
-
-#: prefs.js:726
-msgid "View your Claude Code API usage and costs"
-msgstr "View your Claude Code API usage and costs"
-
-#: prefs.js:743
-msgid "Total Cost"
-msgstr "Total Cost"
-
-#: prefs.js:752
-msgid "Total Sessions"
-msgstr "Total Sessions"
-
-#: prefs.js:763
-msgid "Total Tokens"
-msgstr "Total Tokens"
-
-#: prefs.js:785 prefs.js:1900
-msgid "Refresh Stats"
-msgstr "Refresh Stats"
-
-#: prefs.js:789
-msgid "Not loaded yet"
-msgstr "Not loaded yet"
-
-#: prefs.js:944
+#: ui/sessionDialog.js:27
 msgid "Sessions Detail (Beta)"
 msgstr "Sessions Detail (Beta)"
 
-#: prefs.js:988
+#: ui/sessionDialog.js:69
 #, fuzzy
 msgid "Loading session data..."
 msgstr "Loading..."
 
-#: prefs.js:1011
+#: ui/sessionDialog.js:92
 msgid "No session data found"
 msgstr "No session data found"
 
-#: prefs.js:1039
+#: ui/sessionDialog.js:120
 #, fuzzy
 msgid "Failed to load session data"
 msgstr "Failed to load"
 
-#: prefs.js:1062
+#: ui/sessionDialog.js:143
 msgid "Session ID"
 msgstr "Session ID"
 
-#: prefs.js:1069
+#: ui/sessionDialog.js:150
 msgid "Time Range"
 msgstr "Time Range"
 
-#: prefs.js:1076
+#: ui/sessionDialog.js:157
 msgid "Models Used"
 msgstr "Models Used"
 
-#: prefs.js:1083
+#: ui/sessionDialog.js:164
 msgid "Token Details"
 msgstr "Token Details"
 
-#: prefs.js:1094
+#: ui/sessionDialog.js:175
 msgid "View Session"
 msgstr "View Session"
 
-#: prefs.js:1119 prefs.js:1128
+#: ui/sessionDialog.js:200 ui/sessionDialog.js:208
 msgid "Session Content"
 msgstr "Session Content"
 
-#: prefs.js:1174
+#: ui/sessionDialog.js:254
 msgid "Loading session messages..."
 msgstr "Loading session messages..."
 
-#: prefs.js:1206
+#: ui/sessionDialog.js:286
 msgid "Failed to load session messages"
 msgstr "Failed to load session messages"
 
-#: prefs.js:1219
+#: ui/sessionDialog.js:299
 msgid "Analyzing messages..."
 msgstr "Analyzing messages..."
 
-#: prefs.js:1227
+#: ui/sessionDialog.js:307
 msgid "No messages found in this session"
 msgstr "No messages found in this session"
 
-#: prefs.js:1238 prefs.js:1250
+#: ui/sessionDialog.js:318 ui/sessionDialog.js:330
 msgid "Loading messages..."
 msgstr "Loading messages..."
 
-#: prefs.js:1264
+#: ui/sessionDialog.js:344
 msgid "Loading complete"
 msgstr "Loading complete"
 
-#: prefs.js:1407
-msgid "Previous version"
-msgstr ""
-
-#: prefs.js:1415
-#, fuzzy
-msgid "Message version"
-msgstr "Message Content"
-
-#: prefs.js:1422
-msgid "Next version"
-msgstr ""
-
-#: prefs.js:1536
+#: ui/sessionDialog.js:478
 msgid "User"
 msgstr "User"
 
-#: prefs.js:1537
+#: ui/sessionDialog.js:479
 msgid "Assistant"
 msgstr "Assistant"
 
-#: prefs.js:1538
+#: ui/sessionDialog.js:480
 msgid "System"
 msgstr "System"
 
-#: prefs.js:1539
+#: ui/sessionDialog.js:481
 msgid "Tool Result"
 msgstr "Tool Result"
 
-#: prefs.js:1540
+#: ui/sessionDialog.js:482
 msgid "Unknown"
 msgstr "Unknown"
 
-#: prefs.js:1625
+#: ui/sessionDialog.js:564
 msgid "Message Content"
 msgstr "Message Content"
 
-#: prefs.js:1713
-msgid "Tool Name"
-msgstr "Tool Name"
+#: ui/statsPanel.js:31
+msgid "INFO"
+msgstr "INFO"
 
-#: prefs.js:1721 prefs.js:1775
-msgid "Tool Use ID"
-msgstr "Tool Use ID"
+#: ui/statsPanel.js:32
+msgid "View your Claude Code API usage and costs"
+msgstr "View your Claude Code API usage and costs"
 
-#: prefs.js:1733
-msgid "Parameters"
-msgstr "Parameters"
+#: ui/statsPanel.js:48
+msgid "Total Cost"
+msgstr "Total Cost"
 
-#: prefs.js:1766
-msgid "Tool Result⋅"
-msgstr "Tool Result⋅"
+#: ui/statsPanel.js:57
+msgid "Total Sessions"
+msgstr "Total Sessions"
 
-#: prefs.js:1832 prefs.js:1840
-msgid "Unknown Tool"
-msgstr "Unknown Tool"
+#: ui/statsPanel.js:67
+msgid "Total Tokens"
+msgstr "Total Tokens"
 
-#: prefs.js:1872
+#: ui/statsPanel.js:89 ui/statsPanel.js:274
+msgid "Refresh Stats"
+msgstr "Refresh Stats"
+
+#: ui/statsPanel.js:93
+msgid "Not loaded yet"
+msgstr "Not loaded yet"
+
+#: ui/statsPanel.js:246
 msgid "Fetching data..."
 msgstr "Fetching data..."
 
-#: prefs.js:1888
+#: ui/statsPanel.js:262
 msgid "Last updated: "
 msgstr "Last updated: "
 
-#: prefs.js:1893 prefs.js:1896
+#: ui/statsPanel.js:267 ui/statsPanel.js:270
 msgid "Failed to load"
 msgstr "Failed to load"
 
-#: prefs.js:1894 prefs.js:1895
+#: ui/statsPanel.js:268 ui/statsPanel.js:269
 msgid "Error"
 msgstr "Error"
+
+#, fuzzy
+#~ msgid "Message version"
+#~ msgstr "Message Content"
+
+#~ msgid "Tool Name"
+#~ msgstr "Tool Name"
+
+#~ msgid "Tool Use ID"
+#~ msgstr "Tool Use ID"
+
+#~ msgid "Parameters"
+#~ msgstr "Parameters"
+
+#~ msgid "Tool Result⋅"
+#~ msgstr "Tool Result⋅"
+
+#~ msgid "Unknown Tool"
+#~ msgstr "Unknown Tool"
+
+#~ msgid "Task Completion"
+#~ msgstr "Task Completion"
+
+#~ msgid "Show notifications when tasks are completed successfully"
+#~ msgstr "Show notifications when tasks are completed successfully"
+
+#, fuzzy
+#~ msgid "Provider configured successfully"
+#~ msgstr "Show notifications when tasks are completed successfully"
+
+#, fuzzy
+#~ msgid "Claude Code was interrupted"
+#~ msgstr "Claude Code Switcher"
+
+#, fuzzy
+#~ msgid "Claude Code was terminated"
+#~ msgstr "Claude Code Switcher"
+
+#, fuzzy
+#~ msgid "Claude Code exited with code "
+#~ msgstr "Claude Code Switcher"
+
+#~ msgid "Block tool usage, show stderr to Claude"
+#~ msgstr "Block tool usage, show stderr to Claude"
+
+#~ msgid "Show stderr to Claude (tool completed)"
+#~ msgstr "Show stderr to Claude (tool completed)"
+
+#~ msgid "Not applicable, show stderr to user only"
+#~ msgstr "Not applicable, show stderr to user only"
+
+#~ msgid "Block prompt processing, show stderr to user only"
+#~ msgstr "Block prompt processing, show stderr to user only"
+
+#~ msgid "Block stop, show stderr to Claude"
+#~ msgstr "Block stop, show stderr to Claude"
+
+#~ msgid "Block stop, show stderr to Claude subagent"
+#~ msgstr "Block stop, show stderr to Claude subagent"
 
 #~ msgid "Result Content"
 #~ msgstr "Result Content"

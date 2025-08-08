@@ -26,6 +26,7 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import {ClaudeHookInterface} from './claudeHookInterface.js';
 
 const Indicator = GObject.registerClass(
 class Indicator extends PanelMenu.Button {
@@ -158,6 +159,9 @@ class Indicator extends PanelMenu.Button {
 
 export default class IndicatorExampleExtension extends Extension {
     enable() {
+        // Initialize Claude Code Hook Interface
+        this._claudeHookInterface = new ClaudeHookInterface(this);
+        
         this._indicator = new Indicator(this);
         Main.panel.addToStatusArea(this.uuid, this._indicator);
         
@@ -186,12 +190,24 @@ export default class IndicatorExampleExtension extends Extension {
                 this.syncToLocalFile();
             })
         );
+        this._settingsChangedIds.push(
+            this._settings.connect('changed::notifications-enabled', () => {
+                // 同步设置到本地文件（包括hooks）
+                this.syncToLocalFile();
+            })
+        );
         
         // 初始化时同步一次
         this.syncToLocalFile();
     }
 
     disable() {
+        // Cleanup Claude Code Hook Interface
+        if (this._claudeHookInterface) {
+            this._claudeHookInterface.destroy();
+            this._claudeHookInterface = null;
+        }
+        
         // 断开设置监听
         if (this._settingsChangedIds) {
             this._settingsChangedIds.forEach(id => {
@@ -203,6 +219,40 @@ export default class IndicatorExampleExtension extends Extension {
         this._indicator.destroy();
         this._indicator = null;
         this._settings = null;
+    }
+    
+    handleClaudeExit(exitCode) {
+        const currentProvider = this._getCurrentProviderInfo();
+        const providerName = currentProvider ? currentProvider.name : 'Unknown';
+        
+        if (this._hookInterface) {
+            this._hookInterface.onExit(exitCode, providerName);
+        }
+        
+        return exitCode;
+    }
+    
+    getHookInterface() {
+        return this._hookInterface;
+    }
+    
+    /**
+     * 安装Claude Code hooks
+     */
+    installHooks() {
+        if (this._claudeHook && this._claudeHook.isHookSupported()) {
+            const success = this._claudeHook.installExitCodeHook();
+            if (success) {
+                console.log('Claude Code hooks installed successfully');
+            }
+        }
+    }
+    
+    /**
+     * 获取Claude Hook接口状态
+     */
+    getHookStatus() {
+        return this._claudeHook ? this._claudeHook.getStatus() : null;
     }
     
     /**
@@ -300,6 +350,9 @@ export default class IndicatorExampleExtension extends Extension {
         const proxyHost = this._settings.get_string('proxy-host');
         const proxyPort = this._settings.get_string('proxy-port');
         
+        // 获取通知设置
+        const notificationsEnabled = this._settings.get_boolean('notifications-enabled');
+        
         // 构建代理URL
         let proxyUrl = '';
         if (proxyHost) {
@@ -309,7 +362,7 @@ export default class IndicatorExampleExtension extends Extension {
             }
         }
         
-        // 读取现有配置以保留其他字段
+        // 读取现有配置以保留其他字段（包括自定义hooks）
         const existingConfig = await this._readExistingConfig() || {};
         
         const config = {
@@ -325,11 +378,94 @@ export default class IndicatorExampleExtension extends Extension {
             permissions: existingConfig.permissions || {
                 allow: [],
                 deny: []
-            },
-            feedbackSurveyState: existingConfig.feedbackSurveyState || {
-                lastShownTime: Date.now()
             }
         };
+        
+        // 根据通知设置管理hooks
+        // notificationsEnabled 已在第354行声明
+        
+        // 先保留现有的hooks配置
+        if (existingConfig.hooks) {
+            config.hooks = existingConfig.hooks;
+        } else {
+            config.hooks = {};
+        }
+        
+        if (notificationsEnabled) {
+            // 添加我们的hooks
+            // 使用gjs命令执行JS脚本，避免路径问题
+            const checkCommand = `cd "${this.path}" && gjs check-provider.js`;
+            
+            const ourHooks = {
+                'UserPromptSubmit': [
+                    {
+                        "matcher": "*",  // 匹配所有用户提示
+                        "hooks": [
+                            {
+                                "type": "command",
+                                "command": checkCommand
+                            }
+                        ]
+                    }
+                ]
+            };
+            
+            // 合并hooks
+            Object.keys(ourHooks).forEach(eventName => {
+                if (!config.hooks[eventName]) {
+                    config.hooks[eventName] = ourHooks[eventName];
+                } else {
+                    // 移除旧的Claude Code Switcher hooks
+                    config.hooks[eventName] = config.hooks[eventName].filter(hookGroup => {
+                        if (hookGroup.hooks && Array.isArray(hookGroup.hooks)) {
+                            return !hookGroup.hooks.some(h => 
+                                h.command && (
+                                    h.command.includes('Claude Code Switcher') ||
+                                    h.command.includes('check-provider.js') ||
+                                    h.command.includes('check-provider.sh')
+                                )
+                            );
+                        }
+                        return true;
+                    });
+                    // 添加新的
+                    config.hooks[eventName].push(...ourHooks[eventName]);
+                }
+            });
+        } else {
+            // 移除我们的hooks但保留用户自定义的
+            ['UserPromptSubmit', 'PreToolUse', 'PostToolUse', 'Stop'].forEach(eventName => {
+                if (config.hooks[eventName]) {
+                    config.hooks[eventName] = config.hooks[eventName].filter(hookGroup => {
+                        if (hookGroup.hooks && Array.isArray(hookGroup.hooks)) {
+                            return !hookGroup.hooks.some(h => 
+                                h.command && (
+                                    h.command.includes('Claude Code Switcher') ||
+                                    h.command.includes('check-provider.js') ||
+                                    h.command.includes('check-provider.sh')
+                                )
+                            );
+                        }
+                        return true;
+                    });
+                    
+                    if (config.hooks[eventName].length === 0) {
+                        delete config.hooks[eventName];
+                    }
+                }
+            });
+            
+            if (Object.keys(config.hooks).length === 0) {
+                delete config.hooks;
+            }
+        }
+        
+        // 保留其他未知的配置字段
+        Object.keys(existingConfig).forEach(key => {
+            if (!['env', 'permissions', 'hooks'].includes(key)) {
+                config[key] = existingConfig[key];
+            }
+        });
         
         return config;
     }
