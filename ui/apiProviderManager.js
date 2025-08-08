@@ -278,36 +278,56 @@ export class ApiProviderManager {
     }
 
     /**
-     * 加载保存的提供商
+     * 加载保存的提供商 (优化版本)
      */
     _loadSavedProviders() {
         try {
             const providersJson = this.settings.get_string('api-providers');
             const providers = JSON.parse(providersJson);
             
-            // 分批加载提供商UI以避免阻塞
-            let index = 0;
-            const loadNextProvider = () => {
-                if (index < providers.length) {
-                    const provider = providers[index];
-                    this._addProviderToUI(
-                        provider.name, 
-                        provider.url, 
-                        provider.key,
-                        provider.largeModel || '',
-                        provider.smallModel || ''
-                    );
-                    index++;
-                    // 使用idle_add分批处理
+            if (providers.length === 0) {
+                return;
+            }
+            
+            // 优化：使用更高效的批量加载策略
+            const BATCH_SIZE = 3; // 每批加载3个提供商
+            let currentBatch = 0;
+            
+            const loadBatch = () => {
+                const startIndex = currentBatch * BATCH_SIZE;
+                const endIndex = Math.min(startIndex + BATCH_SIZE, providers.length);
+                
+                // 加载当前批次的提供商
+                for (let i = startIndex; i < endIndex; i++) {
+                    const provider = providers[i];
+                    try {
+                        this._addProviderToUI(
+                            provider.name,
+                            provider.url,
+                            provider.key,
+                            provider.largeModel || '',
+                            provider.smallModel || ''
+                        );
+                    } catch (e) {
+                        console.error(`Error loading provider ${provider.name}:`, e);
+                    }
+                }
+                
+                currentBatch++;
+                
+                // 如果还有更多批次，继续加载
+                if (currentBatch * BATCH_SIZE < providers.length) {
                     GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-                        loadNextProvider();
+                        loadBatch();
                         return GLib.SOURCE_REMOVE;
                     });
                 }
             };
-            loadNextProvider();
+            
+            // 开始加载第一批
+            loadBatch();
         } catch (e) {
-            console.log('No saved providers found or parsing failed:', e);
+            console.error('Error loading saved providers:', e);
         }
     }
 
@@ -393,5 +413,15 @@ export class ApiProviderManager {
         });
 
         dialog.present();
+    }
+    
+    /**
+     * 清理资源
+     */
+    cleanup() {
+        this.settings = null;
+        this.settingsManager = null;
+        this.apiGroup = null;
+        this.parentWindow = null;
     }
 }

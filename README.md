@@ -1,5 +1,7 @@
 # Claude Code Switcher
 
+[中文](/README_CN.md)
+
 A GNOME Shell extension for quickly switching Claude Code API providers.
 
 ![Home](img/en/Home.png)
@@ -13,6 +15,10 @@ A GNOME Shell extension for quickly switching Claude Code API providers.
 - Local sync with `~/.claude/settings.json`
 - Proxy and auto-update settings
 - Model size configuration
+- Task progress notifications
+- Telegram bot integration for remote notifications
+- Session history viewer with detailed conversation logs
+- API usage statistics and cost tracking
 
 ## Installation
 
@@ -44,6 +50,10 @@ Open the extension preferences to:
 - Configure provider settings (API keys, models, etc.)
 - Set up proxy settings
 - Enable auto-update features
+- Configure task completion and interruption notifications
+- Set up Telegram bot for remote notifications
+- View session history and conversation details
+- Monitor API usage statistics and costs
 
 ## API Requirements
 
@@ -69,6 +79,14 @@ This extension is built using:
 ## License
 
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
+
+## TODO
+
+- [ ] Optimize and enhance session history viewer
+- [ ] Add more notification methods
+- [ ] Optimize dashboard interface
+- [ ] Export and import settings functionality
+- [ ] Add session search and filtering capabilities
 
 ## Contributing
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-08 10:50+0800\n"
+"POT-Creation-Date: 2025-08-08 22:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,150 +17,84 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: extension.js:34 prefs.js:301
+#: extension.js:34 ui/aboutGroup.js:25
 msgid "Claude Code Switcher"
 msgstr ""
 
-#: extension.js:66
+#: extension.js:71
 msgid "Add more.."
 msgstr ""
 
-#: extension.js:81
-msgid "No configured providers"
-msgstr ""
-
-#: extension.js:104
+#: extension.js:120
 msgid "Failed to load providers"
 msgstr ""
 
-#: extension.js:116
+#: extension.js:128
+msgid "No configured providers"
+msgstr ""
+
+#: extension.js:149
 msgid "Switched to: "
 msgstr ""
 
-#: extension.js:138
+#: extension.js:156
+msgid "Error switching provider"
+msgstr ""
+
+#: extension.js:156
+msgid "Please check the extension settings"
+msgstr ""
+
+#: extension.js:199
 msgid "Please configure Anthropic API key first"
 msgstr ""
 
-#: extension.js:138
+#: extension.js:199
 msgid ""
 "Click \"Add more..\" button to open settings and configure the official API "
 "key for Anthropic provider."
 msgstr ""
 
-#: extension.js:140
+#: extension.js:201
 msgid "Please configure API key for "
 msgstr ""
 
-#: extension.js:140
+#: extension.js:201
 msgid " first"
 msgstr ""
 
-#: extension.js:140
+#: extension.js:201
 msgid ""
 "Click \"Add more..\" button to open settings and configure the API key for "
 "this provider."
 msgstr ""
 
-#: prefs.js:60
+#: prefs.js:66
 msgid "General"
 msgstr ""
 
-#: prefs.js:67 ui/statsPanel.js:245
+#: prefs.js:73 ui/statsPanel.js:261
 msgid "Loading..."
 msgstr ""
 
-#: prefs.js:68
+#: prefs.js:74
 msgid "Please wait, initializing settings interface"
 msgstr ""
 
-#: prefs.js:109
-msgid "Notifications"
-msgstr ""
-
-#: prefs.js:110
-msgid "Configure Claude Code hooks notifications"
-msgstr ""
-
-#: prefs.js:116
-msgid "Enable Notifications"
-msgstr ""
-
-#: prefs.js:117
-msgid "Enable Claude Code hooks notifications"
-msgstr ""
-
-#: prefs.js:137
-msgid "Normal Exit Notifications"
-msgstr ""
-
-#: prefs.js:138
-msgid "Show notifications when Claude Code exits normally (exit code 0)"
-msgstr ""
-
-#: prefs.js:142
-msgid "Abnormal Exit Notifications"
-msgstr ""
-
-#: prefs.js:143
-msgid ""
-"Show notifications when Claude Code exits abnormally (non-zero exit codes)"
-msgstr ""
-
-#: prefs.js:165
-msgid "Global Settings"
-msgstr ""
-
-#: prefs.js:166
-msgid "Configure global extension options"
-msgstr ""
-
-#: prefs.js:172
-msgid "Auto Update"
-msgstr ""
-
-#: prefs.js:173
-msgid "Enable automatic updates for the extension"
-msgstr ""
-
-#: prefs.js:189
-msgid "Proxy Settings"
-msgstr ""
-
-#: prefs.js:190 prefs.js:283
-msgid "Configure network proxy server"
-msgstr ""
-
-#: prefs.js:206 prefs.js:208 prefs.js:279 prefs.js:281
-msgid "Configured: "
-msgstr ""
-
-#: prefs.js:220
-msgid "Proxy Server"
-msgstr ""
-
-#: prefs.js:227
-msgid "Port"
-msgstr ""
-
-#: prefs.js:234 ui/apiProviderManager.js:187 ui/sessionDialog.js:171
-msgid "Actions"
-msgstr ""
-
-#: prefs.js:244 ui/apiProviderManager.js:109 ui/apiProviderManager.js:199
-#: ui/apiProviderManager.js:380
-msgid "Cancel"
-msgstr ""
-
-#: prefs.js:249 ui/apiProviderManager.js:205
-msgid "Save"
-msgstr ""
-
-#: prefs.js:296
+#: ui/aboutGroup.js:20
 msgid "About"
 msgstr ""
 
-#: prefs.js:302
+#: ui/aboutGroup.js:26
 msgid "Quickly switch Claude Code API providers"
+msgstr ""
+
+#: ui/aboutGroup.js:33
+msgid "Version"
+msgstr ""
+
+#: ui/aboutGroup.js:42
+msgid "Author"
 msgstr ""
 
 #: ui/apiProviderManager.js:26
@@ -207,6 +141,12 @@ msgstr ""
 msgid "Small Model (optional, e.g.: claude-3-haiku-20240307)"
 msgstr ""
 
+#: ui/apiProviderManager.js:109 ui/apiProviderManager.js:199
+#: ui/apiProviderManager.js:400 ui/globalSettingsGroup.js:105
+#: ui/notificationsGroup.js:481
+msgid "Cancel"
+msgstr ""
+
 #: ui/apiProviderManager.js:110
 msgid "Add"
 msgstr ""
@@ -227,24 +167,417 @@ msgstr ""
 msgid "Small Model"
 msgstr ""
 
+#: ui/apiProviderManager.js:187 ui/globalSettingsGroup.js:95
+#: ui/sessionDialog.js:171
+msgid "Actions"
+msgstr ""
+
+#: ui/apiProviderManager.js:205 ui/globalSettingsGroup.js:110
+msgid "Save"
+msgstr ""
+
 #: ui/apiProviderManager.js:267
 msgid "Delete this provider"
 msgstr ""
 
-#: ui/apiProviderManager.js:376
+#: ui/apiProviderManager.js:396
 msgid "Confirm Delete"
 msgstr ""
 
-#: ui/apiProviderManager.js:377
+#: ui/apiProviderManager.js:397
 msgid "Are you sure you want to delete provider \""
 msgstr ""
 
-#: ui/apiProviderManager.js:377
+#: ui/apiProviderManager.js:397
 msgid "\"\\n\\nThis action cannot be undone."
 msgstr ""
 
-#: ui/apiProviderManager.js:381
+#: ui/apiProviderManager.js:401
 msgid "Delete"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:23
+msgid "Global Settings"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:24
+msgid "Configure global extension options"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:29
+msgid "Auto Update"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:30
+msgid "Enable automatic updates for the extension"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:49
+msgid "Proxy Settings"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:50 ui/globalSettingsGroup.js:144
+msgid "Configure network proxy server"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:66 ui/globalSettingsGroup.js:68
+#: ui/globalSettingsGroup.js:140 ui/globalSettingsGroup.js:142
+msgid "Configured: "
+msgstr ""
+
+#: ui/globalSettingsGroup.js:81
+msgid "Proxy Server"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:88
+msgid "Port"
+msgstr ""
+
+#: ui/notificationsGroup.js:23
+msgid "Notifications"
+msgstr ""
+
+#: ui/notificationsGroup.js:24
+msgid "Get notified when Claude Code tasks complete or need attention"
+msgstr ""
+
+#: ui/notificationsGroup.js:29
+msgid "Enable Notifications"
+msgstr ""
+
+#: ui/notificationsGroup.js:30
+msgid "Get desktop notifications for Claude Code events"
+msgstr ""
+
+#: ui/notificationsGroup.js:55
+msgid "Task Completion Notifications"
+msgstr ""
+
+#: ui/notificationsGroup.js:56
+msgid "Show notifications when Claude Code successfully completes a task"
+msgstr ""
+
+#: ui/notificationsGroup.js:66
+msgid "Task Interruption Notifications"
+msgstr ""
+
+#: ui/notificationsGroup.js:67
+msgid ""
+"Show notifications when Claude Code stops unexpectedly or encounters errors"
+msgstr ""
+
+#: ui/notificationsGroup.js:77
+msgid "Authorization Notifications"
+msgstr ""
+
+#: ui/notificationsGroup.js:78
+msgid ""
+"Show notifications when Claude Code needs permission or is waiting for input"
+msgstr ""
+
+#: ui/notificationsGroup.js:93
+msgid "Advanced Settings"
+msgstr ""
+
+#: ui/notificationsGroup.js:94
+msgid "Customize notification messages and setup external notifications"
+msgstr ""
+
+#: ui/notificationsGroup.js:118 ui/notificationsGroup.js:132
+msgid "Advanced Notification Settings"
+msgstr ""
+
+#: ui/notificationsGroup.js:171
+msgid "Custom Messages"
+msgstr ""
+
+#: ui/notificationsGroup.js:172
+msgid "Personalize the text shown in notifications"
+msgstr ""
+
+#: ui/notificationsGroup.js:177
+msgid "Task Completion Message"
+msgstr ""
+
+#: ui/notificationsGroup.js:189
+msgid "Task Interruption Message"
+msgstr ""
+
+#: ui/notificationsGroup.js:201
+msgid "Authorization Notification Message"
+msgstr ""
+
+#: ui/notificationsGroup.js:220
+msgid "Telegram Notifications"
+msgstr ""
+
+#: ui/notificationsGroup.js:221 ui/notificationsGroup.js:227
+msgid "Send notifications to Telegram bot"
+msgstr ""
+
+#: ui/notificationsGroup.js:226
+msgid "Enable Telegram Notifications"
+msgstr ""
+
+#: ui/notificationsGroup.js:237
+msgid "Telegram Bot Token"
+msgstr ""
+
+#: ui/notificationsGroup.js:249
+msgid "Telegram Chat ID"
+msgstr ""
+
+#: ui/notificationsGroup.js:260
+msgid "How to get Chat ID"
+msgstr ""
+
+#: ui/notificationsGroup.js:273
+msgid "Test Telegram Configuration"
+msgstr ""
+
+#: ui/notificationsGroup.js:274
+msgid "Send a test message to verify your Telegram settings"
+msgstr ""
+
+#: ui/notificationsGroup.js:279 ui/notificationsGroup.js:699
+msgid "Send Test Message"
+msgstr ""
+
+#: ui/notificationsGroup.js:293
+msgid "How to Setup Telegram Bot"
+msgstr ""
+
+#: ui/notificationsGroup.js:294
+msgid ""
+"1. Create bot with @BotFather\n"
+"2. Get your Chat ID from @userinfobot\n"
+"3. Enter both values above"
+msgstr ""
+
+#: ui/notificationsGroup.js:314
+msgid "Notification Behavior"
+msgstr ""
+
+#: ui/notificationsGroup.js:315
+msgid "Configure how notifications are displayed and behave"
+msgstr ""
+
+#: ui/notificationsGroup.js:320
+msgid "Enable Notification Sound"
+msgstr ""
+
+#: ui/notificationsGroup.js:321
+msgid "Play sound when notifications are shown"
+msgstr ""
+
+#: ui/notificationsGroup.js:331
+msgid "Custom Sound File"
+msgstr ""
+
+#: ui/notificationsGroup.js:332
+msgid "Choose a custom sound file for notifications"
+msgstr ""
+
+#: ui/notificationsGroup.js:337
+msgid "Default system sound"
+msgstr ""
+
+#: ui/notificationsGroup.js:356
+msgid "Notification Urgency"
+msgstr ""
+
+#: ui/notificationsGroup.js:357
+msgid "Set the urgency level for notifications"
+msgstr ""
+
+#: ui/notificationsGroup.js:361
+msgid "Low"
+msgstr ""
+
+#: ui/notificationsGroup.js:362
+msgid "Normal"
+msgstr ""
+
+#: ui/notificationsGroup.js:363
+msgid "Critical"
+msgstr ""
+
+#: ui/notificationsGroup.js:379
+msgid "Notification Timeout"
+msgstr ""
+
+#: ui/notificationsGroup.js:380
+msgid "Time in seconds before notification disappears (0 = no timeout)"
+msgstr ""
+
+#: ui/notificationsGroup.js:405
+msgid "Custom Commands"
+msgstr ""
+
+#: ui/notificationsGroup.js:406
+msgid "Run custom commands when different events occur"
+msgstr ""
+
+#: ui/notificationsGroup.js:420
+msgid "Task Completion Command"
+msgstr ""
+
+#: ui/notificationsGroup.js:420
+msgid "Command to run when Claude Code completes successfully"
+msgstr ""
+
+#: ui/notificationsGroup.js:421
+msgid "Task Interruption Command"
+msgstr ""
+
+#: ui/notificationsGroup.js:421
+msgid "Command to run when Claude Code stops unexpectedly"
+msgstr ""
+
+#: ui/notificationsGroup.js:422
+msgid "Authorization Command"
+msgstr ""
+
+#: ui/notificationsGroup.js:422
+msgid "Command to run when Claude Code needs permission"
+msgstr ""
+
+#: ui/notificationsGroup.js:423
+msgid "Session Start Command"
+msgstr ""
+
+#: ui/notificationsGroup.js:423
+msgid "Command to run when Claude Code session starts"
+msgstr ""
+
+#: ui/notificationsGroup.js:455
+msgid "Command Variables"
+msgstr ""
+
+#: ui/notificationsGroup.js:456
+msgid "Use {message}, {exitCode}, {provider} in your commands"
+msgstr ""
+
+#: ui/notificationsGroup.js:476
+msgid "Choose Sound File"
+msgstr ""
+
+#: ui/notificationsGroup.js:482
+msgid "Open"
+msgstr ""
+
+#: ui/notificationsGroup.js:486
+msgid "Audio Files"
+msgstr ""
+
+#: ui/notificationsGroup.js:491
+msgid "All Files"
+msgstr ""
+
+#: ui/notificationsGroup.js:518
+msgid "Please enter both Bot Token and Chat ID first"
+msgstr ""
+
+#: ui/notificationsGroup.js:523
+msgid "Sending..."
+msgstr ""
+
+#: ui/notificationsGroup.js:559
+msgid "Test failed: "
+msgstr ""
+
+#: ui/notificationsGroup.js:594
+msgid "Invalid Bot Token: "
+msgstr ""
+
+#: ui/notificationsGroup.js:597
+msgid "Network error during validation"
+msgstr ""
+
+#: ui/notificationsGroup.js:600
+msgid "Failed to validate Bot Token: "
+msgstr ""
+
+#: ui/notificationsGroup.js:661
+msgid "Test message sent successfully!"
+msgstr ""
+
+#: ui/notificationsGroup.js:665
+msgid "Please check your Telegram."
+msgstr ""
+
+#: ui/notificationsGroup.js:673
+msgid "API Error: "
+msgstr ""
+
+#: ui/notificationsGroup.js:678
+msgid "Network error: "
+msgstr ""
+
+#: ui/notificationsGroup.js:682
+msgid "Failed to parse response: "
+msgstr ""
+
+#: ui/notificationsGroup.js:704
+msgid "Test Successful"
+msgstr ""
+
+#: ui/notificationsGroup.js:704
+msgid "Test Failed"
+msgstr ""
+
+#: ui/notificationsGroup.js:709
+msgid "OK"
+msgstr ""
+
+#: ui/notificationsGroup.js:729
+msgid "How to get Telegram Chat ID"
+msgstr ""
+
+#: ui/notificationsGroup.js:730
+msgid "Follow these steps to get your Chat ID:"
+msgstr ""
+
+#: ui/notificationsGroup.js:731
+msgid "Start a conversation with your bot"
+msgstr ""
+
+#: ui/notificationsGroup.js:732
+msgid "Send any message to the bot"
+msgstr ""
+
+#: ui/notificationsGroup.js:733
+msgid "Open this URL in your browser:"
+msgstr ""
+
+#: ui/notificationsGroup.js:735
+msgid "Replace <YOUR_BOT_TOKEN> with your actual bot token"
+msgstr ""
+
+#: ui/notificationsGroup.js:736
+msgid "Look for \"chat\":{\"id\":XXXXXXX} in the response"
+msgstr ""
+
+#: ui/notificationsGroup.js:737
+msgid "Copy the number after \"id\": (this is your Chat ID)"
+msgstr ""
+
+#: ui/notificationsGroup.js:738
+msgid ""
+"Tip: If you see no messages, send another message to your bot and refresh "
+"the URL"
+msgstr ""
+
+#: ui/notificationsGroup.js:742
+msgid "Close"
+msgstr ""
+
+#: ui/notificationsGroup.js:747
+msgid "Copy URL Template"
+msgstr ""
+
+#: ui/notificationsGroup.js:757
+msgid "URL template copied to clipboard"
 msgstr ""
 
 #: ui/sessionDialog.js:27
@@ -335,46 +668,46 @@ msgstr ""
 msgid "Message Content"
 msgstr ""
 
-#: ui/statsPanel.js:31
+#: ui/statsPanel.js:39
 msgid "INFO"
 msgstr ""
 
-#: ui/statsPanel.js:32
+#: ui/statsPanel.js:40
 msgid "View your Claude Code API usage and costs"
 msgstr ""
 
-#: ui/statsPanel.js:48
+#: ui/statsPanel.js:56
 msgid "Total Cost"
 msgstr ""
 
-#: ui/statsPanel.js:57
+#: ui/statsPanel.js:65
 msgid "Total Sessions"
 msgstr ""
 
-#: ui/statsPanel.js:67
+#: ui/statsPanel.js:75
 msgid "Total Tokens"
 msgstr ""
 
-#: ui/statsPanel.js:89 ui/statsPanel.js:274
+#: ui/statsPanel.js:97 ui/statsPanel.js:314
 msgid "Refresh Stats"
 msgstr ""
 
-#: ui/statsPanel.js:93
+#: ui/statsPanel.js:101
 msgid "Not loaded yet"
 msgstr ""
 
-#: ui/statsPanel.js:246
+#: ui/statsPanel.js:264
 msgid "Fetching data..."
 msgstr ""
 
-#: ui/statsPanel.js:262
+#: ui/statsPanel.js:297
 msgid "Last updated: "
 msgstr ""
 
-#: ui/statsPanel.js:267 ui/statsPanel.js:270
+#: ui/statsPanel.js:305 ui/statsPanel.js:308
 msgid "Failed to load"
 msgstr ""
 
-#: ui/statsPanel.js:268 ui/statsPanel.js:269
+#: ui/statsPanel.js:306 ui/statsPanel.js:307
 msgid "Error"
 msgstr ""

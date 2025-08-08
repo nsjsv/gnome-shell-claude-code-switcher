@@ -4,7 +4,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
-import {TokenStatsManager, TokenStats} from '../tokenStats.js';
+import {TokenStatsManager, TokenStats} from '../lib/tokenStats.js';
 
 /**
  * 统计仪表盘UI组件
@@ -245,17 +245,44 @@ export class StatsPanel {
     }
 
     /**
-     * 刷新 Token 统计数据
+     * 刷新 Token 统计数据 (优化版本)
      */
-    async _refreshTokenStats() {
+    _refreshTokenStats() {
+        // 防止重复刷新
+        if (this._isRefreshing) {
+            return;
+        }
+        
+        this._isRefreshing = true;
+        
         // 设置刷新按钮为加载状态
-        this.statsWidgets.refreshButton.set_sensitive(false);
-        this.statsWidgets.refreshButton.set_label(_('Loading...'));
-        this.statsWidgets.lastUpdatedLabel.set_label(_('Fetching data...'));
+        if (this.statsWidgets.refreshButton) {
+            this.statsWidgets.refreshButton.set_sensitive(false);
+            this.statsWidgets.refreshButton.set_label(_('Loading...'));
+        }
+        if (this.statsWidgets.lastUpdatedLabel) {
+            this.statsWidgets.lastUpdatedLabel.set_label(_('Fetching data...'));
+        }
 
+        // 使用GLib.idle_add来异步处理，避免阻塞UI
+        GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+            this._performStatsRefresh();
+            return GLib.SOURCE_REMOVE;
+        });
+    }
+    
+    /**
+     * 执行统计数据刷新
+     */
+    async _performStatsRefresh() {
         try {
             // 异步获取统计数据
             const stats = await this.tokenStatsManager.getTokenStatsAsync();
+            
+            // 检查组件是否仍然有效
+            if (!this.statsWidgets.totalCostLabel) {
+                return;
+            }
             
             // 更新界面
             this.statsWidgets.totalCostLabel.set_label(TokenStats.formatCurrency(stats.totalCost));
@@ -263,23 +290,30 @@ export class StatsPanel {
             this.statsWidgets.totalTokensLabel.set_label(TokenStats.formatNumber(stats.totalTokens));
             
             const now = new Date();
-            const timeStr = now.toLocaleTimeString('zh-CN', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
+            const timeStr = now.toLocaleTimeString('zh-CN', {
+                hour: '2-digit',
+                minute: '2-digit'
             });
             this.statsWidgets.lastUpdatedLabel.set_label(_('Last updated: ') + timeStr);
 
             console.log('Token stats refreshed successfully');
         } catch (error) {
             console.error('Failed to refresh token stats:', error);
-            this.statsWidgets.totalCostLabel.set_label(_('Failed to load'));
-            this.statsWidgets.totalSessionsLabel.set_label(_('Error'));
-            this.statsWidgets.totalTokensLabel.set_label(_('Error'));
-            this.statsWidgets.lastUpdatedLabel.set_label(_('Failed to load'));
+            
+            // 检查组件是否仍然有效
+            if (this.statsWidgets.totalCostLabel) {
+                this.statsWidgets.totalCostLabel.set_label(_('Failed to load'));
+                this.statsWidgets.totalSessionsLabel.set_label(_('Error'));
+                this.statsWidgets.totalTokensLabel.set_label(_('Error'));
+                this.statsWidgets.lastUpdatedLabel.set_label(_('Failed to load'));
+            }
         } finally {
             // 恢复刷新按钮状态
-            this.statsWidgets.refreshButton.set_sensitive(true);
-            this.statsWidgets.refreshButton.set_label(_('Refresh Stats'));
+            if (this.statsWidgets.refreshButton) {
+                this.statsWidgets.refreshButton.set_sensitive(true);
+                this.statsWidgets.refreshButton.set_label(_('Refresh Stats'));
+            }
+            this._isRefreshing = false;
         }
     }
 
@@ -288,9 +322,29 @@ export class StatsPanel {
      * 将使用 SessionDetailDialog 来处理
      */
     async _showSessionsDetailDialog() {
-        // 动态导入会话详情模块
-        const { SessionDetailDialog } = await import('../ui/sessionDialog.js');
-        const dialog = new SessionDetailDialog(this.extensionPath, this.tokenStatsManager);
-        dialog.show(this.parentWindow);
+        try {
+            // 动态导入会话详情模块
+            const { SessionDetailDialog } = await import('../ui/sessionDialog.js');
+            const dialog = new SessionDetailDialog(this.extensionPath, this.tokenStatsManager);
+            dialog.show(this.parentWindow);
+        } catch (error) {
+            console.error('Failed to show session detail dialog:', error);
+        }
+    }
+    
+    /**
+     * 清理资源
+     */
+    cleanup() {
+        // 清理统计组件引用
+        Object.keys(this.statsWidgets).forEach(key => {
+            this.statsWidgets[key] = null;
+        });
+        
+        // 清理其他引用
+        this.extensionPath = null;
+        this.tokenStatsManager = null;
+        this.parentWindow = null;
+        this._isRefreshing = false;
     }
 }

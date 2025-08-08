@@ -26,7 +26,7 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import {ClaudeHookInterface} from './claudeHookInterface.js';
+import {ClaudeHookInterface} from './lib/claudeHookInterface.js';
 
 const Indicator = GObject.registerClass(
 class Indicator extends PanelMenu.Button {
@@ -34,6 +34,7 @@ class Indicator extends PanelMenu.Button {
         super._init(0.0, _('Claude Code Switcher'));
         this._extension = extension;
         this._settings = extension.getSettings();
+        this._signalIds = [];
 
         this.add_child(new St.Icon({
             icon_name: 'face-smile-symbolic',
@@ -43,13 +44,17 @@ class Indicator extends PanelMenu.Button {
         // 构建菜单
         this._buildMenu();
 
-        // 监听设置变化
-        this._settings.connect('changed::api-providers', () => {
-            this._rebuildMenu();
-        });
-        this._settings.connect('changed::current-provider', () => {
-            this._updateCurrentProvider();
-        });
+        // 监听设置变化 - 使用数组管理信号连接
+        this._signalIds.push(
+            this._settings.connect('changed::api-providers', () => {
+                this._rebuildMenu();
+            })
+        );
+        this._signalIds.push(
+            this._settings.connect('changed::current-provider', () => {
+                this._updateCurrentProvider();
+            })
+        );
     }
 
     _buildMenu() {
@@ -73,62 +78,118 @@ class Indicator extends PanelMenu.Button {
     _addProviderMenuItems() {
         try {
             const providersJson = this._settings.get_string('api-providers');
+            if (!providersJson || providersJson.trim() === '') {
+                this._addNoProvidersItem();
+                return;
+            }
+
             const providers = JSON.parse(providersJson);
             const currentProvider = this._settings.get_string('current-provider');
 
-            if (providers.length === 0) {
-                // 如果没有配置提供商，显示提示
-                let noProvidersItem = new PopupMenu.PopupMenuItem(_('No configured providers'));
-                noProvidersItem.setSensitive(false);
-                this.menu.addMenuItem(noProvidersItem);
+            if (!Array.isArray(providers) || providers.length === 0) {
+                this._addNoProvidersItem();
                 return;
             }
 
             // 为每个提供商创建菜单项
-            providers.forEach(provider => {
-                let item = new PopupMenu.PopupMenuItem(provider.name);
-                
-                // 如果是当前选中的提供商，添加勾选标记
-                if (provider.name === currentProvider) {
-                    item.setOrnament(PopupMenu.Ornament.CHECK);
+            providers.forEach((provider, index) => {
+                try {
+                    if (!provider || typeof provider.name !== 'string') {
+                        console.warn(`Invalid provider at index ${index}:`, provider);
+                        return;
+                    }
+
+                    let item = new PopupMenu.PopupMenuItem(provider.name);
+                    
+                    // 如果是当前选中的提供商，添加勾选标记
+                    if (provider.name === currentProvider) {
+                        item.setOrnament(PopupMenu.Ornament.CHECK);
+                    }
+
+                    item.connect('activate', () => {
+                        this._selectProvider(provider.name);
+                    });
+
+                    this.menu.addMenuItem(item);
+                } catch (itemError) {
+                    console.error(`Error creating menu item for provider ${provider?.name || 'unknown'}:`, itemError);
                 }
-
-                item.connect('activate', () => {
-                    this._selectProvider(provider.name);
-                });
-
-                this.menu.addMenuItem(item);
             });
         } catch (e) {
-            console.log('Failed to load API providers:', e);
-            let errorItem = new PopupMenu.PopupMenuItem(_('Failed to load providers'));
-            errorItem.setSensitive(false);
-            this.menu.addMenuItem(errorItem);
+            console.error('Failed to load API providers:', e);
+            this._addErrorItem(_('Failed to load providers'));
         }
+    }
+    
+    /**
+     * 添加无提供商提示项
+     */
+    _addNoProvidersItem() {
+        let noProvidersItem = new PopupMenu.PopupMenuItem(_('No configured providers'));
+        noProvidersItem.setSensitive(false);
+        this.menu.addMenuItem(noProvidersItem);
+    }
+    
+    /**
+     * 添加错误提示项
+     */
+    _addErrorItem(message) {
+        let errorItem = new PopupMenu.PopupMenuItem(message);
+        errorItem.setSensitive(false);
+        this.menu.addMenuItem(errorItem);
     }
 
     _selectProvider(providerName) {
-        // 检查提供商是否有API密钥
-        if (this._checkProviderKey(providerName)) {
-            this._settings.set_string('current-provider', providerName);
-            // 同步配置到本地文件
-            this._extension.syncToLocalFile();
-            Main.notify(_('Switched to: ') + providerName);
-        } else {
-            // 显示配置API密钥的提示
-            this._showConfigureKeyNotification(providerName);
+        try {
+            // 检查提供商是否有API密钥
+            if (this._checkProviderKey(providerName)) {
+                this._settings.set_string('current-provider', providerName);
+                // 同步配置到本地文件
+                this._extension.syncToLocalFile();
+                Main.notify(_('Switched to: ') + providerName);
+            } else {
+                // 显示配置API密钥的提示
+                this._showConfigureKeyNotification(providerName);
+            }
+        } catch (e) {
+            console.error('Error selecting provider:', e);
+            Main.notify(_('Error switching provider'), _('Please check the extension settings'));
         }
     }
 
     _checkProviderKey(providerName) {
         try {
+            if (!providerName || typeof providerName !== 'string') {
+                console.warn('Invalid provider name:', providerName);
+                return false;
+            }
+
             const providersJson = this._settings.get_string('api-providers');
+            if (!providersJson || providersJson.trim() === '') {
+                console.warn('No providers configuration found');
+                return false;
+            }
+
             const providers = JSON.parse(providersJson);
+            if (!Array.isArray(providers)) {
+                console.warn('Invalid providers format - not an array');
+                return false;
+            }
             
-            const provider = providers.find(p => p.name === providerName);
-            return provider && provider.key && provider.key.trim() !== '';
+            const provider = providers.find(p => p && p.name === providerName);
+            if (!provider) {
+                console.warn(`Provider '${providerName}' not found`);
+                return false;
+            }
+
+            const hasValidKey = provider.key && typeof provider.key === 'string' && provider.key.trim() !== '';
+            if (!hasValidKey) {
+                console.info(`Provider '${providerName}' has no valid API key`);
+            }
+
+            return hasValidKey;
         } catch (e) {
-            console.log('Failed to check API key:', e);
+            console.error('Failed to check API key for provider:', providerName, e);
             return false;
         }
     }
@@ -155,6 +216,30 @@ class Indicator extends PanelMenu.Button {
             this._extension.openPreferences();
         }
     }
+    
+    /**
+     * 清理资源 - 符合GJS最佳实践
+     */
+    destroy() {
+        // 断开信号连接
+        if (this._signalIds && this._settings) {
+            this._signalIds.forEach(id => {
+                try {
+                    this._settings.disconnect(id);
+                } catch (e) {
+                    console.error('Error disconnecting signal:', e);
+                }
+            });
+            this._signalIds = null;
+        }
+        
+        // 清理引用
+        this._extension = null;
+        this._settings = null;
+        
+        // 调用父类的destroy方法
+        super.destroy();
+    }
 });
 
 export default class IndicatorExampleExtension extends Extension {
@@ -169,33 +254,41 @@ export default class IndicatorExampleExtension extends Extension {
         this._settings = this.getSettings();
         this._settingsChangedIds = [];
         
-        // 监听各种设置变化
-        this._settingsChangedIds.push(
-            this._settings.connect('changed::current-provider', () => {
-                this.syncToLocalFile();
-            })
-        );
-        this._settingsChangedIds.push(
-            this._settings.connect('changed::auto-update', () => {
-                this.syncToLocalFile();
-            })
-        );
-        this._settingsChangedIds.push(
-            this._settings.connect('changed::proxy-host', () => {
-                this.syncToLocalFile();
-            })
-        );
-        this._settingsChangedIds.push(
-            this._settings.connect('changed::proxy-port', () => {
-                this.syncToLocalFile();
-            })
-        );
-        this._settingsChangedIds.push(
-            this._settings.connect('changed::notifications-enabled', () => {
-                // 同步设置到本地文件（包括hooks）
-                this.syncToLocalFile();
-            })
-        );
+        // 优化：使用单个处理函数和批量监听
+        const settingsToWatch = [
+            'current-provider',
+            'auto-update',
+            'proxy-host',
+            'proxy-port',
+            'notifications-enabled',
+            'hook-normal-exit',
+            'hook-abnormal-exit',
+            'hook-notification'
+        ];
+        
+        // 使用GLib.idle_add来防抖，避免频繁同步
+        this._syncTimeoutId = null;
+        const debouncedSync = () => {
+            if (this._syncTimeoutId) {
+                GLib.source_remove(this._syncTimeoutId);
+            }
+            this._syncTimeoutId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+                try {
+                    this.syncToLocalFile();
+                } catch (e) {
+                    console.error('Error syncing to local file:', e);
+                }
+                this._syncTimeoutId = null;
+                return GLib.SOURCE_REMOVE;
+            });
+        };
+        
+        // 批量添加监听器
+        settingsToWatch.forEach(setting => {
+            this._settingsChangedIds.push(
+                this._settings.connect(`changed::${setting}`, debouncedSync)
+            );
+        });
         
         // 初始化时同步一次
         this.syncToLocalFile();
@@ -204,20 +297,42 @@ export default class IndicatorExampleExtension extends Extension {
     disable() {
         // Cleanup Claude Code Hook Interface
         if (this._claudeHookInterface) {
-            this._claudeHookInterface.destroy();
+            try {
+                this._claudeHookInterface.destroy();
+            } catch (e) {
+                console.error('Error destroying Claude Hook Interface:', e);
+            }
             this._claudeHookInterface = null;
         }
         
+        // 清理同步超时
+        if (this._syncTimeoutId) {
+            GLib.source_remove(this._syncTimeoutId);
+            this._syncTimeoutId = null;
+        }
+        
         // 断开设置监听
-        if (this._settingsChangedIds) {
+        if (this._settingsChangedIds && this._settings) {
             this._settingsChangedIds.forEach(id => {
-                this._settings.disconnect(id);
+                try {
+                    this._settings.disconnect(id);
+                } catch (e) {
+                    console.error('Error disconnecting settings signal:', e);
+                }
             });
             this._settingsChangedIds = null;
         }
         
-        this._indicator.destroy();
-        this._indicator = null;
+        // 清理指示器
+        if (this._indicator) {
+            try {
+                this._indicator.destroy();
+            } catch (e) {
+                console.error('Error destroying indicator:', e);
+            }
+            this._indicator = null;
+        }
+        
         this._settings = null;
     }
     
@@ -285,9 +400,9 @@ export default class IndicatorExampleExtension extends Extension {
     }
     
     /**
-     * 读取现有的settings.json文件 (异步)
+     * 读取现有的settings.json文件 (同步优化版本)
      */
-    async _readExistingConfig() {
+    _readExistingConfig() {
         const configPath = this._getClaudeConfigPath();
         const file = Gio.File.new_for_path(configPath);
         
@@ -296,24 +411,12 @@ export default class IndicatorExampleExtension extends Extension {
         }
         
         try {
-            const [contents] = await new Promise((resolve, reject) => {
-                file.load_contents_async(null, (file, result) => {
-                    try {
-                        const [success, contents] = file.load_contents_finish(result);
-                        if (success) {
-                            resolve([contents]);
-                        } else {
-                            reject(new Error('Failed to read file'));
-                        }
-                    } catch (e) {
-                        reject(e);
-                    }
-                });
-            });
-            
-            const decoder = new TextDecoder('utf-8');
-            const jsonString = decoder.decode(contents);
-            return JSON.parse(jsonString);
+            const [success, contents] = file.load_contents(null);
+            if (success) {
+                const decoder = new TextDecoder('utf-8');
+                const jsonString = decoder.decode(contents);
+                return JSON.parse(jsonString);
+            }
         } catch (e) {
             console.error('Failed to read Claude config file:', e);
         }
@@ -342,9 +445,9 @@ export default class IndicatorExampleExtension extends Extension {
     }
     
     /**
-     * 生成标准的Claude配置对象 (异步)
+     * 生成标准的Claude配置对象 (优化版本)
      */
-    async _generateClaudeConfig() {
+    _generateClaudeConfig() {
         const currentProvider = this._getCurrentProviderInfo();
         const autoUpdate = this._settings.get_boolean('auto-update');
         const proxyHost = this._settings.get_string('proxy-host');
@@ -352,6 +455,9 @@ export default class IndicatorExampleExtension extends Extension {
         
         // 获取通知设置
         const notificationsEnabled = this._settings.get_boolean('notifications-enabled');
+        const normalExitEnabled = this._settings.get_boolean('hook-normal-exit');
+        const abnormalExitEnabled = this._settings.get_boolean('hook-abnormal-exit');
+        const notificationHookEnabled = this._settings.get_boolean('hook-notification');
         
         // 构建代理URL
         let proxyUrl = '';
@@ -363,7 +469,7 @@ export default class IndicatorExampleExtension extends Extension {
         }
         
         // 读取现有配置以保留其他字段（包括自定义hooks）
-        const existingConfig = await this._readExistingConfig() || {};
+        const existingConfig = this._readExistingConfig() || {};
         
         const config = {
             env: {
@@ -391,58 +497,102 @@ export default class IndicatorExampleExtension extends Extension {
             config.hooks = {};
         }
         
-        if (notificationsEnabled) {
-            // 添加我们的hooks
-            // 使用gjs命令执行JS脚本，避免路径问题
-            const checkCommand = `cd "${this.path}" && gjs check-provider.js`;
+        // 根据具体的通知设置来添加hooks
+        if (notificationsEnabled && (normalExitEnabled || abnormalExitEnabled || notificationHookEnabled)) {
+            const ourHooks = {};
+            const notificationCommand = `cd "${this.path}" && gjs -m ./hooks/notificationHandler.js`;
             
-            const ourHooks = {
-                'UserPromptSubmit': [
+            // 正常退出通知：使用Stop hook（只在正常完成时触发）
+            if (normalExitEnabled) {
+                ourHooks['Stop'] = [
                     {
-                        "matcher": "*",  // 匹配所有用户提示
                         "hooks": [
                             {
                                 "type": "command",
-                                "command": checkCommand
+                                "command": notificationCommand
                             }
                         ]
                     }
-                ]
-            };
+                ];
+            }
             
-            // 合并hooks
-            Object.keys(ourHooks).forEach(eventName => {
-                if (!config.hooks[eventName]) {
-                    config.hooks[eventName] = ourHooks[eventName];
-                } else {
-                    // 移除旧的Claude Code Switcher hooks
+            // 异常退出通知：使用独立的进程监控器
+            if (abnormalExitEnabled) {
+                const processMonitorCommand = `cd "${this.path}" && gjs -m ./hooks/processMonitor.js &`;
+                
+                // 使用SessionStart hook启动进程监控器
+                ourHooks['SessionStart'] = [
+                    {
+                        "hooks": [
+                            {
+                                "type": "command",
+                                "command": processMonitorCommand
+                            }
+                        ]
+                    }
+                ];
+            }
+            
+            // 添加Notification hook来处理Claude Code通知事件
+            if (notificationHookEnabled) {
+                ourHooks['Notification'] = [
+                    {
+                        "hooks": [
+                            {
+                                "type": "command",
+                                "command": notificationCommand
+                            }
+                        ]
+                    }
+                ];
+            }
+            
+            // 先清理所有扩展相关的hooks
+            ['Stop', 'Notification', 'SessionStart'].forEach(eventName => {
+                if (config.hooks[eventName]) {
                     config.hooks[eventName] = config.hooks[eventName].filter(hookGroup => {
                         if (hookGroup.hooks && Array.isArray(hookGroup.hooks)) {
-                            return !hookGroup.hooks.some(h => 
+                            return !hookGroup.hooks.some(h =>
                                 h.command && (
                                     h.command.includes('Claude Code Switcher') ||
-                                    h.command.includes('check-provider.js') ||
-                                    h.command.includes('check-provider.sh')
+                                    h.command.includes('hooks/notificationHandler.js') ||
+                                    h.command.includes('hooks/processMonitor.js') ||
+                                    h.command.includes('ui/notificationHandler.js') ||
+                                    h.command.includes('ui/processMonitor.js')
                                 )
                             );
                         }
                         return true;
                     });
-                    // 添加新的
+                    
+                    // 如果清理后为空，删除该事件
+                    if (config.hooks[eventName].length === 0) {
+                        delete config.hooks[eventName];
+                    }
+                }
+            });
+            
+            // 然后添加新的hooks
+            Object.keys(ourHooks).forEach(eventName => {
+                if (!config.hooks[eventName]) {
+                    config.hooks[eventName] = ourHooks[eventName];
+                } else {
                     config.hooks[eventName].push(...ourHooks[eventName]);
                 }
             });
         } else {
             // 移除我们的hooks但保留用户自定义的
-            ['UserPromptSubmit', 'PreToolUse', 'PostToolUse', 'Stop'].forEach(eventName => {
+            ['Stop', 'Notification', 'SessionStart', 'UserPromptSubmit', 'PreToolUse', 'PostToolUse'].forEach(eventName => {
                 if (config.hooks[eventName]) {
                     config.hooks[eventName] = config.hooks[eventName].filter(hookGroup => {
                         if (hookGroup.hooks && Array.isArray(hookGroup.hooks)) {
-                            return !hookGroup.hooks.some(h => 
+                            return !hookGroup.hooks.some(h =>
                                 h.command && (
                                     h.command.includes('Claude Code Switcher') ||
-                                    h.command.includes('check-provider.js') ||
-                                    h.command.includes('check-provider.sh')
+                                    h.command.includes('hooks/notificationHandler.js') ||
+                                    h.command.includes('hooks/processMonitor.js') ||
+                                    h.command.includes('ui/notificationHandler.js') ||
+                                    h.command.includes('ui/processMonitor.js')
                                 )
                             );
                         }
@@ -471,15 +621,15 @@ export default class IndicatorExampleExtension extends Extension {
     }
     
     /**
-     * 同步配置到本地Claude配置文件 (异步)
+     * 同步配置到本地Claude配置文件 (优化版本)
      */
-    async syncToLocalFile() {
+    syncToLocalFile() {
         if (!this._ensureClaudeDir()) {
             return;
         }
         
         const configPath = this._getClaudeConfigPath();
-        const config = await this._generateClaudeConfig();
+        const config = this._generateClaudeConfig();
         
         try {
             const jsonString = JSON.stringify(config, null, 2);

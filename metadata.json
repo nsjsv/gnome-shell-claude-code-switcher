@@ -1,6 +1,6 @@
 {
   "name": "Claude Code Switcher",
-  "description": "A GNOME shell extension for quickly switching Claude Code API providers.",
+  "description": "A GNOME shell extension for quickly switching Claude Code API providers with enhanced performance and reliability.",
   "uuid": "claude-code-switcher@nsjsv.github.io",
   "shell-version": [
     "45",
@@ -8,8 +8,9 @@
     "47",
     "48"
   ],
-  "version-name": "1.2.0",
+  "version-name": "1.4.0",
   "settings-schema": "org.gnome.shell.extensions.claude-code-switcher",
   "gettext-domain": "claude-code-switcher@nsjsv.github.io",
-  "url": "https://github.com/nsjsv/gnome-shell-claude-code-switcher"
+  "url": "https://github.com/nsjsv/gnome-shell-claude-code-switcher",
+  "session-modes": ["user"]
 }

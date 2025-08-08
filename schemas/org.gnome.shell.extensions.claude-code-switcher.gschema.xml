@@ -46,5 +46,65 @@
       <summary>Abnormal Exit Notifications</summary>
       <description>Show notifications when Claude Code exits abnormally (non-zero exit codes)</description>
     </key>
+    <key name="normal-exit-message" type="s">
+      <default>'Claude Code has completed successfully!'</default>
+      <summary>Normal Exit Message</summary>
+      <description>Custom message to display when Claude Code exits normally</description>
+    </key>
+    <key name="abnormal-exit-message" type="s">
+      <default>'Claude Code exited unexpectedly.'</default>
+      <summary>Abnormal Exit Message</summary>
+      <description>Custom message to display when Claude Code exits abnormally</description>
+    </key>
+    <key name="hook-notification" type="b">
+      <default>true</default>
+      <summary>Notification Hook</summary>
+      <description>Show notifications when Claude Code sends notifications (e.g., waiting for input)</description>
+    </key>
+    <key name="telegram-enabled" type="b">
+      <default>false</default>
+      <summary>Telegram Notifications</summary>
+      <description>Enable Telegram push notifications (reserved for future use)</description>
+    </key>
+    <key name="telegram-bot-token" type="s">
+      <default>''</default>
+      <summary>Telegram Bot Token</summary>
+      <description>Telegram bot token for push notifications (reserved for future use)</description>
+    </key>
+    <key name="telegram-chat-id" type="s">
+      <default>''</default>
+      <summary>Telegram Chat ID</summary>
+      <description>Telegram chat ID for push notifications (reserved for future use)</description>
+    </key>
+    <key name="notification-hook-message" type="s">
+      <default>'Claude Code is waiting for input or has sent a notification.'</default>
+      <summary>Notification Hook Message</summary>
+      <description>Custom message to display when Claude Code sends notifications</description>
+    </key>
+    <key name="custom-hook-commands" type="s">
+      <default>'{}'</default>
+      <summary>Custom Hook Commands</summary>
+      <description>JSON string containing custom hook commands for different events</description>
+    </key>
+    <key name="notification-sound-enabled" type="b">
+      <default>false</default>
+      <summary>Enable Notification Sound</summary>
+      <description>Whether to play sound with notifications</description>
+    </key>
+    <key name="notification-sound-file" type="s">
+      <default>''</default>
+      <summary>Notification Sound File</summary>
+      <description>Path to custom notification sound file</description>
+    </key>
+    <key name="notification-urgency" type="s">
+      <default>'normal'</default>
+      <summary>Notification Urgency</summary>
+      <description>Urgency level for notifications (low, normal, critical)</description>
+    </key>
+    <key name="notification-timeout" type="i">
+      <default>5000</default>
+      <summary>Notification Timeout</summary>
+      <description>Timeout for notifications in milliseconds (0 for no timeout)</description>
+    </key>
   </schema>
 </schemalist>

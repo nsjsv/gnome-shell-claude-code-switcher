@@ -45,23 +45,6 @@ export class AboutGroup {
             aboutGroup.add(authorRow);
         }
 
-        // 描述信息
-        if (this.metadata && this.metadata.description) {
-            const descriptionRow = new Adw.ActionRow({
-                title: _('Description'),
-                subtitle: this.metadata.description,
-            });
-            aboutGroup.add(descriptionRow);
-        }
-
-        // UUID信息
-        if (this.metadata && this.metadata.uuid) {
-            const uuidRow = new Adw.ActionRow({
-                title: _('Extension ID'),
-                subtitle: this.metadata.uuid,
-            });
-            aboutGroup.add(uuidRow);
-        }
 
         return aboutGroup;
     }

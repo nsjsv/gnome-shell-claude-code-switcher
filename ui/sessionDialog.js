@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import Pango from 'gi://Pango';
 
 import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
-import {TokenStats} from '../tokenStats.js';
+import {TokenStats} from '../lib/tokenStats.js';
 
 /**
  * 会话详情对话框
