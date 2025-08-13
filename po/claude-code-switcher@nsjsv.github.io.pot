@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-08 22:11+0800\n"
+"POT-Creation-Date: 2025-08-13 16:55+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -81,20 +81,97 @@ msgstr ""
 msgid "Please wait, initializing settings interface"
 msgstr ""
 
-#: ui/aboutGroup.js:20
-msgid "About"
+#: ui/globalSettingsGroup.js:23
+msgid "Global Settings"
 msgstr ""
 
-#: ui/aboutGroup.js:26
-msgid "Quickly switch Claude Code API providers"
+#: ui/globalSettingsGroup.js:24
+msgid "Configure global extension options"
 msgstr ""
 
-#: ui/aboutGroup.js:33
-msgid "Version"
+#: ui/globalSettingsGroup.js:29
+msgid "Auto Update"
 msgstr ""
 
-#: ui/aboutGroup.js:42
-msgid "Author"
+#: ui/globalSettingsGroup.js:30
+msgid "Enable automatic updates for the extension"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:52
+msgid "Proxy Settings"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:53 ui/globalSettingsGroup.js:147
+msgid "Configure network proxy server"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:69 ui/globalSettingsGroup.js:71
+#: ui/globalSettingsGroup.js:143 ui/globalSettingsGroup.js:145
+msgid "Configured: "
+msgstr ""
+
+#: ui/globalSettingsGroup.js:84
+msgid "Proxy Server"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:91
+msgid "Port"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:98 ui/apiProviderManager.js:187
+#: ui/sessionDialog.js:171
+msgid "Actions"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:108 ui/globalSettingsGroup.js:189
+#: ui/apiProviderManager.js:109 ui/apiProviderManager.js:199
+#: ui/apiProviderManager.js:400 ui/notificationsGroup.js:481
+msgid "Cancel"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:113 ui/apiProviderManager.js:205
+msgid "Save"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:161 ui/globalSettingsGroup.js:184
+msgid "Clear Configuration"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:162
+msgid "Reset Claude settings.json to empty state"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:166 ui/globalSettingsGroup.js:190
+msgid "Clear Config"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:185
+msgid ""
+"This will clear the Claude settings.json file to an empty state. All current "
+"configuration will be lost. Are you sure you want to continue?"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:229
+msgid "Configuration Cleared"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:230
+msgid "Claude settings.json has been successfully cleared to empty state."
+msgstr ""
+
+#: ui/globalSettingsGroup.js:234 ui/globalSettingsGroup.js:256
+#: ui/notificationsGroup.js:709
+msgid "OK"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:251 ui/statsPanel.js:306 ui/statsPanel.js:307
+msgid "Error"
+msgstr ""
+
+#: ui/globalSettingsGroup.js:252
+msgid ""
+"Failed to clear Claude configuration. Please check the console for more "
+"details."
 msgstr ""
 
 #: ui/apiProviderManager.js:26
@@ -141,12 +218,6 @@ msgstr ""
 msgid "Small Model (optional, e.g.: claude-3-haiku-20240307)"
 msgstr ""
 
-#: ui/apiProviderManager.js:109 ui/apiProviderManager.js:199
-#: ui/apiProviderManager.js:400 ui/globalSettingsGroup.js:105
-#: ui/notificationsGroup.js:481
-msgid "Cancel"
-msgstr ""
-
 #: ui/apiProviderManager.js:110
 msgid "Add"
 msgstr ""
@@ -165,15 +236,6 @@ msgstr ""
 
 #: ui/apiProviderManager.js:180
 msgid "Small Model"
-msgstr ""
-
-#: ui/apiProviderManager.js:187 ui/globalSettingsGroup.js:95
-#: ui/sessionDialog.js:171
-msgid "Actions"
-msgstr ""
-
-#: ui/apiProviderManager.js:205 ui/globalSettingsGroup.js:110
-msgid "Save"
 msgstr ""
 
 #: ui/apiProviderManager.js:267
@@ -196,41 +258,20 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: ui/globalSettingsGroup.js:23
-msgid "Global Settings"
+#: ui/aboutGroup.js:20
+msgid "About"
 msgstr ""
 
-#: ui/globalSettingsGroup.js:24
-msgid "Configure global extension options"
+#: ui/aboutGroup.js:26
+msgid "Quickly switch Claude Code API providers"
 msgstr ""
 
-#: ui/globalSettingsGroup.js:29
-msgid "Auto Update"
+#: ui/aboutGroup.js:33
+msgid "Version"
 msgstr ""
 
-#: ui/globalSettingsGroup.js:30
-msgid "Enable automatic updates for the extension"
-msgstr ""
-
-#: ui/globalSettingsGroup.js:49
-msgid "Proxy Settings"
-msgstr ""
-
-#: ui/globalSettingsGroup.js:50 ui/globalSettingsGroup.js:144
-msgid "Configure network proxy server"
-msgstr ""
-
-#: ui/globalSettingsGroup.js:66 ui/globalSettingsGroup.js:68
-#: ui/globalSettingsGroup.js:140 ui/globalSettingsGroup.js:142
-msgid "Configured: "
-msgstr ""
-
-#: ui/globalSettingsGroup.js:81
-msgid "Proxy Server"
-msgstr ""
-
-#: ui/globalSettingsGroup.js:88
-msgid "Port"
+#: ui/aboutGroup.js:42
+msgid "Author"
 msgstr ""
 
 #: ui/notificationsGroup.js:23
@@ -526,10 +567,6 @@ msgstr ""
 msgid "Test Failed"
 msgstr ""
 
-#: ui/notificationsGroup.js:709
-msgid "OK"
-msgstr ""
-
 #: ui/notificationsGroup.js:729
 msgid "How to get Telegram Chat ID"
 msgstr ""
@@ -578,6 +615,46 @@ msgstr ""
 
 #: ui/notificationsGroup.js:757
 msgid "URL template copied to clipboard"
+msgstr ""
+
+#: ui/statsPanel.js:39
+msgid "INFO"
+msgstr ""
+
+#: ui/statsPanel.js:40
+msgid "View your Claude Code API usage and costs"
+msgstr ""
+
+#: ui/statsPanel.js:56
+msgid "Total Cost"
+msgstr ""
+
+#: ui/statsPanel.js:65
+msgid "Total Sessions"
+msgstr ""
+
+#: ui/statsPanel.js:75
+msgid "Total Tokens"
+msgstr ""
+
+#: ui/statsPanel.js:97 ui/statsPanel.js:314
+msgid "Refresh Stats"
+msgstr ""
+
+#: ui/statsPanel.js:101
+msgid "Not loaded yet"
+msgstr ""
+
+#: ui/statsPanel.js:264
+msgid "Fetching data..."
+msgstr ""
+
+#: ui/statsPanel.js:297
+msgid "Last updated: "
+msgstr ""
+
+#: ui/statsPanel.js:305 ui/statsPanel.js:308
+msgid "Failed to load"
 msgstr ""
 
 #: ui/sessionDialog.js:27
@@ -666,48 +743,4 @@ msgstr ""
 
 #: ui/sessionDialog.js:564
 msgid "Message Content"
-msgstr ""
-
-#: ui/statsPanel.js:39
-msgid "INFO"
-msgstr ""
-
-#: ui/statsPanel.js:40
-msgid "View your Claude Code API usage and costs"
-msgstr ""
-
-#: ui/statsPanel.js:56
-msgid "Total Cost"
-msgstr ""
-
-#: ui/statsPanel.js:65
-msgid "Total Sessions"
-msgstr ""
-
-#: ui/statsPanel.js:75
-msgid "Total Tokens"
-msgstr ""
-
-#: ui/statsPanel.js:97 ui/statsPanel.js:314
-msgid "Refresh Stats"
-msgstr ""
-
-#: ui/statsPanel.js:101
-msgid "Not loaded yet"
-msgstr ""
-
-#: ui/statsPanel.js:264
-msgid "Fetching data..."
-msgstr ""
-
-#: ui/statsPanel.js:297
-msgid "Last updated: "
-msgstr ""
-
-#: ui/statsPanel.js:305 ui/statsPanel.js:308
-msgid "Failed to load"
-msgstr ""
-
-#: ui/statsPanel.js:306 ui/statsPanel.js:307
-msgid "Error"
 msgstr ""

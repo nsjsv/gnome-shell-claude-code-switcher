@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Claude Code Switcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-08 22:11+0800\n"
+"POT-Creation-Date: 2025-08-13 16:55+0800\n"
 "PO-Revision-Date: 2025-08-04 23:02+0800\n"
 "Last-Translator: Claude AI <claude@anthropic.com>\n"
 "Language-Team: Chinese\n"
@@ -83,21 +83,99 @@ msgstr "正在加载..."
 msgid "Please wait, initializing settings interface"
 msgstr "请稍候，正在初始化设置界面"
 
-#: ui/aboutGroup.js:20
-msgid "About"
-msgstr "关于"
+#: ui/globalSettingsGroup.js:23
+msgid "Global Settings"
+msgstr "全局设置"
 
-#: ui/aboutGroup.js:26
-msgid "Quickly switch Claude Code API providers"
-msgstr "快速切换 Claude Code API 提供商"
+#: ui/globalSettingsGroup.js:24
+msgid "Configure global extension options"
+msgstr "配置扩展的全局选项"
 
-#: ui/aboutGroup.js:33
-msgid "Version"
-msgstr "版本"
+#: ui/globalSettingsGroup.js:29
+msgid "Auto Update"
+msgstr "自动更新"
 
-#: ui/aboutGroup.js:42
-msgid "Author"
-msgstr "作者"
+#: ui/globalSettingsGroup.js:30
+msgid "Enable automatic updates for the extension"
+msgstr "启用扩展的自动更新功能"
+
+#: ui/globalSettingsGroup.js:52
+msgid "Proxy Settings"
+msgstr "代理设置"
+
+#: ui/globalSettingsGroup.js:53 ui/globalSettingsGroup.js:147
+msgid "Configure network proxy server"
+msgstr "配置网络代理服务器"
+
+#: ui/globalSettingsGroup.js:69 ui/globalSettingsGroup.js:71
+#: ui/globalSettingsGroup.js:143 ui/globalSettingsGroup.js:145
+msgid "Configured: "
+msgstr "已配置: "
+
+#: ui/globalSettingsGroup.js:84
+msgid "Proxy Server"
+msgstr "代理服务器"
+
+#: ui/globalSettingsGroup.js:91
+msgid "Port"
+msgstr "端口"
+
+#: ui/globalSettingsGroup.js:98 ui/apiProviderManager.js:187
+#: ui/sessionDialog.js:171
+msgid "Actions"
+msgstr "操作"
+
+#: ui/globalSettingsGroup.js:108 ui/globalSettingsGroup.js:189
+#: ui/apiProviderManager.js:109 ui/apiProviderManager.js:199
+#: ui/apiProviderManager.js:400 ui/notificationsGroup.js:481
+msgid "Cancel"
+msgstr "取消"
+
+#: ui/globalSettingsGroup.js:113 ui/apiProviderManager.js:205
+msgid "Save"
+msgstr "保存"
+
+#: ui/globalSettingsGroup.js:161 ui/globalSettingsGroup.js:184
+msgid "Clear Configuration"
+msgstr "清空配置"
+
+#: ui/globalSettingsGroup.js:162
+msgid "Reset Claude settings.json to empty state"
+msgstr "将 Claude settings.json 重置为空状态"
+
+#: ui/globalSettingsGroup.js:166 ui/globalSettingsGroup.js:190
+msgid "Clear Config"
+msgstr "清空配置"
+
+#: ui/globalSettingsGroup.js:185
+msgid ""
+"This will clear the Claude settings.json file to an empty state. All current "
+"configuration will be lost. Are you sure you want to continue?"
+msgstr ""
+"这将清空 Claude settings.json 文件到空状态。所有当前配置都将丢失。您确定要继续吗？"
+
+#: ui/globalSettingsGroup.js:229
+msgid "Configuration Cleared"
+msgstr "配置已清空"
+
+#: ui/globalSettingsGroup.js:230
+msgid "Claude settings.json has been successfully cleared to empty state."
+msgstr "Claude settings.json 已成功清空到空状态。"
+
+#: ui/globalSettingsGroup.js:234 ui/globalSettingsGroup.js:256
+#: ui/notificationsGroup.js:709
+msgid "OK"
+msgstr "确定"
+
+#: ui/globalSettingsGroup.js:251 ui/statsPanel.js:306 ui/statsPanel.js:307
+msgid "Error"
+msgstr "错误"
+
+#: ui/globalSettingsGroup.js:252
+msgid ""
+"Failed to clear Claude configuration. Please check the console for more "
+"details."
+msgstr "清空 Claude 配置失败。请检查控制台获取更多详细信息。"
 
 #: ui/apiProviderManager.js:26
 msgid "API Providers"
@@ -143,12 +221,6 @@ msgstr "大模型（可选，例如：claude-3-5-sonnet-20241022）"
 msgid "Small Model (optional, e.g.: claude-3-haiku-20240307)"
 msgstr "小模型（可选，例如：claude-3-haiku-20240307）"
 
-#: ui/apiProviderManager.js:109 ui/apiProviderManager.js:199
-#: ui/apiProviderManager.js:400 ui/globalSettingsGroup.js:105
-#: ui/notificationsGroup.js:481
-msgid "Cancel"
-msgstr "取消"
-
 #: ui/apiProviderManager.js:110
 msgid "Add"
 msgstr "添加"
@@ -168,15 +240,6 @@ msgstr "大模型"
 #: ui/apiProviderManager.js:180
 msgid "Small Model"
 msgstr "小模型"
-
-#: ui/apiProviderManager.js:187 ui/globalSettingsGroup.js:95
-#: ui/sessionDialog.js:171
-msgid "Actions"
-msgstr "操作"
-
-#: ui/apiProviderManager.js:205 ui/globalSettingsGroup.js:110
-msgid "Save"
-msgstr "保存"
 
 #: ui/apiProviderManager.js:267
 msgid "Delete this provider"
@@ -199,42 +262,21 @@ msgstr "\"吗？\\n\\n此操作无法撤销。"
 msgid "Delete"
 msgstr "删除"
 
-#: ui/globalSettingsGroup.js:23
-msgid "Global Settings"
-msgstr "全局设置"
+#: ui/aboutGroup.js:20
+msgid "About"
+msgstr "关于"
 
-#: ui/globalSettingsGroup.js:24
-msgid "Configure global extension options"
-msgstr "配置扩展的全局选项"
+#: ui/aboutGroup.js:26
+msgid "Quickly switch Claude Code API providers"
+msgstr "快速切换 Claude Code API 提供商"
 
-#: ui/globalSettingsGroup.js:29
-msgid "Auto Update"
-msgstr "自动更新"
+#: ui/aboutGroup.js:33
+msgid "Version"
+msgstr "版本"
 
-#: ui/globalSettingsGroup.js:30
-msgid "Enable automatic updates for the extension"
-msgstr "启用扩展的自动更新功能"
-
-#: ui/globalSettingsGroup.js:49
-msgid "Proxy Settings"
-msgstr "代理设置"
-
-#: ui/globalSettingsGroup.js:50 ui/globalSettingsGroup.js:144
-msgid "Configure network proxy server"
-msgstr "配置网络代理服务器"
-
-#: ui/globalSettingsGroup.js:66 ui/globalSettingsGroup.js:68
-#: ui/globalSettingsGroup.js:140 ui/globalSettingsGroup.js:142
-msgid "Configured: "
-msgstr "已配置: "
-
-#: ui/globalSettingsGroup.js:81
-msgid "Proxy Server"
-msgstr "代理服务器"
-
-#: ui/globalSettingsGroup.js:88
-msgid "Port"
-msgstr "端口"
+#: ui/aboutGroup.js:42
+msgid "Author"
+msgstr "作者"
 
 #: ui/notificationsGroup.js:23
 msgid "Notifications"
@@ -532,10 +574,6 @@ msgstr "测试成功"
 msgid "Test Failed"
 msgstr "测试失败"
 
-#: ui/notificationsGroup.js:709
-msgid "OK"
-msgstr "确定"
-
 #: ui/notificationsGroup.js:729
 msgid "How to get Telegram Chat ID"
 msgstr "如何获取Telegram Chat ID"
@@ -585,6 +623,46 @@ msgstr "复制URL模板"
 #: ui/notificationsGroup.js:757
 msgid "URL template copied to clipboard"
 msgstr "URL模板已复制到剪贴板"
+
+#: ui/statsPanel.js:39
+msgid "INFO"
+msgstr "INFO"
+
+#: ui/statsPanel.js:40
+msgid "View your Claude Code API usage and costs"
+msgstr "查看您的 Claude Code API 使用情况和成本"
+
+#: ui/statsPanel.js:56
+msgid "Total Cost"
+msgstr "总成本"
+
+#: ui/statsPanel.js:65
+msgid "Total Sessions"
+msgstr "总会话"
+
+#: ui/statsPanel.js:75
+msgid "Total Tokens"
+msgstr "总令牌"
+
+#: ui/statsPanel.js:97 ui/statsPanel.js:314
+msgid "Refresh Stats"
+msgstr "刷新统计"
+
+#: ui/statsPanel.js:101
+msgid "Not loaded yet"
+msgstr "暂未加载"
+
+#: ui/statsPanel.js:264
+msgid "Fetching data..."
+msgstr "正在获取数据..."
+
+#: ui/statsPanel.js:297
+msgid "Last updated: "
+msgstr "最后更新: "
+
+#: ui/statsPanel.js:305 ui/statsPanel.js:308
+msgid "Failed to load"
+msgstr "加载失败"
 
 #: ui/sessionDialog.js:27
 msgid "Sessions Detail (Beta)"
@@ -675,50 +753,6 @@ msgstr "未知"
 #: ui/sessionDialog.js:564
 msgid "Message Content"
 msgstr "消息内容"
-
-#: ui/statsPanel.js:39
-msgid "INFO"
-msgstr "INFO"
-
-#: ui/statsPanel.js:40
-msgid "View your Claude Code API usage and costs"
-msgstr "查看您的 Claude Code API 使用情况和成本"
-
-#: ui/statsPanel.js:56
-msgid "Total Cost"
-msgstr "总成本"
-
-#: ui/statsPanel.js:65
-msgid "Total Sessions"
-msgstr "总会话"
-
-#: ui/statsPanel.js:75
-msgid "Total Tokens"
-msgstr "总令牌"
-
-#: ui/statsPanel.js:97 ui/statsPanel.js:314
-msgid "Refresh Stats"
-msgstr "刷新统计"
-
-#: ui/statsPanel.js:101
-msgid "Not loaded yet"
-msgstr "暂未加载"
-
-#: ui/statsPanel.js:264
-msgid "Fetching data..."
-msgstr "正在获取数据..."
-
-#: ui/statsPanel.js:297
-msgid "Last updated: "
-msgstr "最后更新: "
-
-#: ui/statsPanel.js:305 ui/statsPanel.js:308
-msgid "Failed to load"
-msgstr "加载失败"
-
-#: ui/statsPanel.js:306 ui/statsPanel.js:307
-msgid "Error"
-msgstr "错误"
 
 #~ msgid "Description"
 #~ msgstr "描述"

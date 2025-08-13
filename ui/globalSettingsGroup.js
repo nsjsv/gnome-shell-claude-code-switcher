@@ -37,6 +37,9 @@ export class GlobalSettingsGroup {
         // 代理设置
         this._setupProxySettings(globalGroup);
 
+        // 清空配置按钮
+        this._setupClearConfigButton(globalGroup);
+
         return globalGroup;
     }
 
@@ -147,5 +150,137 @@ export class GlobalSettingsGroup {
             proxyRow.set_expanded(false);
             console.log('Saved proxy settings: ' + newHost + ':' + newPort);
         });
+    }
+
+    /**
+     * 设置清空配置按钮
+     * @param {Adw.PreferencesGroup} globalGroup 全局设置组
+     */
+    _setupClearConfigButton(globalGroup) {
+        const clearConfigRow = new Adw.ActionRow({
+            title: _('Clear Configuration'),
+            subtitle: _('Reset Claude settings.json to empty state'),
+        });
+
+        const clearButton = new Gtk.Button({
+            label: _('Clear Config'),
+            css_classes: ['destructive-action'],
+            valign: Gtk.Align.CENTER,
+        });
+
+        clearButton.connect('clicked', () => {
+            this._showClearConfigDialog();
+        });
+
+        clearConfigRow.add_suffix(clearButton);
+        globalGroup.add(clearConfigRow);
+    }
+
+    /**
+     * 显示清空配置确认对话框
+     */
+    _showClearConfigDialog() {
+        const dialog = new Adw.MessageDialog({
+            heading: _('Clear Configuration'),
+            body: _('This will clear the Claude settings.json file to an empty state. All current configuration will be lost. Are you sure you want to continue?'),
+            modal: true,
+        });
+
+        dialog.add_response('cancel', _('Cancel'));
+        dialog.add_response('clear', _('Clear Config'));
+        dialog.set_response_appearance('clear', Adw.ResponseAppearance.DESTRUCTIVE);
+        dialog.set_default_response('cancel');
+        dialog.set_close_response('cancel');
+
+        dialog.connect('response', (dialog, response) => {
+            if (response === 'clear') {
+                this._performClearConfig();
+            }
+            dialog.close();
+        });
+
+        // 获取当前窗口作为父窗口
+        const topLevel = this._getTopLevelWindow();
+        if (topLevel) {
+            dialog.set_transient_for(topLevel);
+        }
+
+        dialog.present();
+    }
+
+    /**
+     * 执行清空配置操作
+     */
+    _performClearConfig() {
+        const success = this.settingsManager.clearClaudeConfig();
+        
+        if (success) {
+            this._showSuccessDialog();
+        } else {
+            this._showErrorDialog();
+        }
+    }
+
+    /**
+     * 显示成功对话框
+     */
+    _showSuccessDialog() {
+        const dialog = new Adw.MessageDialog({
+            heading: _('Configuration Cleared'),
+            body: _('Claude settings.json has been successfully cleared to empty state.'),
+            modal: true,
+        });
+
+        dialog.add_response('ok', _('OK'));
+        dialog.set_default_response('ok');
+        dialog.set_close_response('ok');
+
+        const topLevel = this._getTopLevelWindow();
+        if (topLevel) {
+            dialog.set_transient_for(topLevel);
+        }
+
+        dialog.present();
+    }
+
+    /**
+     * 显示错误对话框
+     */
+    _showErrorDialog() {
+        const dialog = new Adw.MessageDialog({
+            heading: _('Error'),
+            body: _('Failed to clear Claude configuration. Please check the console for more details.'),
+            modal: true,
+        });
+
+        dialog.add_response('ok', _('OK'));
+        dialog.set_default_response('ok');
+        dialog.set_close_response('ok');
+
+        const topLevel = this._getTopLevelWindow();
+        if (topLevel) {
+            dialog.set_transient_for(topLevel);
+        }
+
+        dialog.present();
+    }
+
+    /**
+     * 获取顶级窗口
+     */
+    _getTopLevelWindow() {
+        // 尝试从设置中获取窗口引用
+        if (this._settings && this._settings.get_parent) {
+            let widget = this._settings;
+            while (widget && widget.get_parent) {
+                const parent = widget.get_parent();
+                if (!parent) break;
+                widget = parent;
+                if (widget instanceof Adw.PreferencesWindow || widget instanceof Gtk.Window) {
+                    return widget;
+                }
+            }
+        }
+        return null;
     }
 }

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Claude Code Switcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-08 14:13+0800\n"
+"POT-Creation-Date: 2025-08-08 22:11+0800\n"
 "PO-Revision-Date: 2025-08-04 23:02+0800\n"
 "Last-Translator: Claude AI <claude@anthropic.com>\n"
 "Language-Team: Chinese\n"
@@ -20,27 +20,35 @@ msgstr ""
 msgid "Claude Code Switcher"
 msgstr "Claude Code Switcher"
 
-#: extension.js:66
+#: extension.js:71
 msgid "Add more.."
 msgstr "添加更多.."
 
-#: extension.js:81
-msgid "No configured providers"
-msgstr "暂无配置的提供商"
-
-#: extension.js:104
+#: extension.js:120
 msgid "Failed to load providers"
 msgstr "加载提供商失败"
 
-#: extension.js:116
+#: extension.js:128
+msgid "No configured providers"
+msgstr "暂无配置的提供商"
+
+#: extension.js:149
 msgid "Switched to: "
 msgstr "已切换到: "
 
-#: extension.js:138
+#: extension.js:156
+msgid "Error switching provider"
+msgstr "切换提供商时出错"
+
+#: extension.js:156
+msgid "Please check the extension settings"
+msgstr "请检查扩展设置"
+
+#: extension.js:199
 msgid "Please configure Anthropic API key first"
 msgstr "请先配置 Anthropic API 密钥"
 
-#: extension.js:138
+#: extension.js:199
 msgid ""
 "Click \"Add more..\" button to open settings and configure the official API "
 "key for Anthropic provider."
@@ -48,30 +56,30 @@ msgstr ""
 "点击\"添加更多..\"按钮打开设置界面，为 Anthropic 提供商配置官方 API 密钥后即"
 "可使用。"
 
-#: extension.js:140
+#: extension.js:201
 msgid "Please configure API key for "
 msgstr "请先为 "
 
-#: extension.js:140
+#: extension.js:201
 msgid " first"
 msgstr " 配置 API 密钥"
 
-#: extension.js:140
+#: extension.js:201
 msgid ""
 "Click \"Add more..\" button to open settings and configure the API key for "
 "this provider."
 msgstr ""
 "点击\"添加更多..\"按钮打开设置界面，为此提供商配置 API 密钥后即可使用。"
 
-#: prefs.js:69
+#: prefs.js:66
 msgid "General"
 msgstr "常规"
 
-#: prefs.js:76 ui/statsPanel.js:253
+#: prefs.js:73 ui/statsPanel.js:261
 msgid "Loading..."
 msgstr "正在加载..."
 
-#: prefs.js:77
+#: prefs.js:74
 msgid "Please wait, initializing settings interface"
 msgstr "请稍候，正在初始化设置界面"
 
@@ -90,14 +98,6 @@ msgstr "版本"
 #: ui/aboutGroup.js:42
 msgid "Author"
 msgstr "作者"
-
-#: ui/aboutGroup.js:51
-msgid "Description"
-msgstr "描述"
-
-#: ui/aboutGroup.js:60
-msgid "Extension ID"
-msgstr "扩展 ID"
 
 #: ui/apiProviderManager.js:26
 msgid "API Providers"
@@ -144,7 +144,8 @@ msgid "Small Model (optional, e.g.: claude-3-haiku-20240307)"
 msgstr "小模型（可选，例如：claude-3-haiku-20240307）"
 
 #: ui/apiProviderManager.js:109 ui/apiProviderManager.js:199
-#: ui/apiProviderManager.js:380 ui/globalSettingsGroup.js:105
+#: ui/apiProviderManager.js:400 ui/globalSettingsGroup.js:105
+#: ui/notificationsGroup.js:481
 msgid "Cancel"
 msgstr "取消"
 
@@ -181,20 +182,20 @@ msgstr "保存"
 msgid "Delete this provider"
 msgstr "删除此提供商"
 
-#: ui/apiProviderManager.js:376
+#: ui/apiProviderManager.js:396
 msgid "Confirm Delete"
 msgstr "确认删除"
 
-#: ui/apiProviderManager.js:377
+#: ui/apiProviderManager.js:397
 msgid "Are you sure you want to delete provider \""
 msgstr "确定要删除提供商\""
 
-#: ui/apiProviderManager.js:377
+#: ui/apiProviderManager.js:397
 #, fuzzy
 msgid "\"\\n\\nThis action cannot be undone."
 msgstr "\"吗？\\n\\n此操作无法撤销。"
 
-#: ui/apiProviderManager.js:381
+#: ui/apiProviderManager.js:401
 msgid "Delete"
 msgstr "删除"
 
@@ -235,304 +236,355 @@ msgstr "代理服务器"
 msgid "Port"
 msgstr "端口"
 
-#: ui/notificationHandler.js:182
-msgid "Claude Code Notification"
-msgstr "Claude Code 通知"
-
-#: ui/notificationHandler.js:210
-msgid "Claude Code Completed"
-msgstr "Claude Code 已完成"
-
-#: ui/notificationHandler.js:210
-msgid "Claude Code Exited"
-msgstr "Claude Code 已退出"
-
-#: ui/notificationHandler.js:240 ui/notificationHandler.js:241
-msgid "Claude Code has completed successfully!"
-msgstr "Claude Code 已成功完成！"
-
-#: ui/notificationHandler.js:244 ui/notificationHandler.js:245
-msgid "Claude Code exited unexpectedly."
-msgstr "Claude Code 意外退出。"
-
-#: ui/notificationsGroup.js:22
+#: ui/notificationsGroup.js:23
 msgid "Notifications"
 msgstr "通知"
 
-#: ui/notificationsGroup.js:23
-msgid "Configure Claude Code hooks notifications"
-msgstr "配置 Claude Code 钩子通知"
+#: ui/notificationsGroup.js:24
+msgid "Get notified when Claude Code tasks complete or need attention"
+msgstr "当 Claude Code 任务完成或需要关注时获得通知"
 
-#: ui/notificationsGroup.js:28
+#: ui/notificationsGroup.js:29
 msgid "Enable Notifications"
 msgstr "启用通知"
 
-#: ui/notificationsGroup.js:29
-msgid "Enable Claude Code hooks notifications"
-msgstr "启用 Claude Code 钩子通知"
+#: ui/notificationsGroup.js:30
+msgid "Get desktop notifications for Claude Code events"
+msgstr "为 Claude Code 事件获取桌面通知"
 
-#: ui/notificationsGroup.js:53
-msgid "Normal Exit Notifications"
-msgstr "正常退出通知"
+#: ui/notificationsGroup.js:55
+msgid "Task Completion Notifications"
+msgstr "任务完成通知"
 
-#: ui/notificationsGroup.js:54
-msgid "Show notifications when Claude Code exits normally (exit code 0)"
-msgstr "当 Claude Code 正常退出时显示通知（退出码 0）"
+#: ui/notificationsGroup.js:56
+msgid "Show notifications when Claude Code successfully completes a task"
+msgstr "当 Claude Code 成功完成任务时显示通知"
 
-#: ui/notificationsGroup.js:64
-msgid "Abnormal Exit Notifications"
-msgstr "异常退出通知"
+#: ui/notificationsGroup.js:66
+msgid "Task Interruption Notifications"
+msgstr "任务中断通知"
 
-#: ui/notificationsGroup.js:65
+#: ui/notificationsGroup.js:67
 msgid ""
-"Show notifications when Claude Code exits abnormally (non-zero exit codes)"
-msgstr "当 Claude Code 异常退出时显示通知（非零退出码）"
+"Show notifications when Claude Code stops unexpectedly or encounters errors"
+msgstr "当 Claude Code 意外停止或遇到错误时显示通知"
 
-#: ui/notificationsGroup.js:75
-msgid "Notification Hook"
-msgstr "通知钩子"
+#: ui/notificationsGroup.js:77
+msgid "Authorization Notifications"
+msgstr "授权通知"
 
-#: ui/notificationsGroup.js:76
+#: ui/notificationsGroup.js:78
 msgid ""
-"Show notifications when Claude Code sends notifications (e.g., waiting for "
-"input)"
-msgstr "当 Claude Code 发送通知时显示通知（例如：等待输入）"
+"Show notifications when Claude Code needs permission or is waiting for input"
+msgstr "当 Claude Code 需要权限或等待输入时显示通知"
 
-#: ui/notificationsGroup.js:91
+#: ui/notificationsGroup.js:93
 msgid "Advanced Settings"
 msgstr "高级设置"
 
-#: ui/notificationsGroup.js:92
-msgid "Configure custom messages and external notifications"
-msgstr "配置自定义消息和外部通知"
+#: ui/notificationsGroup.js:94
+msgid "Customize notification messages and setup external notifications"
+msgstr "自定义通知消息并设置外部通知"
 
-#: ui/notificationsGroup.js:116 ui/notificationsGroup.js:130
+#: ui/notificationsGroup.js:118 ui/notificationsGroup.js:132
 msgid "Advanced Notification Settings"
 msgstr "高级通知设置"
 
-#: ui/notificationsGroup.js:163
+#: ui/notificationsGroup.js:171
 msgid "Custom Messages"
 msgstr "自定义消息"
 
-#: ui/notificationsGroup.js:164
-msgid "Customize notification messages for different events"
-msgstr "为不同事件自定义通知消息"
+#: ui/notificationsGroup.js:172
+msgid "Personalize the text shown in notifications"
+msgstr "个性化通知中显示的文本"
 
-#: ui/notificationsGroup.js:169
-msgid "Normal Exit Message"
-msgstr "正常退出消息"
+#: ui/notificationsGroup.js:177
+msgid "Task Completion Message"
+msgstr "任务完成消息"
 
-#: ui/notificationsGroup.js:181
-msgid "Abnormal Exit Message"
-msgstr "异常退出消息"
+#: ui/notificationsGroup.js:189
+msgid "Task Interruption Message"
+msgstr "任务中断消息"
 
-#: ui/notificationsGroup.js:200
+#: ui/notificationsGroup.js:201
+msgid "Authorization Notification Message"
+msgstr "授权通知消息"
+
+#: ui/notificationsGroup.js:220
 msgid "Telegram Notifications"
 msgstr "Telegram 通知"
 
-#: ui/notificationsGroup.js:201
-msgid "Send notifications to Telegram bot (Coming Soon)"
-msgstr "发送通知到 Telegram 机器人（即将推出）"
-
-#: ui/notificationsGroup.js:206
-msgid "Enable Telegram Notifications"
-msgstr "启用 Telegram 通知"
-
-#: ui/notificationsGroup.js:207
+#: ui/notificationsGroup.js:221 ui/notificationsGroup.js:227
 msgid "Send notifications to Telegram bot"
 msgstr "发送通知到 Telegram 机器人"
 
-#: ui/notificationsGroup.js:217
+#: ui/notificationsGroup.js:226
+msgid "Enable Telegram Notifications"
+msgstr "启用 Telegram 通知"
+
+#: ui/notificationsGroup.js:237
 msgid "Telegram Bot Token"
 msgstr "Telegram 机器人令牌"
 
-#: ui/notificationsGroup.js:193
-msgid "Notification Hook Message"
-msgstr "通知钩子消息"
-
-#: ui/notificationsGroup.js:258
-msgid "Notification Behavior"
-msgstr "通知行为"
-
-#: ui/notificationsGroup.js:259
-msgid "Configure how notifications are displayed and behave"
-msgstr "配置通知的显示方式和行为"
-
-#: ui/notificationsGroup.js:264
-msgid "Enable Notification Sound"
-msgstr "启用通知声音"
-
-#: ui/notificationsGroup.js:265
-msgid "Play sound when notifications are shown"
-msgstr "显示通知时播放声音"
-
-#: ui/notificationsGroup.js:274
-msgid "Custom Sound File"
-msgstr "自定义声音文件"
-
-#: ui/notificationsGroup.js:275
-msgid "Choose a custom sound file for notifications"
-msgstr "为通知选择自定义声音文件"
-
-#: ui/notificationsGroup.js:279
-msgid "Default system sound"
-msgstr "默认系统声音"
-
-#: ui/notificationsGroup.js:292
-msgid "Notification Urgency"
-msgstr "通知紧急程度"
-
-#: ui/notificationsGroup.js:293
-msgid "Set the urgency level for notifications"
-msgstr "设置通知的紧急程度"
-
-#: ui/notificationsGroup.js:297
-msgid "Low"
-msgstr "低"
-
-#: ui/notificationsGroup.js:298
-msgid "Normal"
-msgstr "普通"
-
-#: ui/notificationsGroup.js:299
-msgid "Critical"
-msgstr "紧急"
-
-#: ui/notificationsGroup.js:312
-msgid "Notification Timeout"
-msgstr "通知超时时间"
-
-#: ui/notificationsGroup.js:313
-msgid "Time in seconds before notification disappears (0 = no timeout)"
-msgstr "通知消失前的时间（秒）（0 = 不自动消失）"
-
-#: ui/notificationsGroup.js:327
-msgid "Custom Hook Commands"
-msgstr "自定义钩子命令"
-
-#: ui/notificationsGroup.js:328
-msgid "Define custom commands to execute for different hook events"
-msgstr "为不同的钩子事件定义要执行的自定义命令"
-
-#: ui/notificationsGroup.js:338
-msgid "Normal Exit Command"
-msgstr "正常退出命令"
-
-#: ui/notificationsGroup.js:338
-msgid "Command to run when Claude Code exits normally"
-msgstr "Claude Code 正常退出时运行的命令"
-
-#: ui/notificationsGroup.js:339
-msgid "Abnormal Exit Command"
-msgstr "异常退出命令"
-
-#: ui/notificationsGroup.js:339
-msgid "Command to run when Claude Code exits abnormally"
-msgstr "Claude Code 异常退出时运行的命令"
-
-#: ui/notificationsGroup.js:340
-msgid "Notification Command"
-msgstr "通知命令"
-
-#: ui/notificationsGroup.js:340
-msgid "Command to run when Claude Code sends notifications"
-msgstr "Claude Code 发送通知时运行的命令"
-
-#: ui/notificationsGroup.js:341
-msgid "Session Start Command"
-msgstr "会话开始命令"
-
-#: ui/notificationsGroup.js:341
-msgid "Command to run when Claude Code session starts"
-msgstr "Claude Code 会话开始时运行的命令"
-
-#: ui/notificationsGroup.js:365
-msgid "Command Variables"
-msgstr "命令变量"
-
-#: ui/notificationsGroup.js:366
-msgid "Use {message}, {exitCode}, {provider} in your commands"
-msgstr "在命令中使用 {message}、{exitCode}、{provider} 变量"
-
-#: ui/notificationsGroup.js:378
-msgid "Choose Sound File"
-msgstr "选择声音文件"
-
-#: ui/notificationsGroup.js:383
-msgid "Open"
-msgstr "打开"
-
-#: ui/notificationsGroup.js:388
-msgid "Audio Files"
-msgstr "音频文件"
-
-#: ui/notificationsGroup.js:392
-msgid "All Files"
-msgstr "所有文件"
-
-#: ui/notificationsGroup.js:229
+#: ui/notificationsGroup.js:249
 msgid "Telegram Chat ID"
 msgstr "Telegram 聊天 ID"
 
 #: ui/notificationsGroup.js:260
+msgid "How to get Chat ID"
+msgstr "如何获取Chat ID"
+
+#: ui/notificationsGroup.js:273
 msgid "Test Telegram Configuration"
 msgstr "测试 Telegram 配置"
 
-#: ui/notificationsGroup.js:261
+#: ui/notificationsGroup.js:274
 msgid "Send a test message to verify your Telegram settings"
 msgstr "发送测试消息以验证您的 Telegram 设置"
 
-#: ui/notificationsGroup.js:266
+#: ui/notificationsGroup.js:279 ui/notificationsGroup.js:699
 msgid "Send Test Message"
 msgstr "发送测试消息"
 
-#: ui/notificationsGroup.js:280
+#: ui/notificationsGroup.js:293
 msgid "How to Setup Telegram Bot"
 msgstr "如何设置 Telegram 机器人"
 
-#: ui/notificationsGroup.js:281
-msgid "1. Create bot with @BotFather\\n2. Get your Chat ID from @userinfobot\\n3. Enter both values above"
-msgstr "1. 使用 @BotFather 创建机器人\\n2. 从 @userinfobot 获取您的 Chat ID\\n3. 在上方输入这两个值"
+#: ui/notificationsGroup.js:294
+msgid ""
+"1. Create bot with @BotFather\n"
+"2. Get your Chat ID from @userinfobot\n"
+"3. Enter both values above"
+msgstr ""
+"1. 使用 @BotFather 创建机器人\n"
+"2. 从 @userinfobot 获取您的 Chat ID\n"
+"3. 在上方输入这两个值"
 
-#: ui/notificationsGroup.js:508
+#: ui/notificationsGroup.js:314
+msgid "Notification Behavior"
+msgstr "通知行为"
+
+#: ui/notificationsGroup.js:315
+msgid "Configure how notifications are displayed and behave"
+msgstr "配置通知的显示方式和行为"
+
+#: ui/notificationsGroup.js:320
+msgid "Enable Notification Sound"
+msgstr "启用通知声音"
+
+#: ui/notificationsGroup.js:321
+msgid "Play sound when notifications are shown"
+msgstr "显示通知时播放声音"
+
+#: ui/notificationsGroup.js:331
+msgid "Custom Sound File"
+msgstr "自定义声音文件"
+
+#: ui/notificationsGroup.js:332
+msgid "Choose a custom sound file for notifications"
+msgstr "为通知选择自定义声音文件"
+
+#: ui/notificationsGroup.js:337
+msgid "Default system sound"
+msgstr "默认系统声音"
+
+#: ui/notificationsGroup.js:356
+msgid "Notification Urgency"
+msgstr "通知紧急程度"
+
+#: ui/notificationsGroup.js:357
+msgid "Set the urgency level for notifications"
+msgstr "设置通知的紧急程度"
+
+#: ui/notificationsGroup.js:361
+msgid "Low"
+msgstr "低"
+
+#: ui/notificationsGroup.js:362
+msgid "Normal"
+msgstr "普通"
+
+#: ui/notificationsGroup.js:363
+msgid "Critical"
+msgstr "紧急"
+
+#: ui/notificationsGroup.js:379
+msgid "Notification Timeout"
+msgstr "通知超时时间"
+
+#: ui/notificationsGroup.js:380
+msgid "Time in seconds before notification disappears (0 = no timeout)"
+msgstr "通知消失前的时间（秒）（0 = 不自动消失）"
+
+#: ui/notificationsGroup.js:405
+msgid "Custom Commands"
+msgstr "自定义命令"
+
+#: ui/notificationsGroup.js:406
+msgid "Run custom commands when different events occur"
+msgstr "在不同事件发生时运行自定义命令"
+
+#: ui/notificationsGroup.js:420
+msgid "Task Completion Command"
+msgstr "任务完成命令"
+
+#: ui/notificationsGroup.js:420
+msgid "Command to run when Claude Code completes successfully"
+msgstr "Claude Code 成功完成时运行的命令"
+
+#: ui/notificationsGroup.js:421
+msgid "Task Interruption Command"
+msgstr "任务中断命令"
+
+#: ui/notificationsGroup.js:421
+msgid "Command to run when Claude Code stops unexpectedly"
+msgstr "Claude Code 意外停止时运行的命令"
+
+#: ui/notificationsGroup.js:422
+msgid "Authorization Command"
+msgstr "授权命令"
+
+#: ui/notificationsGroup.js:422
+msgid "Command to run when Claude Code needs permission"
+msgstr "Claude Code 需要权限时运行的命令"
+
+#: ui/notificationsGroup.js:423
+msgid "Session Start Command"
+msgstr "会话开始命令"
+
+#: ui/notificationsGroup.js:423
+msgid "Command to run when Claude Code session starts"
+msgstr "Claude Code 会话开始时运行的命令"
+
+#: ui/notificationsGroup.js:455
+msgid "Command Variables"
+msgstr "命令变量"
+
+#: ui/notificationsGroup.js:456
+msgid "Use {message}, {exitCode}, {provider} in your commands"
+msgstr "在命令中使用 {message}、{exitCode}、{provider} 变量"
+
+#: ui/notificationsGroup.js:476
+msgid "Choose Sound File"
+msgstr "选择声音文件"
+
+#: ui/notificationsGroup.js:482
+msgid "Open"
+msgstr "打开"
+
+#: ui/notificationsGroup.js:486
+msgid "Audio Files"
+msgstr "音频文件"
+
+#: ui/notificationsGroup.js:491
+msgid "All Files"
+msgstr "所有文件"
+
+#: ui/notificationsGroup.js:518
 msgid "Please enter both Bot Token and Chat ID first"
 msgstr "请先输入 Bot Token 和 Chat ID"
 
-#: ui/notificationsGroup.js:513
+#: ui/notificationsGroup.js:523
 msgid "Sending..."
 msgstr "发送中..."
 
-#: ui/notificationsGroup.js:558
-msgid "Test message sent successfully! Check your Telegram."
-msgstr "测试消息发送成功！请检查您的 Telegram。"
-
-#: ui/notificationsGroup.js:560
-msgid "API Error: "
-msgstr "API 错误: "
-
-#: ui/notificationsGroup.js:563
-msgid "Failed to parse response: "
-msgstr "解析响应失败: "
-
-#: ui/notificationsGroup.js:566
-msgid "Network error: "
-msgstr "网络错误: "
-
-#: ui/notificationsGroup.js:570
+#: ui/notificationsGroup.js:559
 msgid "Test failed: "
 msgstr "测试失败: "
 
-#: ui/notificationsGroup.js:580
+#: ui/notificationsGroup.js:594
+msgid "Invalid Bot Token: "
+msgstr "无效的机器人令牌："
+
+#: ui/notificationsGroup.js:597
+msgid "Network error during validation"
+msgstr "验证过程中网络错误"
+
+#: ui/notificationsGroup.js:600
+msgid "Failed to validate Bot Token: "
+msgstr "验证机器人令牌失败："
+
+#: ui/notificationsGroup.js:661
+msgid "Test message sent successfully!"
+msgstr "测试消息发送成功！"
+
+#: ui/notificationsGroup.js:665
+msgid "Please check your Telegram."
+msgstr "请检查您的 Telegram。"
+
+#: ui/notificationsGroup.js:673
+msgid "API Error: "
+msgstr "API 错误: "
+
+#: ui/notificationsGroup.js:678
+msgid "Network error: "
+msgstr "网络错误: "
+
+#: ui/notificationsGroup.js:682
+msgid "Failed to parse response: "
+msgstr "解析响应失败: "
+
+#: ui/notificationsGroup.js:704
 msgid "Test Successful"
 msgstr "测试成功"
 
-#: ui/notificationsGroup.js:580
+#: ui/notificationsGroup.js:704
 msgid "Test Failed"
 msgstr "测试失败"
 
-#: ui/notificationsGroup.js:584
+#: ui/notificationsGroup.js:709
 msgid "OK"
 msgstr "确定"
+
+#: ui/notificationsGroup.js:729
+msgid "How to get Telegram Chat ID"
+msgstr "如何获取Telegram Chat ID"
+
+#: ui/notificationsGroup.js:730
+msgid "Follow these steps to get your Chat ID:"
+msgstr "按照以下步骤获取您的Chat ID："
+
+#: ui/notificationsGroup.js:731
+msgid "Start a conversation with your bot"
+msgstr "与您的机器人开始对话"
+
+#: ui/notificationsGroup.js:732
+msgid "Send any message to the bot"
+msgstr "向机器人发送任意消息"
+
+#: ui/notificationsGroup.js:733
+msgid "Open this URL in your browser:"
+msgstr "在浏览器中打开此URL："
+
+#: ui/notificationsGroup.js:735
+msgid "Replace <YOUR_BOT_TOKEN> with your actual bot token"
+msgstr "将<YOUR_BOT_TOKEN>替换为您的实际机器人令牌"
+
+#: ui/notificationsGroup.js:736
+msgid "Look for \"chat\":{\"id\":XXXXXXX} in the response"
+msgstr "在响应中查找\"chat\":{\"id\":XXXXXXX}"
+
+#: ui/notificationsGroup.js:737
+msgid "Copy the number after \"id\": (this is your Chat ID)"
+msgstr "复制\"id\":后面的数字（这就是您的Chat ID）"
+
+#: ui/notificationsGroup.js:738
+msgid ""
+"Tip: If you see no messages, send another message to your bot and refresh "
+"the URL"
+msgstr "提示：如果看不到消息，请向机器人发送另一条消息并刷新URL"
+
+#: ui/notificationsGroup.js:742
+msgid "Close"
+msgstr "关闭"
+
+#: ui/notificationsGroup.js:747
+msgid "Copy URL Template"
+msgstr "复制URL模板"
+
+#: ui/notificationsGroup.js:757
+msgid "URL template copied to clipboard"
+msgstr "URL模板已复制到剪贴板"
 
 #: ui/sessionDialog.js:27
 msgid "Sessions Detail (Beta)"
@@ -644,7 +696,7 @@ msgstr "总会话"
 msgid "Total Tokens"
 msgstr "总令牌"
 
-#: ui/statsPanel.js:97 ui/statsPanel.js:282
+#: ui/statsPanel.js:97 ui/statsPanel.js:314
 msgid "Refresh Stats"
 msgstr "刷新统计"
 
@@ -652,21 +704,72 @@ msgstr "刷新统计"
 msgid "Not loaded yet"
 msgstr "暂未加载"
 
-#: ui/statsPanel.js:254
+#: ui/statsPanel.js:264
 msgid "Fetching data..."
 msgstr "正在获取数据..."
 
-#: ui/statsPanel.js:270
+#: ui/statsPanel.js:297
 msgid "Last updated: "
 msgstr "最后更新: "
 
-#: ui/statsPanel.js:275 ui/statsPanel.js:278
+#: ui/statsPanel.js:305 ui/statsPanel.js:308
 msgid "Failed to load"
 msgstr "加载失败"
 
-#: ui/statsPanel.js:276 ui/statsPanel.js:277
+#: ui/statsPanel.js:306 ui/statsPanel.js:307
 msgid "Error"
 msgstr "错误"
+
+#~ msgid "Description"
+#~ msgstr "描述"
+
+#~ msgid "Extension ID"
+#~ msgstr "扩展 ID"
+
+#~ msgid "Claude Code Notification"
+#~ msgstr "Claude Code 通知"
+
+#~ msgid "Claude Code Completed"
+#~ msgstr "Claude Code 已完成"
+
+#~ msgid "Claude Code Exited"
+#~ msgstr "Claude Code 已退出"
+
+#~ msgid "Claude Code has completed successfully!"
+#~ msgstr "Claude Code 已成功完成！"
+
+#~ msgid "Claude Code exited unexpectedly."
+#~ msgstr "Claude Code 意外退出。"
+
+#~ msgid "Configure Claude Code hooks notifications"
+#~ msgstr "配置 Claude Code 钩子通知"
+
+#~ msgid "Normal Exit Notifications"
+#~ msgstr "正常退出通知"
+
+#~ msgid "Notification Hook"
+#~ msgstr "通知钩子"
+
+#~ msgid "Normal Exit Message"
+#~ msgstr "正常退出消息"
+
+#~ msgid "Abnormal Exit Message"
+#~ msgstr "异常退出消息"
+
+#~ msgid "Send notifications to Telegram bot (Coming Soon)"
+#~ msgstr "发送通知到 Telegram 机器人（即将推出）"
+
+#~ msgid "Normal Exit Command"
+#~ msgstr "正常退出命令"
+
+#~ msgid "Abnormal Exit Command"
+#~ msgstr "异常退出命令"
+
+#~ msgid "Command to run when Claude Code exits abnormally"
+#~ msgstr "Claude Code 异常退出时运行的命令"
+
+#~ msgid "Command to run when Claude Code sends notifications"
+#~ msgstr "Claude Code 发送通知时运行的命令"
 
 #~ msgid "Push Notifications (Coming Soon)"
 #~ msgstr "推送通知（即将推出）"
@@ -676,9 +779,6 @@ msgstr "错误"
 
 #~ msgid "Time: "
 #~ msgstr "时间: "
-
-#~ msgid "Close"
-#~ msgstr "关闭"
 
 #~ msgid "Previous version"
 #~ msgstr "上一个版本"
@@ -700,10 +800,6 @@ msgstr "错误"
 
 #~ msgid "Unknown Tool"
 #~ msgstr "未知工具"
-
-#, fuzzy
-#~ msgid "Task Completion"
-#~ msgstr "任务完成通知"
 
 #~ msgid "Provider configured successfully"
 #~ msgstr "提供商配置成功"
@@ -806,63 +902,3 @@ msgstr "错误"
 
 #~ msgid "错误"
 #~ msgstr "错误"
-
-#: ui/notificationsGroup.js:260
-msgid "How to get Chat ID"
-msgstr "如何获取Chat ID"
-
-#: ui/notificationsGroup.js:651
-msgid "How to get Telegram Chat ID"
-msgstr "如何获取Telegram Chat ID"
-
-#: ui/notificationsGroup.js:652
-msgid "Follow these steps to get your Chat ID:"
-msgstr "按照以下步骤获取您的Chat ID："
-
-#: ui/notificationsGroup.js:653
-msgid "Start a conversation with your bot"
-msgstr "与您的机器人开始对话"
-
-#: ui/notificationsGroup.js:654
-msgid "Send any message to the bot"
-msgstr "向机器人发送任意消息"
-
-#: ui/notificationsGroup.js:655
-msgid "Open this URL in your browser:"
-msgstr "在浏览器中打开此URL："
-
-#: ui/notificationsGroup.js:657
-msgid "Replace <YOUR_BOT_TOKEN> with your actual bot token"
-msgstr "将<YOUR_BOT_TOKEN>替换为您的实际机器人令牌"
-
-#: ui/notificationsGroup.js:658
-msgid "Look for \"chat\":{\"id\":XXXXXXX} in the response"
-msgstr "在响应中查找\"chat\":{\"id\":XXXXXXX}"
-
-#: ui/notificationsGroup.js:659
-msgid "Copy the number after \"id\": (this is your Chat ID)"
-msgstr "复制\"id\":后面的数字（这就是您的Chat ID）"
-
-#: ui/notificationsGroup.js:660
-msgid "Tip: If you see no messages, send another message to your bot and refresh the URL"
-msgstr "提示：如果看不到消息，请向机器人发送另一条消息并刷新URL"
-
-#: ui/notificationsGroup.js:669
-msgid "Copy URL Template"
-msgstr "复制URL模板"
-
-#: ui/notificationsGroup.js:679
-msgid "URL template copied to clipboard"
-msgstr "URL模板已复制到剪贴板"
-
-#: ui/notificationsGroup.js:568
-msgid "Invalid Bot Token: "
-msgstr "无效的机器人令牌："
-
-#: ui/notificationsGroup.js:571
-msgid "Failed to validate Bot Token: "
-msgstr "验证机器人令牌失败："
-
-#: ui/notificationsGroup.js:575
-msgid "Network error during validation: "
-msgstr "验证过程中网络错误："
