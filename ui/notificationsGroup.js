@@ -50,31 +50,20 @@ export class NotificationsGroup {
      * @param {Adw.ExpanderRow} notificationsToggle 通知主开关展开行
      */
     _addBasicNotificationSwitches(notificationsToggle) {
-        // Task Completion Notifications
-        const normalExitRow = new Adw.SwitchRow({
+        // Task Completion Notifications (包含完成和中断)
+        const taskCompletionRow = new Adw.SwitchRow({
             title: _('Task Completion Notifications'),
-            subtitle: _('Show notifications when Claude Code successfully completes a task'),
+            subtitle: _('Show notifications when Claude Code completes tasks or encounters issues'),
         });
         
-        this._settings.bind('hook-normal-exit', normalExitRow, 'active',
+        this._settings.bind('hook-task-completion', taskCompletionRow, 'active',
             Gio.SettingsBindFlags.DEFAULT);
         
-        notificationsToggle.add_row(normalExitRow);
+        notificationsToggle.add_row(taskCompletionRow);
 
-        // Task Interruption Notifications
-        const abnormalExitRow = new Adw.SwitchRow({
-            title: _('Task Interruption Notifications'),
-            subtitle: _('Show notifications when Claude Code stops unexpectedly or encounters errors'),
-        });
-        
-        this._settings.bind('hook-abnormal-exit', abnormalExitRow, 'active',
-            Gio.SettingsBindFlags.DEFAULT);
-        
-        notificationsToggle.add_row(abnormalExitRow);
-
-        // Authorization Notifications
+        // Tool Authorization Notifications
         const notificationHookRow = new Adw.SwitchRow({
-            title: _('Authorization Notifications'),
+            title: _('Tool Authorization Notifications'),
             subtitle: _('Show notifications when Claude Code needs permission or is waiting for input'),
         });
         
@@ -150,8 +139,6 @@ export class NotificationsGroup {
         // 添加通知行为设置组
         this._addNotificationBehaviorGroup(preferencesPage);
 
-        // 添加自定义Hook命令设置组
-        this._addCustomHookCommandsGroup(preferencesPage);
 
         // 添加Telegram设置组
         this._addTelegramSettingsGroup(preferencesPage);
@@ -172,33 +159,21 @@ export class NotificationsGroup {
             description: _('Personalize the text shown in notifications'),
         });
 
-        // Task Completion Message
-        const normalExitMessageRow = new Adw.EntryRow({
+        // Task Completion Message (统一消息)
+        const taskCompletionMessageRow = new Adw.EntryRow({
             title: _('Task Completion Message'),
-            text: this._settings.get_string('normal-exit-message') || 'Claude Code has completed successfully!',
+            text: this._settings.get_string('task-completion-message') || 'Claude Code task completed.',
         });
         
-        normalExitMessageRow.connect('changed', () => {
-            this._settings.set_string('normal-exit-message', normalExitMessageRow.get_text());
+        taskCompletionMessageRow.connect('changed', () => {
+            this._settings.set_string('task-completion-message', taskCompletionMessageRow.get_text());
         });
         
-        messagesGroup.add(normalExitMessageRow);
+        messagesGroup.add(taskCompletionMessageRow);
 
-        // Task Interruption Message
-        const abnormalExitMessageRow = new Adw.EntryRow({
-            title: _('Task Interruption Message'),
-            text: this._settings.get_string('abnormal-exit-message') || 'Claude Code exited unexpectedly.',
-        });
-        
-        abnormalExitMessageRow.connect('changed', () => {
-            this._settings.set_string('abnormal-exit-message', abnormalExitMessageRow.get_text());
-        });
-        
-        messagesGroup.add(abnormalExitMessageRow);
-
-        // Authorization Notification Message
+        // Tool Authorization Message
         const notificationHookMessageRow = new Adw.EntryRow({
-            title: _('Authorization Notification Message'),
+            title: _('Tool Authorization Message'),
             text: this._settings.get_string('notification-hook-message') || 'Claude Code is waiting for input or has sent a notification.',
         });
         
@@ -396,76 +371,6 @@ export class NotificationsGroup {
         preferencesPage.add(behaviorGroup);
     }
 
-    /**
-     * 添加自定义Hook命令设置组
-     * @param {Adw.PreferencesPage} preferencesPage 设置页面
-     */
-    _addCustomHookCommandsGroup(preferencesPage) {
-        const hookCommandsGroup = new Adw.PreferencesGroup({
-            title: _('Custom Commands'),
-            description: _('Run custom commands when different events occur'),
-        });
-
-        // 获取当前的自定义Hook命令
-        let customCommands = {};
-        try {
-            const commandsJson = this._settings.get_string('custom-hook-commands');
-            customCommands = JSON.parse(commandsJson);
-        } catch (e) {
-            console.log('Failed to parse custom hook commands:', e);
-        }
-
-        // Hook事件类型
-        const hookEvents = [
-            { key: 'normal-exit', title: _('Task Completion Command'), description: _('Command to run when Claude Code completes successfully') },
-            { key: 'abnormal-exit', title: _('Task Interruption Command'), description: _('Command to run when Claude Code stops unexpectedly') },
-            { key: 'notification', title: _('Authorization Command'), description: _('Command to run when Claude Code needs permission') },
-            { key: 'session-start', title: _('Session Start Command'), description: _('Command to run when Claude Code session starts') },
-        ];
-
-        hookEvents.forEach(event => {
-            const commandRow = new Adw.EntryRow({
-                title: event.title,
-                text: customCommands[event.key] || '',
-            });
-            
-            commandRow.connect('changed', () => {
-                // 更新自定义命令
-                try {
-                    const currentCommands = JSON.parse(this._settings.get_string('custom-hook-commands') || '{}');
-                    const commandText = commandRow.get_text().trim();
-                    
-                    if (commandText) {
-                        currentCommands[event.key] = commandText;
-                    } else {
-                        delete currentCommands[event.key];
-                    }
-                    
-                    this._settings.set_string('custom-hook-commands', JSON.stringify(currentCommands));
-                } catch (e) {
-                    console.error('Failed to update custom hook commands:', e);
-                }
-            });
-            
-            hookCommandsGroup.add(commandRow);
-        });
-
-        // 添加说明文本
-        const helpRow = new Adw.ActionRow({
-            title: _('Command Variables'),
-            subtitle: _('Use {message}, {exitCode}, {provider} in your commands'),
-        });
-        
-        const helpIcon = new Gtk.Image({
-            icon_name: 'help-about-symbolic',
-            css_classes: ['dim-label'],
-        });
-        helpRow.add_suffix(helpIcon);
-
-        hookCommandsGroup.add(helpRow);
-
-        preferencesPage.add(hookCommandsGroup);
-    }
 
     /**
      * 显示声音文件选择器

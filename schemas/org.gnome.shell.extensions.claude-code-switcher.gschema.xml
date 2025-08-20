@@ -36,25 +36,15 @@
       <summary>Enable Notifications</summary>
       <description>Whether to enable Claude Code hooks notifications</description>
     </key>
-    <key name="hook-normal-exit" type="b">
-      <default>false</default>
-      <summary>Normal Exit Notifications</summary>
-      <description>Show notifications when Claude Code exits normally (exit code 0)</description>
-    </key>
-    <key name="hook-abnormal-exit" type="b">
+    <key name="hook-task-completion" type="b">
       <default>true</default>
-      <summary>Abnormal Exit Notifications</summary>
-      <description>Show notifications when Claude Code exits abnormally (non-zero exit codes)</description>
+      <summary>Task Completion Notifications</summary>
+      <description>Show notifications when Claude Code completes tasks or encounters issues</description>
     </key>
-    <key name="normal-exit-message" type="s">
-      <default>'Claude Code has completed successfully!'</default>
-      <summary>Normal Exit Message</summary>
-      <description>Custom message to display when Claude Code exits normally</description>
-    </key>
-    <key name="abnormal-exit-message" type="s">
-      <default>'Claude Code exited unexpectedly.'</default>
-      <summary>Abnormal Exit Message</summary>
-      <description>Custom message to display when Claude Code exits abnormally</description>
+    <key name="task-completion-message" type="s">
+      <default>'Claude Code task completed.'</default>
+      <summary>Task Completion Message</summary>
+      <description>Custom message to display when Claude Code completes tasks</description>
     </key>
     <key name="hook-notification" type="b">
       <default>true</default>
@@ -81,11 +71,6 @@
       <summary>Notification Hook Message</summary>
       <description>Custom message to display when Claude Code sends notifications</description>
     </key>
-    <key name="custom-hook-commands" type="s">
-      <default>'{}'</default>
-      <summary>Custom Hook Commands</summary>
-      <description>JSON string containing custom hook commands for different events</description>
-    </key>
     <key name="notification-sound-enabled" type="b">
       <default>false</default>
       <summary>Enable Notification Sound</summary>
@@ -105,6 +90,11 @@
       <default>5000</default>
       <summary>Notification Timeout</summary>
       <description>Timeout for notifications in milliseconds (0 for no timeout)</description>
+    </key>
+    <key name="notification-settings-migrated" type="b">
+      <default>false</default>
+      <summary>Notification Settings Migration Status</summary>
+      <description>Whether notification settings have been migrated from separate to merged options</description>
     </key>
   </schema>
 </schemalist>

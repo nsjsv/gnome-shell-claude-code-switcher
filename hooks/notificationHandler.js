@@ -8,6 +8,16 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+// 尝试使用现代的GioUnix，如果不可用则回退到旧版本
+let UnixInputStream;
+try {
+    const GioUnix = imports.gi.GioUnix;
+    UnixInputStream = GioUnix.InputStream;
+} catch (e) {
+    // 回退到旧版本
+    UnixInputStream = Gio.UnixInputStream;
+}
+
 // 导入gettext用于国际化
 const Gettext = imports.gettext;
 const _ = Gettext.gettext;
@@ -103,7 +113,7 @@ class NotificationHandler {
         try {
             // 检查是否有stdin数据可读
             const stdin = new Gio.DataInputStream({
-                base_stream: new Gio.UnixInputStream({ fd: 0 })
+                base_stream: new UnixInputStream({ fd: 0 })
             });
             
             // 设置非阻塞模式
@@ -212,17 +222,12 @@ class NotificationHandler {
             return;
         }
         
-        // 处理其他类型的通知（保持原有逻辑）
-        const normalExitEnabled = this.settings.get_boolean('hook-normal-exit');
-        const abnormalExitEnabled = this.settings.get_boolean('hook-abnormal-exit');
+        // 处理其他类型的通知（使用新的合并设置）
+        const taskCompletionEnabled = this.settings.get_boolean('hook-task-completion');
         
-        // 根据退出类型决定是否显示通知
-        if (notificationInfo.type === 'normal' && !normalExitEnabled) {
-            return; // 正常退出通知未启用
-        }
-        
-        if (notificationInfo.type === 'abnormal' && !abnormalExitEnabled) {
-            return; // 异常退出通知未启用
+        // 对于完成和中断通知，统一使用task-completion设置
+        if ((notificationInfo.type === 'normal' || notificationInfo.type === 'abnormal') && !taskCompletionEnabled) {
+            return; // 任务完成通知未启用
         }
         
         // 显示系统通知
@@ -240,9 +245,6 @@ class NotificationHandler {
             
             // 获取自定义消息
             const customMessage = this.settings.get_string('notification-hook-message') || message;
-            
-            // 执行自定义Hook命令（如果有）
-            this.executeCustomHookCommand('notification', customMessage, hookData);
             
             // 显示系统通知
             this.sendSystemNotification(title, customMessage, iconName);
@@ -266,10 +268,6 @@ class NotificationHandler {
             const message = this.getNotificationMessage(isNormal, hookData);
             const iconName = isNormal ? 'emblem-ok-symbolic' : 'dialog-warning-symbolic';
             
-            // 执行自定义Hook命令（如果有）
-            const commandType = isNormal ? 'normal-exit' : 'abnormal-exit';
-            this.executeCustomHookCommand(commandType, message, hookData);
-            
             // 显示系统通知
             this.sendSystemNotification(title, message, iconName);
             
@@ -288,15 +286,10 @@ class NotificationHandler {
      * 获取通知消息
      */
     getNotificationMessage(isNormal, hookData) {
-        if (isNormal) {
-            return this.settings ? 
-                this.settings.get_string('normal-exit-message') || _('Claude Code has completed successfully!') :
-                _('Claude Code has completed successfully!');
-        } else {
-            return this.settings ? 
-                this.settings.get_string('abnormal-exit-message') || _('Claude Code exited unexpectedly.') :
-                _('Claude Code exited unexpectedly.');
-        }
+        // 对于所有任务完成相关的通知，统一使用task-completion-message
+        return this.settings ? 
+            this.settings.get_string('task-completion-message') || _('Claude Code task completed.') :
+            _('Claude Code task completed.');
     }
 
     /**
@@ -307,33 +300,6 @@ class NotificationHandler {
             GLib.spawn_command_line_async('gnome-extensions prefs claude-code-switcher@nsjsv.github.io');
         } catch (e) {
             console.error('Failed to open extension settings:', e);
-        }
-    }
-
-    /**
-     * 执行自定义Hook命令
-     */
-    executeCustomHookCommand(commandType, message, hookData) {
-        try {
-            const customCommandsJson = this.settings.get_string('custom-hook-commands');
-            if (!customCommandsJson) return;
-            
-            const customCommands = JSON.parse(customCommandsJson);
-            const command = customCommands[commandType];
-            
-            if (!command) return;
-            
-            // 替换命令中的变量
-            let processedCommand = command
-                .replace(/{message}/g, message || '')
-                .replace(/{exitCode}/g, hookData?.exit_code || '0')
-                .replace(/{provider}/g, this.getCurrentProvider() || 'Unknown');
-            
-            // 异步执行自定义命令
-            GLib.spawn_command_line_async(processedCommand);
-            
-        } catch (e) {
-            console.error('Failed to execute custom hook command:', e);
         }
     }
 
