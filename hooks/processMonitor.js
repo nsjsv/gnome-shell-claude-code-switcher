@@ -77,12 +77,12 @@ class ProcessMonitor {
      * 检查设置并启动后台监控
      */
     checkAndStartMonitoring() {
-        // 检查是否启用了异常退出通知
+        // 检查是否启用了任务完成通知
         const notificationsEnabled = this.settings.get_boolean('notifications-enabled');
-        const abnormalExitEnabled = this.settings.get_boolean('hook-abnormal-exit');
+        const taskCompletionEnabled = this.settings.get_boolean('hook-task-completion');
         
-        if (!notificationsEnabled || !abnormalExitEnabled) {
-            console.log('Abnormal exit notifications disabled');
+        if (!notificationsEnabled || !taskCompletionEnabled) {
+            console.log('Task completion notifications disabled');
             return;
         }
 
@@ -90,7 +90,7 @@ class ProcessMonitor {
         
         // 这里可以启动一个真正的后台监控进程
         // 但为了避免阻塞Claude Code启动，我们暂时只记录日志
-        // 实际的异常退出检测可以通过其他方式实现
+        // 实际的任务完成检测通过Stop hook实现
     }
 
     /**

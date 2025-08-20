@@ -261,8 +261,7 @@ export default class IndicatorExampleExtension extends Extension {
             'proxy-host',
             'proxy-port',
             'notifications-enabled',
-            'hook-normal-exit',
-            'hook-abnormal-exit',
+            'hook-task-completion',
             'hook-notification'
         ];
         
@@ -455,8 +454,7 @@ export default class IndicatorExampleExtension extends Extension {
         
         // 获取通知设置
         const notificationsEnabled = this._settings.get_boolean('notifications-enabled');
-        const normalExitEnabled = this._settings.get_boolean('hook-normal-exit');
-        const abnormalExitEnabled = this._settings.get_boolean('hook-abnormal-exit');
+        const taskCompletionEnabled = this._settings.get_boolean('hook-task-completion');
         const notificationHookEnabled = this._settings.get_boolean('hook-notification');
         
         // 构建代理URL
@@ -498,35 +496,18 @@ export default class IndicatorExampleExtension extends Extension {
         }
         
         // 根据具体的通知设置来添加hooks
-        if (notificationsEnabled && (normalExitEnabled || abnormalExitEnabled || notificationHookEnabled)) {
+        if (notificationsEnabled && (taskCompletionEnabled || notificationHookEnabled)) {
             const ourHooks = {};
             const notificationCommand = `cd "${this.path}" && gjs -m ./hooks/notificationHandler.js`;
             
-            // 正常退出通知：使用Stop hook（只在正常完成时触发）
-            if (normalExitEnabled) {
+            // 任务完成通知：使用Stop hook（在任务完成时触发）
+            if (taskCompletionEnabled) {
                 ourHooks['Stop'] = [
                     {
                         "hooks": [
                             {
                                 "type": "command",
                                 "command": notificationCommand
-                            }
-                        ]
-                    }
-                ];
-            }
-            
-            // 异常退出通知：使用独立的进程监控器
-            if (abnormalExitEnabled) {
-                const processMonitorCommand = `cd "${this.path}" && gjs -m ./hooks/processMonitor.js &`;
-                
-                // 使用SessionStart hook启动进程监控器
-                ourHooks['SessionStart'] = [
-                    {
-                        "hooks": [
-                            {
-                                "type": "command",
-                                "command": processMonitorCommand
                             }
                         ]
                     }
@@ -548,7 +529,7 @@ export default class IndicatorExampleExtension extends Extension {
             }
             
             // 先清理所有扩展相关的hooks
-            ['Stop', 'Notification', 'SessionStart'].forEach(eventName => {
+            ['Stop', 'Notification'].forEach(eventName => {
                 if (config.hooks[eventName]) {
                     config.hooks[eventName] = config.hooks[eventName].filter(hookGroup => {
                         if (hookGroup.hooks && Array.isArray(hookGroup.hooks)) {
@@ -582,7 +563,7 @@ export default class IndicatorExampleExtension extends Extension {
             });
         } else {
             // 移除我们的hooks但保留用户自定义的
-            ['Stop', 'Notification', 'SessionStart', 'UserPromptSubmit', 'PreToolUse', 'PostToolUse'].forEach(eventName => {
+            ['Stop', 'Notification'].forEach(eventName => {
                 if (config.hooks[eventName]) {
                     config.hooks[eventName] = config.hooks[eventName].filter(hookGroup => {
                         if (hookGroup.hooks && Array.isArray(hookGroup.hooks)) {
