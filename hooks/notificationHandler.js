@@ -7,18 +7,19 @@
 
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import Soup from 'gi://Soup?version=3.0';
 
 // 尝试使用现代的GioUnix，如果不可用则回退到旧版本
 let UnixInputStream;
 try {
-    const GioUnix = imports.gi.GioUnix;
-    UnixInputStream = GioUnix.InputStream;
+    // 暂时使用传统方法，因为GioUnix的ES6导入可能有问题
+    UnixInputStream = Gio.UnixInputStream;
 } catch (e) {
     // 回退到旧版本
     UnixInputStream = Gio.UnixInputStream;
 }
 
-// 导入gettext用于国际化
+// 导入gettext用于国际化 - 使用传统方法
 const Gettext = imports.gettext;
 const _ = Gettext.gettext;
 
@@ -27,6 +28,7 @@ class NotificationHandler {
         this.extensionPath = null;
         this.settings = null;
         this.telegramNotifier = null;
+        this.soupSession = null; // Soup 3 session
     }
 
     /**
@@ -86,24 +88,27 @@ class NotificationHandler {
      * 初始化Telegram通知器
      */
     _initTelegramNotifier() {
-        // 简单标记，实际的Telegram功能在发送时检查
-        this.telegramNotifier = {
-            isAvailable: this._checkTelegramAvailability()
-        };
+        // 初始化Soup Session用于HTTP请求
+        try {
+            this.soupSession = new Soup.Session();
+            this.telegramNotifier = {
+                isAvailable: true // Soup总是可用的
+            };
+            console.log('Telegram notifier initialized with Soup 3');
+        } catch (e) {
+            console.error('Failed to initialize Soup session:', e);
+            this.telegramNotifier = {
+                isAvailable: false
+            };
+        }
     }
 
     /**
-     * 检查Telegram功能可用性
+     * 检查Telegram功能可用性 (使用Soup 3)
      */
     _checkTelegramAvailability() {
-        try {
-            // 检查curl命令是否可用（用于发送HTTP请求）
-            const result = GLib.spawn_command_line_sync('which curl');
-            return result[0]; // 如果curl存在则返回true
-        } catch (e) {
-            console.debug('curl not available, Telegram notifications disabled');
-            return false;
-        }
+        // Soup 3总是可用的，不需要检查外部命令
+        return this.soupSession !== null;
     }
 
     /**
@@ -403,8 +408,10 @@ class NotificationHandler {
             // 格式化消息
             const formattedMessage = this._formatTelegramMessage(message, messageType);
 
-            // 使用curl发送Telegram消息
-            this._sendTelegramViaCurl(botToken, chatId, formattedMessage);
+            // 使用Soup 3发送Telegram消息
+            this._sendTelegramViaSoup(botToken, chatId, formattedMessage).catch(e => {
+                console.error('Async Telegram send failed:', e);
+            });
 
         } catch (e) {
             console.error('Failed to send Telegram notification:', e);
@@ -464,13 +471,17 @@ _来自 Claude Code Switcher_`;
     }
 
     /**
-     * 使用curl发送Telegram消息
+     * 使用Soup 3发送Telegram消息
      * @param {string} botToken Bot Token
      * @param {string} chatId Chat ID
      * @param {string} message 消息内容
      */
-    _sendTelegramViaCurl(botToken, chatId, message) {
+    async _sendTelegramViaSoup(botToken, chatId, message) {
         try {
+            if (!this.soupSession) {
+                throw new Error('Soup session not initialized');
+            }
+            
             const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
             
             // 构建请求数据
@@ -480,61 +491,107 @@ _来自 Claude Code Switcher_`;
                 parse_mode: 'Markdown',
                 disable_web_page_preview: true
             };
-
-            // 构建curl命令
-            const jsonData = JSON.stringify(requestData);
-            const curlCommand = [
-                'curl',
-                '-s',
-                '-X', 'POST',
-                '-H', 'Content-Type: application/json',
-                '-d', jsonData,
-                apiUrl
-            ];
-
-
-            // 使用同步方式获取响应以便调试
-            const [success, stdout, stderr, exitStatus] = GLib.spawn_sync(
-                null,
-                curlCommand,
-                null,
-                GLib.SpawnFlags.SEARCH_PATH,
-                null
-            );
-
-            if (success && exitStatus === 0) {
-                try {
-                    const response = JSON.parse(new TextDecoder().decode(stdout));
-                    if (response.ok) {
-                        console.log(`Telegram通知发送成功，消息ID: ${response.result.message_id}`);
-                    } else {
-                        console.error('Telegram API错误:', response.description);
-                        if (response.error_code === 400 && response.description.includes('chat not found')) {
-                            console.error('💡 提示: Chat ID无效或机器人未与用户开始对话，请先向机器人发送 /start 命令');
-                        }
-                    }
-                } catch (e) {
-                    console.error('解析Telegram API响应失败:', e.message);
-                    console.error('原始响应:', new TextDecoder().decode(stdout));
-                }
-            } else {
-                const errorMsg = stderr ? new TextDecoder().decode(stderr) : 'Unknown error';
-                console.error('Telegram网络请求失败:', errorMsg);
+            
+            // 创建HTTP消息
+            const msg = Soup.Message.new('POST', apiUrl);
+            if (!msg) {
+                throw new Error('Failed to create HTTP message');
             }
-
+            
+            // 设置请求头
+            const requestHeaders = msg.get_request_headers();
+            requestHeaders.append('Content-Type', 'application/json');
+            requestHeaders.append('User-Agent', 'Claude-Code-Switcher/1.0');
+            
+            // 设置请求体
+            const jsonData = JSON.stringify(requestData);
+            const requestBody = msg.get_request_body();
+            requestBody.append_bytes(new GLib.Bytes(new TextEncoder().encode(jsonData)));
+            
+            // 发送请求并等待响应（带超时处理）
+            const bytes = await Promise.race([
+                new Promise((resolve, reject) => {
+                    this.soupSession.send_and_read_async(
+                        msg,
+                        GLib.PRIORITY_DEFAULT,
+                        null,
+                        (session, result) => {
+                            try {
+                                const bytes = session.send_and_read_finish(result);
+                                resolve(bytes);
+                            } catch (e) {
+                                reject(new Error(`HTTP request failed: ${e.message}`));
+                            }
+                        }
+                    );
+                }),
+                // 15秒超时
+                new Promise((_, reject) => {
+                    GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 15, () => {
+                        reject(new Error('Request timeout after 15 seconds'));
+                        return GLib.SOURCE_REMOVE;
+                    });
+                })
+            ]);
+            
+            // 检查HTTP响应状态
+            const statusCode = msg.get_status();
+            if (statusCode !== Soup.Status.OK) {
+                throw new Error(`HTTP error ${statusCode}: ${msg.get_reason_phrase()}`);
+            }
+            
+            // 解析响应
+            const responseText = new TextDecoder().decode(bytes.get_data());
+            if (!responseText) {
+                throw new Error('Empty response from Telegram API');
+            }
+            
+            const response = JSON.parse(responseText);
+            
+            if (response.ok) {
+                console.log(`Telegram通知发送成功，消息ID: ${response.result.message_id}`);
+            } else {
+                const errorMsg = response.description || 'Unknown API error';
+                console.error('Telegram API错误:', errorMsg);
+                
+                // 提供用户友好的错误提示
+                if (response.error_code === 400) {
+                    if (response.description.includes('chat not found')) {
+                        console.error('💡 提示: Chat ID无效或机器人未与用户开始对话，请先向机器人发送 /start 命令');
+                    } else if (response.description.includes('bot token')) {
+                        console.error('💡 提示: Bot Token 无效，请检查配置');
+                    }
+                } else if (response.error_code === 401) {
+                    console.error('💡 提示: Bot Token 未授权或已过期');
+                }
+                
+                throw new Error(`Telegram API error (${response.error_code}): ${errorMsg}`);
+            }
+            
         } catch (e) {
-            console.error('发送Telegram消息失败:', e);
+            // 统一错误处理
+            const errorMessage = e.message || 'Unknown error occurred';
+            console.error('发送Telegram消息失败:', errorMessage);
+            
+            // 根据错误类型提供不同的用户反馈
+            if (errorMessage.includes('timeout')) {
+                console.error('💡 提示: 网络连接超时，请检查网络连接');
+            } else if (errorMessage.includes('not initialized')) {
+                console.error('💡 提示: HTTP客户端初始化失败，请重启扩展');
+            }
+            
+            throw e;
         }
     }
 
     /**
      * 测试Telegram配置
-     * @returns {boolean} 测试是否成功
+     * @returns {Promise<boolean>} 测试是否成功
      */
-    testTelegramConfiguration() {
+    async testTelegramConfiguration() {
         try {
             const testMessage = '🧪 这是一条测试消息，用于验证Telegram通知配置是否正确。';
-            this.sendTelegramNotification(testMessage, 'notification');
+            await this.sendTelegramNotification(testMessage, 'notification');
             return true;
         } catch (e) {
             console.error('Telegram test failed:', e);

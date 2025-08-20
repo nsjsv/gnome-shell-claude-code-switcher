@@ -144,8 +144,13 @@ class Indicator extends PanelMenu.Button {
             // 检查提供商是否有API密钥
             if (this._checkProviderKey(providerName)) {
                 this._settings.set_string('current-provider', providerName);
-                // 同步配置到本地文件
-                this._extension.syncToLocalFile();
+                // 同步配置到本地文件 (异步调用，包含错误处理)
+                this._extension.syncToLocalFile().catch(e => {
+                    console.error('Error syncing to local file:', e);
+                    // 显示用户友好的错误消息
+                    Main.notify(_('Configuration Error'), 
+                        _('Failed to save configuration. Please check extension settings.'));
+                });
                 Main.notify(_('Switched to: ') + providerName);
             } else {
                 // 显示配置API密钥的提示
@@ -246,6 +251,10 @@ export default class IndicatorExampleExtension extends Extension {
     enable() {
         // Initialize Claude Code Hook Interface
         this._claudeHookInterface = new ClaudeHookInterface(this);
+        // 异步初始化，但不阻塞enable()
+        this._claudeHookInterface.initialize().catch(e => {
+            console.error('Failed to initialize Claude Hook Interface:', e);
+        });
         
         this._indicator = new Indicator(this);
         Main.panel.addToStatusArea(this.uuid, this._indicator);
@@ -272,11 +281,10 @@ export default class IndicatorExampleExtension extends Extension {
                 GLib.source_remove(this._syncTimeoutId);
             }
             this._syncTimeoutId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-                try {
-                    this.syncToLocalFile();
-                } catch (e) {
+                // 使用异步方式调用，但不在GLib.idle_add中等待
+                this.syncToLocalFile().catch(e => {
                     console.error('Error syncing to local file:', e);
-                }
+                });
                 this._syncTimeoutId = null;
                 return GLib.SOURCE_REMOVE;
             });
@@ -289,8 +297,10 @@ export default class IndicatorExampleExtension extends Extension {
             );
         });
         
-        // 初始化时同步一次
-        this.syncToLocalFile();
+        // 初始化时异步同步一次
+        this.syncToLocalFile().catch(e => {
+            console.error('Initial sync failed:', e);
+        });
     }
 
     disable() {
@@ -379,39 +389,87 @@ export default class IndicatorExampleExtension extends Extension {
     }
     
     /**
-     * 确保Claude配置目录存在
+     * 确保Claude配置目录存在 (异步版本)
      */
-    _ensureClaudeDir() {
+    async _ensureClaudeDir() {
         const homeDir = GLib.get_home_dir();
         const claudeDir = GLib.build_filenamev([homeDir, '.claude']);
         const dir = Gio.File.new_for_path(claudeDir);
         
-        if (!dir.query_exists(null)) {
-            try {
-                dir.make_directory(null);
-                console.log('Created Claude config directory:', claudeDir);
-            } catch (e) {
-                console.error('Failed to create Claude config directory:', e);
-                return false;
+        try {
+            // 使用异步方式检查目录是否存在
+            const exists = await new Promise((resolve, reject) => {
+                dir.query_info_async(
+                    'standard::type',
+                    Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS,
+                    GLib.PRIORITY_DEFAULT,
+                    null,
+                    (source, result) => {
+                        try {
+                            source.query_info_finish(result);
+                            resolve(true);
+                        } catch (e) {
+                            if (e.code === Gio.IOErrorEnum.NOT_FOUND) {
+                                resolve(false);
+                            } else {
+                                reject(e);
+                            }
+                        }
+                    }
+                );
+            });
+            
+            if (!exists) {
+                await new Promise((resolve, reject) => {
+                    dir.make_directory_async(
+                        GLib.PRIORITY_DEFAULT,
+                        null,
+                        (source, result) => {
+                            try {
+                                source.make_directory_finish(result);
+                                console.log('Created Claude config directory:', claudeDir);
+                                resolve();
+                            } catch (e) {
+                                reject(e);
+                            }
+                        }
+                    );
+                });
             }
+            return true;
+        } catch (e) {
+            console.error('Failed to create Claude config directory:', e);
+            return false;
         }
-        return true;
     }
     
     /**
-     * 读取现有的settings.json文件 (同步优化版本)
+     * 读取现有的settings.json文件 (异步版本)
      */
-    _readExistingConfig() {
+    async _readExistingConfig() {
         const configPath = this._getClaudeConfigPath();
         const file = Gio.File.new_for_path(configPath);
         
-        if (!file.query_exists(null)) {
-            return null;
-        }
-        
         try {
-            const [success, contents] = file.load_contents(null);
-            if (success) {
+            const [contents] = await new Promise((resolve, reject) => {
+                file.load_contents_async(
+                    null,
+                    (source, result) => {
+                        try {
+                            const [contents, etag] = source.load_contents_finish(result);
+                            resolve([contents, etag]);
+                        } catch (e) {
+                            if (e.code === Gio.IOErrorEnum.NOT_FOUND) {
+                                resolve([null, null]);
+                            } else {
+                                reject(e);
+                            }
+                        }
+                    }
+                );
+            });
+            
+            if (contents) {
                 const decoder = new TextDecoder('utf-8');
                 const jsonString = decoder.decode(contents);
                 return JSON.parse(jsonString);
@@ -444,9 +502,9 @@ export default class IndicatorExampleExtension extends Extension {
     }
     
     /**
-     * 生成标准的Claude配置对象 (优化版本)
+     * 生成标准的Claude配置对象 (异步优化版本)
      */
-    _generateClaudeConfig() {
+    async _generateClaudeConfig() {
         const currentProvider = this._getCurrentProviderInfo();
         const autoUpdate = this._settings.get_boolean('auto-update');
         const proxyHost = this._settings.get_string('proxy-host');
@@ -467,7 +525,7 @@ export default class IndicatorExampleExtension extends Extension {
         }
         
         // 读取现有配置以保留其他字段（包括自定义hooks）
-        const existingConfig = this._readExistingConfig() || {};
+        const existingConfig = await this._readExistingConfig() || {};
         
         const config = {
             env: {
@@ -498,7 +556,7 @@ export default class IndicatorExampleExtension extends Extension {
         // 根据具体的通知设置来添加hooks
         if (notificationsEnabled && (taskCompletionEnabled || notificationHookEnabled)) {
             const ourHooks = {};
-            const notificationCommand = `cd "${this.path}" && gjs -m ./hooks/notificationHandler.js`;
+            const notificationCommand = `gjs -m "${this.path}/hooks/notificationHandler.js"`;
             
             // 任务完成通知：使用Stop hook（在任务完成时触发）
             if (taskCompletionEnabled) {
@@ -602,34 +660,47 @@ export default class IndicatorExampleExtension extends Extension {
     }
     
     /**
-     * 同步配置到本地Claude配置文件 (优化版本)
+     * 同步配置到本地Claude配置文件 (异步优化版本)
      */
-    syncToLocalFile() {
-        if (!this._ensureClaudeDir()) {
-            return;
-        }
-        
-        const configPath = this._getClaudeConfigPath();
-        const config = this._generateClaudeConfig();
-        
+    async syncToLocalFile() {
         try {
+            const dirReady = await this._ensureClaudeDir();
+            if (!dirReady) {
+                console.error('Failed to create Claude configuration directory');
+                throw new Error(_('Cannot create Claude configuration directory'));
+            }
+            
+            const configPath = this._getClaudeConfigPath();
+            const config = await this._generateClaudeConfig();
+            
             const jsonString = JSON.stringify(config, null, 2);
             const file = Gio.File.new_for_path(configPath);
             
             const encoder = new TextEncoder();
             const bytes = encoder.encode(jsonString);
             
-            file.replace_contents(
-                bytes,
-                null, // etag
-                false, // make_backup
-                Gio.FileCreateFlags.REPLACE_DESTINATION,
-                null // cancellable
-            );
-            
-            console.log('Synced config to Claude config file:', configPath);
+            await new Promise((resolve, reject) => {
+                file.replace_contents_async(
+                    bytes,
+                    null, // etag
+                    false, // make_backup
+                    Gio.FileCreateFlags.REPLACE_DESTINATION,
+                    null, // cancellable
+                    (source, result) => {
+                        try {
+                            source.replace_contents_finish(result);
+                            console.log('Synced config to Claude config file:', configPath);
+                            resolve();
+                        } catch (e) {
+                            console.error('Failed to write configuration file:', e);
+                            reject(new Error(_('Failed to save configuration file')));
+                        }
+                    }
+                );
+            });
         } catch (e) {
-            console.error('Failed to write Claude config file:', e);
+            console.error('Failed to sync configuration:', e);
+            throw e; // 重新抛出错误，让调用者处理
         }
     }
 }

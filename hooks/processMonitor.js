@@ -8,7 +8,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-// 导入gettext用于国际化
+// 导入gettext用于国际化 - 使用传统方法，因为hooks脚本可能需要兼容性
 const Gettext = imports.gettext;
 const _ = Gettext.gettext;
 
