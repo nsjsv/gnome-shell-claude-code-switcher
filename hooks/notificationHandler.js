@@ -19,9 +19,8 @@ try {
     UnixInputStream = Gio.UnixInputStream;
 }
 
-// 导入gettext用于国际化 - 使用传统方法
-const Gettext = imports.gettext;
-const _ = Gettext.gettext;
+// 导入gettext用于国际化 - 使用现代ESM语法
+import {gettext as _} from 'gettext';
 
 class NotificationHandler {
     constructor() {
@@ -53,9 +52,14 @@ class NotificationHandler {
      */
     initTranslations() {
         try {
-            const localeDir = GLib.build_filenamev([this.extensionPath, 'locale']);
-            Gettext.bindtextdomain('claude-code-switcher@nsjsv.github.io', localeDir);
-            Gettext.textdomain('claude-code-switcher@nsjsv.github.io');
+            // 使用GJS内置的gettext绑定
+            import('gettext').then(Gettext => {
+                const localeDir = GLib.build_filenamev([this.extensionPath, 'locale']);
+                Gettext.bindtextdomain('claude-code-switcher@nsjsv.github.io', localeDir);
+                Gettext.textdomain('claude-code-switcher@nsjsv.github.io');
+            }).catch(e => {
+                console.error('Failed to load gettext module:', e);
+            });
         } catch (e) {
             console.error('Failed to initialize translations:', e);
         }

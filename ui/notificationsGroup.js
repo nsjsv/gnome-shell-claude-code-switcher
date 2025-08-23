@@ -2,6 +2,7 @@ import Adw from 'gi://Adw';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk';
 import GLib from 'gi://GLib';
+import Soup from 'gi://Soup?version=3.0';
 
 import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
@@ -12,6 +13,8 @@ import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions
 export class NotificationsGroup {
     constructor(settings) {
         this._settings = settings;
+        // 初始化Soup session用于HTTP请求（替代curl）
+        this._soupSession = new Soup.Session();
     }
 
     /**
@@ -466,59 +469,75 @@ export class NotificationsGroup {
     }
 
     /**
-     * 异步验证Bot Token
+     * 异步验证Bot Token（使用Soup 3 API）
      * @param {string} botToken Bot Token
      * @returns {Promise<Object|null>} Bot信息或null
      */
     async _validateBotTokenAsync(botToken) {
-        return new Promise((resolve, reject) => {
+        try {
             const getMeUrl = `https://api.telegram.org/bot${botToken}/getMe`;
             
-            const curlCommand = [
-                'curl',
-                '-s',
-                '-X', 'GET',
-                getMeUrl
-            ];
-
-            // 使用异步spawn
-            GLib.spawn_async(
-                null,
-                curlCommand,
-                null,
-                GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD,
-                null,
-                (pid, stdin, stdout, stderr) => {
-                    GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid, (pid, status) => {
+            // 创建HTTP消息
+            const msg = Soup.Message.new('GET', getMeUrl);
+            if (!msg) {
+                throw new Error('Failed to create HTTP message');
+            }
+            
+            // 设置请求头
+            const requestHeaders = msg.get_request_headers();
+            requestHeaders.append('User-Agent', 'Claude-Code-Switcher/1.0');
+            
+            // 发送请求并等待响应
+            const bytes = await new Promise((resolve, reject) => {
+                this._soupSession.send_and_read_async(
+                    msg,
+                    GLib.PRIORITY_DEFAULT,
+                    null,
+                    (session, result) => {
                         try {
-                            if (status === 0) {
-                                const response = JSON.parse(new TextDecoder().decode(stdout));
-                                if (response.ok) {
-                                    resolve(response.result);
-                                } else {
-                                    reject(new Error(_('Invalid Bot Token: ') + (response.description || 'Token无效')));
-                                }
-                            } else {
-                                reject(new Error(_('Network error during validation')));
-                            }
+                            const bytes = session.send_and_read_finish(result);
+                            resolve(bytes);
                         } catch (e) {
-                            reject(new Error(_('Failed to validate Bot Token: ') + e.message));
+                            reject(new Error(`HTTP request failed: ${e.message}`));
                         }
-                    });
-                }
-            );
-        });
+                    }
+                );
+            });
+            
+            // 检查HTTP响应状态
+            const statusCode = msg.get_status();
+            if (statusCode !== Soup.Status.OK) {
+                throw new Error(`HTTP error ${statusCode}: ${msg.get_reason_phrase()}`);
+            }
+            
+            // 解析响应
+            const responseText = new TextDecoder().decode(bytes.get_data());
+            if (!responseText) {
+                throw new Error('Empty response from Telegram API');
+            }
+            
+            const response = JSON.parse(responseText);
+            
+            if (response.ok) {
+                return response.result;
+            } else {
+                throw new Error(_('Invalid Bot Token: ') + (response.description || 'Token无效'));
+            }
+            
+        } catch (e) {
+            throw new Error(_('Failed to validate Bot Token: ') + e.message);
+        }
     }
 
     /**
-     * 异步发送实际的测试消息
+     * 异步发送实际的测试消息（使用Soup 3 API）
      * @param {string} botToken Bot Token
      * @param {string} chatId Chat ID
      * @param {Gtk.Button} testButton 测试按钮
      * @param {Object} botInfo Bot信息
      */
     async _sendActualTestMessageAsync(botToken, chatId, testButton, botInfo) {
-        return new Promise((resolve, reject) => {
+        try {
             const testMessage = `🧪 *测试消息*
 
 这是来自 Claude Code Switcher 的测试消息。
@@ -538,59 +557,74 @@ export class NotificationsGroup {
                 disable_web_page_preview: true
             };
 
+            // 创建HTTP消息
+            const msg = Soup.Message.new('POST', apiUrl);
+            if (!msg) {
+                throw new Error('Failed to create HTTP message');
+            }
+            
+            // 设置请求头
+            const requestHeaders = msg.get_request_headers();
+            requestHeaders.append('Content-Type', 'application/json');
+            requestHeaders.append('User-Agent', 'Claude-Code-Switcher/1.0');
+            
+            // 设置请求体
             const jsonData = JSON.stringify(requestData);
-            const curlCommand = [
-                'curl',
-                '-s',
-                '-X', 'POST',
-                '-H', 'Content-Type: application/json',
-                '-d', jsonData,
-                apiUrl
-            ];
-
-            // 使用异步spawn
-            GLib.spawn_async(
-                null,
-                curlCommand,
-                null,
-                GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD,
-                null,
-                (pid, stdin, stdout, stderr) => {
-                    GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid, (pid, status) => {
+            const requestBody = msg.get_request_body();
+            requestBody.append_bytes(new GLib.Bytes(new TextEncoder().encode(jsonData)));
+            
+            // 发送请求并等待响应
+            const bytes = await new Promise((resolve, reject) => {
+                this._soupSession.send_and_read_async(
+                    msg,
+                    GLib.PRIORITY_DEFAULT,
+                    null,
+                    (session, result) => {
                         try {
-                            if (status === 0) {
-                                const response = JSON.parse(new TextDecoder().decode(stdout));
-                                
-                                if (response.ok) {
-                                    this._showTestResult(testButton, true,
-                                        _('Test message sent successfully!') + '\n\n' +
-                                        `Bot: ${botInfo.first_name}\n` +
-                                        `Chat ID: ${chatId}\n` +
-                                        `Message ID: ${response.result.message_id}\n\n` +
-                                        _('Please check your Telegram.')
-                                    );
-                                    resolve();
-                                } else {
-                                    let errorMsg = response.description || 'Unknown error';
-                                    if (response.error_code === 400 && errorMsg.includes('chat not found')) {
-                                        errorMsg += '\n\n💡 提示：\n1. 确保Chat ID正确\n2. 确保您已经与机器人开始对话\n3. 尝试先向机器人发送 /start 命令';
-                                    }
-                                    this._showTestResult(testButton, false, _('API Error: ') + errorMsg);
-                                    reject(new Error(errorMsg));
-                                }
-                            } else {
-                                const errorMsg = stderr ? new TextDecoder().decode(stderr) : 'Unknown error';
-                                this._showTestResult(testButton, false, _('Network error: ') + errorMsg);
-                                reject(new Error(errorMsg));
-                            }
+                            const bytes = session.send_and_read_finish(result);
+                            resolve(bytes);
                         } catch (e) {
-                            this._showTestResult(testButton, false, _('Failed to parse response: ') + e.message);
-                            reject(e);
+                            reject(new Error(`HTTP request failed: ${e.message}`));
                         }
-                    });
+                    }
+                );
+            });
+            
+            // 检查HTTP响应状态
+            const statusCode = msg.get_status();
+            if (statusCode !== Soup.Status.OK) {
+                throw new Error(`HTTP error ${statusCode}: ${msg.get_reason_phrase()}`);
+            }
+            
+            // 解析响应
+            const responseText = new TextDecoder().decode(bytes.get_data());
+            if (!responseText) {
+                throw new Error('Empty response from Telegram API');
+            }
+            
+            const response = JSON.parse(responseText);
+            
+            if (response.ok) {
+                this._showTestResult(testButton, true,
+                    _('Test message sent successfully!') + '\n\n' +
+                    `Bot: ${botInfo.first_name}\n` +
+                    `Chat ID: ${chatId}\n` +
+                    `Message ID: ${response.result.message_id}\n\n` +
+                    _('Please check your Telegram.')
+                );
+            } else {
+                let errorMsg = response.description || 'Unknown error';
+                if (response.error_code === 400 && errorMsg.includes('chat not found')) {
+                    errorMsg += '\n\n💡 提示：\n1. 确保Chat ID正确\n2. 确保您已经与机器人开始对话\n3. 尝试先向机器人发送 /start 命令';
                 }
-            );
-        });
+                this._showTestResult(testButton, false, _('API Error: ') + errorMsg);
+                throw new Error(errorMsg);
+            }
+            
+        } catch (e) {
+            this._showTestResult(testButton, false, _('Failed to send test message: ') + e.message);
+            throw e;
+        }
     }
 
     /**
@@ -676,5 +710,14 @@ export class NotificationsGroup {
         });
 
         dialog.present();
+    }
+    
+    /**
+     * 清理资源
+     */
+    cleanup() {
+        if (this._soupSession) {
+            this._soupSession = null;
+        }
     }
 }
