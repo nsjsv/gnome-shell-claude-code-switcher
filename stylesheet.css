@@ -102,7 +102,9 @@
 }
 
 .monospace {
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Droid Sans Mono', 'Source Code Pro', monospace;
+    font-family:
+        'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Droid Sans Mono',
+        'Source Code Pro', monospace;
     font-size: 0.9em;
     line-height: 1.4;
 }
@@ -128,9 +130,15 @@ button.circular:active {
 
 /* 加载动画 */
 @keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 .loading {
@@ -159,12 +167,12 @@ button.circular:active {
         padding: 2px 4px;
         margin: 0 4px;
     }
-    
+
     .stats-card {
         padding: 8px;
         margin: 2px;
     }
-    
+
     button.circular {
         min-width: 20px;
         min-height: 20px;
@@ -176,15 +184,15 @@ button.circular:active {
     .user-message {
         border-left-width: 4px;
     }
-    
+
     .assistant-message {
         border-left-width: 4px;
     }
-    
+
     .tool-result-message {
         border-left-width: 4px;
     }
-    
+
     .dim-label {
         opacity: 0.9;
     }

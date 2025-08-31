@@ -1,2 +1,7 @@
 CLAUDE.md
 .claude
+
+po/en.po~
+po/zh_CN.po~
+
+schemas/gschemas.compiled

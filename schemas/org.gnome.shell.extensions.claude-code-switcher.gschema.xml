@@ -46,25 +46,25 @@
       <summary>Task Completion Message</summary>
       <description>Custom message to display when Claude Code completes tasks</description>
     </key>
+    <key name="task-interruption-message" type="s">
+      <default>'Claude Code task was interrupted.'</default>
+      <summary>Task Interruption Message</summary>
+      <description>Custom message to display when Claude Code tasks are interrupted</description>
+    </key>
+    <key name="hook-tool-auth" type="b">
+      <default>true</default>
+      <summary>Tool Authorization Notifications</summary>
+      <description>Show notifications for tool authorization events (PreToolUse/PostToolUse)</description>
+    </key>
+    <key name="tool-auth-message" type="s">
+      <default>'Claude Code tool authorization event triggered.'</default>
+      <summary>Tool Authorization Message</summary>
+      <description>Custom message for tool authorization notifications</description>
+    </key>
     <key name="hook-notification" type="b">
       <default>true</default>
       <summary>Notification Hook</summary>
       <description>Show notifications when Claude Code sends notifications (e.g., waiting for input)</description>
-    </key>
-    <key name="telegram-enabled" type="b">
-      <default>false</default>
-      <summary>Telegram Notifications</summary>
-      <description>Enable Telegram push notifications (reserved for future use)</description>
-    </key>
-    <key name="telegram-bot-token" type="s">
-      <default>''</default>
-      <summary>Telegram Bot Token</summary>
-      <description>Telegram bot token for push notifications (reserved for future use)</description>
-    </key>
-    <key name="telegram-chat-id" type="s">
-      <default>''</default>
-      <summary>Telegram Chat ID</summary>
-      <description>Telegram chat ID for push notifications (reserved for future use)</description>
     </key>
     <key name="notification-hook-message" type="s">
       <default>'Claude Code is waiting for input or has sent a notification.'</default>

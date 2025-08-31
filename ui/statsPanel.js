@@ -3,14 +3,17 @@ import Gtk from 'gi://Gtk';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
-import {TokenStatsManager, TokenStats} from '../lib/tokenStats.js';
+import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import { TokenStatsManager, TokenStats } from '../lib/tokenStats.js';
 
 /**
- * 统计仪表盘UI组件
- * 负责显示Token使用统计、成本和会话信息
+ * @class StatsPanel
+ * @description Manages the statistics panel UI in the preferences window.
  */
 export class StatsPanel {
+    /**
+     * @param {string} extensionPath - The path to the extension directory.
+     */
     constructor(extensionPath) {
         this.extensionPath = extensionPath;
         this.tokenStatsManager = new TokenStatsManager();
@@ -20,7 +23,7 @@ export class StatsPanel {
             totalSessionsLabel: null,
             totalTokensLabel: null,
             lastUpdatedLabel: null,
-            refreshButton: null
+            refreshButton: null,
         };
     }
 
@@ -57,7 +60,10 @@ export class StatsPanel {
             '$0.0000',
             'img/icons/cash.svg'
         );
-        this.statsWidgets.totalCostLabel = costBox.get_last_child().get_first_child().get_next_sibling();
+        this.statsWidgets.totalCostLabel = costBox
+            .get_last_child()
+            .get_first_child()
+            .get_next_sibling();
         statsGrid.attach(costBox, 0, 0, 1, 1);
 
         // 总会话数卡片（可点击按钮）
@@ -76,7 +82,10 @@ export class StatsPanel {
             '0',
             'img/icons/claude.svg'
         );
-        this.statsWidgets.totalTokensLabel = tokensBox.get_last_child().get_first_child().get_next_sibling();
+        this.statsWidgets.totalTokensLabel = tokensBox
+            .get_last_child()
+            .get_first_child()
+            .get_next_sibling();
         statsGrid.attach(tokensBox, 2, 0, 1, 1);
 
         // 创建包装器
@@ -103,7 +112,7 @@ export class StatsPanel {
 
         controlsBox.append(this.statsWidgets.refreshButton);
         controlsBox.append(this.statsWidgets.lastUpdatedLabel);
-        
+
         statsWrapper.append(controlsBox);
 
         // 创建包含统计内容的行
@@ -138,7 +147,10 @@ export class StatsPanel {
         // 图标
         let icon;
         if (iconPath.startsWith('img/')) {
-            const fullPath = GLib.build_filenamev([this.extensionPath, iconPath]);
+            const fullPath = GLib.build_filenamev([
+                this.extensionPath,
+                iconPath,
+            ]);
             icon = new Gtk.Image({
                 gicon: Gio.icon_new_for_string(fullPath),
                 pixel_size: 32,
@@ -196,7 +208,10 @@ export class StatsPanel {
         // 图标
         let icon;
         if (iconPath.startsWith('img/')) {
-            const fullPath = GLib.build_filenamev([this.extensionPath, iconPath]);
+            const fullPath = GLib.build_filenamev([
+                this.extensionPath,
+                iconPath,
+            ]);
             icon = new Gtk.Image({
                 gicon: Gio.icon_new_for_string(fullPath),
                 pixel_size: 32,
@@ -230,7 +245,7 @@ export class StatsPanel {
 
         cardBox.append(icon);
         cardBox.append(textBox);
-        
+
         cardButton.set_child(cardBox);
 
         // 连接点击事件
@@ -252,9 +267,9 @@ export class StatsPanel {
         if (this._isRefreshing) {
             return;
         }
-        
+
         this._isRefreshing = true;
-        
+
         // 设置刷新按钮为加载状态
         if (this.statsWidgets.refreshButton) {
             this.statsWidgets.refreshButton.set_sensitive(false);
@@ -270,7 +285,7 @@ export class StatsPanel {
             return GLib.SOURCE_REMOVE;
         });
     }
-    
+
     /**
      * 执行统计数据刷新
      */
@@ -278,34 +293,44 @@ export class StatsPanel {
         try {
             // 异步获取统计数据
             const stats = await this.tokenStatsManager.getTokenStatsAsync();
-            
+
             // 检查组件是否仍然有效
             if (!this.statsWidgets.totalCostLabel) {
                 return;
             }
-            
+
             // 更新界面
-            this.statsWidgets.totalCostLabel.set_label(TokenStats.formatCurrency(stats.totalCost));
-            this.statsWidgets.totalSessionsLabel.set_label(stats.totalSessions.toString());
-            this.statsWidgets.totalTokensLabel.set_label(TokenStats.formatNumber(stats.totalTokens));
-            
+            this.statsWidgets.totalCostLabel.set_label(
+                TokenStats.formatCurrency(stats.totalCost)
+            );
+            this.statsWidgets.totalSessionsLabel.set_label(
+                stats.totalSessions.toString()
+            );
+            this.statsWidgets.totalTokensLabel.set_label(
+                TokenStats.formatNumber(stats.totalTokens)
+            );
+
             const now = new Date();
             const timeStr = now.toLocaleTimeString('zh-CN', {
                 hour: '2-digit',
-                minute: '2-digit'
+                minute: '2-digit',
             });
-            this.statsWidgets.lastUpdatedLabel.set_label(_('Last updated: ') + timeStr);
+            this.statsWidgets.lastUpdatedLabel.set_label(
+                _('Last updated: ') + timeStr
+            );
 
             console.log('Token stats refreshed successfully');
         } catch (error) {
             console.error('Failed to refresh token stats:', error);
-            
+
             // 检查组件是否仍然有效
             if (this.statsWidgets.totalCostLabel) {
                 this.statsWidgets.totalCostLabel.set_label(_('Failed to load'));
                 this.statsWidgets.totalSessionsLabel.set_label(_('Error'));
                 this.statsWidgets.totalTokensLabel.set_label(_('Error'));
-                this.statsWidgets.lastUpdatedLabel.set_label(_('Failed to load'));
+                this.statsWidgets.lastUpdatedLabel.set_label(
+                    _('Failed to load')
+                );
             }
         } finally {
             // 恢复刷新按钮状态
@@ -324,23 +349,28 @@ export class StatsPanel {
     async _showSessionsDetailDialog() {
         try {
             // 动态导入会话详情模块
-            const { SessionDetailDialog } = await import('../ui/sessionDialog.js');
-            const dialog = new SessionDetailDialog(this.extensionPath, this.tokenStatsManager);
+            const { SessionDetailDialog } = await import(
+                '../ui/sessionDialog.js'
+            );
+            const dialog = new SessionDetailDialog(
+                this.extensionPath,
+                this.tokenStatsManager
+            );
             dialog.show(this.parentWindow);
         } catch (error) {
             console.error('Failed to show session detail dialog:', error);
         }
     }
-    
+
     /**
      * 清理资源
      */
     cleanup() {
         // 清理统计组件引用
-        Object.keys(this.statsWidgets).forEach(key => {
+        Object.keys(this.statsWidgets).forEach((key) => {
             this.statsWidgets[key] = null;
         });
-        
+
         // 清理其他引用
         this.extensionPath = null;
         this.tokenStatsManager = null;

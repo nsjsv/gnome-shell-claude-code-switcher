@@ -14,24 +14,26 @@
 - 代理和自动更新设置
 - 模型大小配置
 - 任务进度通知
-- Telegram 机器人集成，支持远程通知
+- 可自定义的通知消息和设置
 - 会话历史查看器，包含详细对话记录
 - API 使用统计和成本跟踪
 
 ## 安装
 
 ### 从 GNOME 扩展网站安装
+
 直接从 [extensions.gnome.org](https://extensions.gnome.org/extension/8424/claude-code-switcher/) 安装
 
 ### 手动安装
+
 1. 进入扩展目录：
-   ```bash
-   cd ~/.local/share/gnome-shell/extensions
-   ```
+    ```bash
+    cd ~/.local/share/gnome-shell/extensions
+    ```
 2. 克隆此仓库：
-   ```bash
-   git clone https://github.com/nsjsv/claude-code-switcher.git claude-code-switcher@nsjsv.github.io
-   ```
+    ```bash
+    git clone https://github.com/nsjsv/claude-code-switcher.git claude-code-switcher@nsjsv.github.io
+    ```
 3. 重启 GNOME Shell（Alt+F2，输入 `r`，按回车）
 4. 在扩展应用中启用此扩展
 
@@ -44,12 +46,13 @@
 ## 配置
 
 打开扩展首选项可以：
+
 - 添加新的 Anthropic 兼容 API 提供商
 - 配置提供商设置（API 密钥、模型等）
 - 设置代理配置
 - 启用自动更新功能
 - 配置任务完成和中断通知
-- 设置 Telegram 机器人远程通知
+- 配置通知偏好和自定义消息
 - 查看会话历史和对话详情
 - 监控 API 使用统计和成本
 
@@ -70,6 +73,7 @@
 ## 开发
 
 此扩展使用以下技术构建：
+
 - GJS (GNOME JavaScript)
 - Adwaita UI 组件
 - GSettings 用于配置存储

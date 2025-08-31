@@ -3,14 +3,18 @@ import Gtk from 'gi://Gtk';
 import GLib from 'gi://GLib';
 import Pango from 'gi://Pango';
 
-import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
-import {TokenStats} from '../lib/tokenStats.js';
+import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import { TokenStats } from '../lib/tokenStats.js';
 
 /**
- * 会话详情对话框
- * 负责显示会话详情和消息内容
+ * @class SessionDetailDialog
+ * @description Manages the dialog for displaying session details and message content.
  */
 export class SessionDetailDialog {
+    /**
+     * @param {string} extensionPath - The path to the extension directory.
+     * @param {TokenStatsManager} tokenStatsManager - The token stats manager instance.
+     */
     constructor(extensionPath, tokenStatsManager) {
         this.extensionPath = extensionPath;
         this.tokenStatsManager = tokenStatsManager;
@@ -82,8 +86,9 @@ export class SessionDetailDialog {
 
         try {
             // 异步加载会话数据
-            const sessionsDetail = await this.tokenStatsManager.getSessionsDetailAsync();
-            
+            const sessionsDetail =
+                await this.tokenStatsManager.getSessionsDetailAsync();
+
             // 移除加载指示器
             mainBox.remove(loadingBox);
 
@@ -109,13 +114,12 @@ export class SessionDetailDialog {
             }
 
             mainBox.append(sessionsList);
-
         } catch (error) {
             console.error('Failed to load sessions detail:', error);
-            
+
             // 移除加载指示器
             mainBox.remove(loadingBox);
-            
+
             const errorLabel = new Gtk.Label({
                 label: _('Failed to load session data'),
                 valign: Gtk.Align.CENTER,
@@ -137,7 +141,7 @@ export class SessionDetailDialog {
 
         // 会话基本信息
         const infoGroup = new Adw.PreferencesGroup();
-        
+
         // 会话ID
         const sessionIdRow = new Adw.ActionRow({
             title: _('Session ID'),
@@ -170,17 +174,17 @@ export class SessionDetailDialog {
         const viewSessionRow = new Adw.ActionRow({
             title: _('Actions'),
         });
-        
+
         const viewSessionButton = new Gtk.Button({
             label: _('View Session'),
             css_classes: ['suggested-action'],
             valign: Gtk.Align.CENTER,
         });
-        
+
         viewSessionButton.connect('clicked', () => {
             this._showSessionContentDialog(session.sessionId, parentWindow);
         });
-        
+
         viewSessionRow.add_suffix(viewSessionButton);
         infoGroup.add(viewSessionRow);
 
@@ -274,14 +278,19 @@ export class SessionDetailDialog {
 
         try {
             // 异步分批加载消息
-            await this._loadMessagesProgressively(sessionId, messagesList, progressContainer, progressLabel, progressBar);
-
+            await this._loadMessagesProgressively(
+                sessionId,
+                messagesList,
+                progressContainer,
+                progressLabel,
+                progressBar
+            );
         } catch (error) {
             console.error('Failed to load session messages:', error);
-            
+
             // 移除进度指示器
             mainBox.remove(progressContainer);
-            
+
             const errorLabel = new Gtk.Label({
                 label: _('Failed to load session messages'),
                 valign: Gtk.Align.CENTER,
@@ -294,13 +303,20 @@ export class SessionDetailDialog {
     /**
      * 分批异步加载消息
      */
-    async _loadMessagesProgressively(sessionId, messagesList, progressContainer, progressLabel, progressBar) {
+    async _loadMessagesProgressively(
+        sessionId,
+        messagesList,
+        progressContainer,
+        progressLabel,
+        progressBar
+    ) {
         // 首先获取消息总数
         progressLabel.set_label(_('Analyzing messages...'));
         progressBar.set_fraction(0.1);
-        
-        const messages = await this.tokenStatsManager.getSessionMessagesAsync(sessionId);
-        
+
+        const messages =
+            await this.tokenStatsManager.getSessionMessagesAsync(sessionId);
+
         if (messages.length === 0) {
             progressContainer.get_parent().remove(progressContainer);
             const emptyLabel = new Gtk.Label({
@@ -314,7 +330,7 @@ export class SessionDetailDialog {
 
         const batchSize = 3;
         const totalBatches = Math.ceil(messages.length / batchSize);
-        
+
         progressLabel.set_label(_('Loading messages...'));
         progressBar.set_fraction(0.2);
 
@@ -327,7 +343,9 @@ export class SessionDetailDialog {
             // 更新进度
             const progress = 0.2 + (batchIndex / totalBatches) * 0.7;
             progressBar.set_fraction(progress);
-            progressLabel.set_label(_('Loading messages...') + ` (${endIndex}/${messages.length})`);
+            progressLabel.set_label(
+                _('Loading messages...') + ` (${endIndex}/${messages.length})`
+            );
 
             // 创建消息卡片
             for (const message of batchMessages) {
@@ -341,8 +359,10 @@ export class SessionDetailDialog {
 
         // 完成加载
         progressBar.set_fraction(1.0);
-        progressLabel.set_label(_('Loading complete') + ` - ${messages.length} messages loaded`);
-        
+        progressLabel.set_label(
+            _('Loading complete') + ` - ${messages.length} messages loaded`
+        );
+
         // 延迟移除进度指示器
         for (let i = 0; i < 30; i++) {
             await this._yield();
@@ -354,7 +374,7 @@ export class SessionDetailDialog {
      * 异步处理函数，用于让出控制权给UI更新
      */
     _yield() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
                 resolve();
                 return GLib.SOURCE_REMOVE;
@@ -400,7 +420,9 @@ export class SessionDetailDialog {
         });
 
         // 角色标签
-        const currentMessage = message.isVersioned ? message.versions[message.currentVersion] : message;
+        const currentMessage = message.isVersioned
+            ? message.versions[message.currentVersion]
+            : message;
         const roleIcon = this._getRoleIcon(currentMessage.role);
         const roleLabel = new Gtk.Label({
             label: `${roleIcon} ${this._formatRole(currentMessage.role)}`,
@@ -433,13 +455,19 @@ export class SessionDetailDialog {
         }
 
         // 消息内容
-        const contentInfo = this._extractMessageContentWithDetails(currentMessage.content);
+        const contentInfo = this._extractMessageContentWithDetails(
+            currentMessage.content
+        );
         if (contentInfo.text || contentInfo.hasComplexContent) {
             this._addMessageContent(cardBox, currentMessage, contentInfo);
         }
 
         // Token使用信息
-        if (currentMessage.usage && Object.keys(currentMessage.usage).length > 0 && currentMessage.role === 'assistant') {
+        if (
+            currentMessage.usage &&
+            Object.keys(currentMessage.usage).length > 0 &&
+            currentMessage.role === 'assistant'
+        ) {
             const usageText = this._formatUsageInfo(currentMessage.usage);
             if (usageText) {
                 const usageLabel = new Gtk.Label({
@@ -461,11 +489,11 @@ export class SessionDetailDialog {
      */
     _getRoleIcon(role) {
         const roleIcons = {
-            'user': '👤',
-            'assistant': '🤖',
-            'system': '⚙️',
-            'tool_result': '🔧',
-            'unknown': '❓'
+            user: '👤',
+            assistant: '🤖',
+            system: '⚙️',
+            tool_result: '🔧',
+            unknown: '❓',
         };
         return roleIcons[role] || '❓';
     }
@@ -475,11 +503,11 @@ export class SessionDetailDialog {
      */
     _formatRole(role) {
         const roleMap = {
-            'user': _('User'),
-            'assistant': _('Assistant'), 
-            'system': _('System'),
-            'tool_result': _('Tool Result'),
-            'unknown': _('Unknown')
+            user: _('User'),
+            assistant: _('Assistant'),
+            system: _('System'),
+            tool_result: _('Tool Result'),
+            unknown: _('Unknown'),
         };
         return roleMap[role] || role;
     }
@@ -493,19 +521,19 @@ export class SessionDetailDialog {
         }
 
         if (typeof content === 'string') {
-            return { 
-                text: content, 
-                hasComplexContent: false, 
-                items: [{ type: 'text', text: content }] 
+            return {
+                text: content,
+                hasComplexContent: false,
+                items: [{ type: 'text', text: content }],
             };
         }
 
         if (!Array.isArray(content)) {
             const strContent = String(content);
-            return { 
-                text: strContent, 
-                hasComplexContent: false, 
-                items: [{ type: 'text', text: strContent }] 
+            return {
+                text: strContent,
+                hasComplexContent: false,
+                items: [{ type: 'text', text: strContent }],
             };
         }
 
@@ -515,7 +543,7 @@ export class SessionDetailDialog {
 
         for (const item of content) {
             items.push(item);
-            
+
             if (item.type === 'text' && item.text) {
                 text += item.text + '\n';
             } else if (item.type === 'tool_use') {
@@ -526,16 +554,16 @@ export class SessionDetailDialog {
                 text += `🔧 Tool Result\n`;
             }
         }
-        
+
         // 如果文本很长也认为是复杂内容
         if (text.length > 500) {
             hasComplexContent = true;
         }
 
-        return { 
-            text: text.trim(), 
-            hasComplexContent, 
-            items 
+        return {
+            text: text.trim(),
+            hasComplexContent,
+            items,
         };
     }
 
@@ -553,7 +581,10 @@ export class SessionDetailDialog {
                 halign: Gtk.Align.FILL,
                 valign: Gtk.Align.START,
                 xalign: 0,
-                css_classes: message.role === 'user' ? ['user-content'] : ['assistant-content'],
+                css_classes:
+                    message.role === 'user'
+                        ? ['user-content']
+                        : ['assistant-content'],
                 hexpand: true,
             });
             contentLabel.set_size_request(-1, -1);
@@ -566,9 +597,12 @@ export class SessionDetailDialog {
             });
 
             const detailGroup = new Adw.PreferencesGroup();
-            
+
             for (const item of contentInfo.items) {
-                const itemRow = this._createContentItemRow(item, contentInfo.items);
+                const itemRow = this._createContentItemRow(
+                    item,
+                    contentInfo.items
+                );
                 if (itemRow) {
                     detailGroup.add(itemRow);
                 }
@@ -647,20 +681,26 @@ export class SessionDetailDialog {
      */
     _formatUsageInfo(usage) {
         const parts = [];
-        
+
         if (usage.input_tokens) {
             parts.push(`Input: ${TokenStats.formatNumber(usage.input_tokens)}`);
         }
         if (usage.output_tokens) {
-            parts.push(`Output: ${TokenStats.formatNumber(usage.output_tokens)}`);
+            parts.push(
+                `Output: ${TokenStats.formatNumber(usage.output_tokens)}`
+            );
         }
         if (usage.cache_creation_input_tokens) {
-            parts.push(`Cache Write: ${TokenStats.formatNumber(usage.cache_creation_input_tokens)}`);
+            parts.push(
+                `Cache Write: ${TokenStats.formatNumber(usage.cache_creation_input_tokens)}`
+            );
         }
         if (usage.cache_read_input_tokens) {
-            parts.push(`Cache Read: ${TokenStats.formatNumber(usage.cache_read_input_tokens)}`);
+            parts.push(
+                `Cache Read: ${TokenStats.formatNumber(usage.cache_read_input_tokens)}`
+            );
         }
-        
+
         return parts.length > 0 ? `Tokens: ${parts.join(' • ')}` : '';
     }
 }

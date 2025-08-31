@@ -3,15 +3,18 @@ import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk';
 import GLib from 'gi://GLib';
 
-import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import {
+    ExtensionPreferences,
+    gettext as _,
+} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 // 导入模块化组件
-import {StatsPanel} from './ui/statsPanel.js';
-import {ApiProviderManager} from './ui/apiProviderManager.js';
-import {SettingsManager} from './lib/settingsManager.js';
-import {GlobalSettingsGroup} from './ui/globalSettingsGroup.js';
-import {AboutGroup} from './ui/aboutGroup.js';
-import {NotificationsGroup} from './ui/notificationsGroup.js';
+import { StatsPanel } from './ui/statsPanel.js';
+import { ApiProviderManager } from './ui/apiProviderManager.js';
+import { SettingsManager } from './lib/settingsManager.js';
+import { GlobalSettingsGroup } from './ui/globalSettingsGroup.js';
+import { AboutGroup } from './ui/aboutGroup.js';
+import { NotificationsGroup } from './ui/notificationsGroup.js';
 
 /**
  * Claude Code Switcher 设置界面
@@ -20,7 +23,7 @@ import {NotificationsGroup} from './ui/notificationsGroup.js';
 export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences {
     constructor(metadata) {
         super(metadata);
-        
+
         // 初始化管理器
         this.settingsManager = null;
         this.statsPanel = null;
@@ -33,10 +36,10 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
     fillPreferencesWindow(window) {
         // 初始化设置和管理器
         this._initializeManagers(window);
-        
+
         // 快速初始化基础UI
         this._setupBasicUI(window);
-        
+
         // 使用更高效的异步加载策略
         this._scheduleComplexContentLoading();
     }
@@ -47,16 +50,25 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
     _initializeManagers(window) {
         this._settings = this.getSettings();
         this._window = window;
-        
+
         // 初始化管理器实例
-        this.settingsManager = new SettingsManager(this._settings);
+        this.settingsManager = new SettingsManager(this._settings, this);
         this.statsPanel = new StatsPanel(this.path);
-        this.apiProviderManager = new ApiProviderManager(this._settings, this.settingsManager);
-        this.globalSettingsGroup = new GlobalSettingsGroup(this._settings, this.settingsManager);
+        this.apiProviderManager = new ApiProviderManager(
+            this._settings,
+            this.settingsManager
+        );
+        this.globalSettingsGroup = new GlobalSettingsGroup(
+            this._settings,
+            this.settingsManager
+        );
         this.aboutGroup = new AboutGroup(this.metadata);
-        this.notificationsGroup = new NotificationsGroup(this._settings);
+        this.notificationsGroup = new NotificationsGroup(
+            this._settings,
+            this.settingsManager
+        );
     }
-    
+
     /**
      * 设置基础UI结构
      */
@@ -75,7 +87,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         });
         this._page.add(this._loadingGroup);
     }
-    
+
     /**
      * 调度复杂内容加载
      */
@@ -87,9 +99,9 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             () => this._loadNotificationsGroup(),
             () => this._loadGlobalSettingsGroup(),
             () => this._loadAboutGroup(),
-            () => this._finalizeLoading()
+            () => this._finalizeLoading(),
         ];
-        
+
         let currentStep = 0;
         const executeNextStep = () => {
             if (currentStep < loadingSteps.length) {
@@ -108,14 +120,14 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                 }
             }
         };
-        
+
         // 开始加载
         GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
             executeNextStep();
             return GLib.SOURCE_REMOVE;
         });
     }
-    
+
     /**
      * 加载统计面板
      */
@@ -124,12 +136,12 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             this._page.remove(this._loadingGroup);
             this._loadingGroup = null;
         }
-        
+
         this.statsPanel.setParentWindow(this._window);
         const statsGroup = this.statsPanel.createStatsGroup();
         this._page.add(statsGroup);
     }
-    
+
     /**
      * 加载API提供商管理器
      */
@@ -137,23 +149,25 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         const apiGroup = this.apiProviderManager.createApiGroup(this._window);
         this._page.add(apiGroup);
     }
-    
+
     /**
      * 加载通知设置组
      */
     _loadNotificationsGroup() {
-        const notificationsGroup = this.notificationsGroup.createNotificationsGroup();
+        const notificationsGroup =
+            this.notificationsGroup.createNotificationsGroup();
         this._page.add(notificationsGroup);
     }
-    
+
     /**
      * 加载全局设置组
      */
     _loadGlobalSettingsGroup() {
-        const globalGroup = this.globalSettingsGroup.createGlobalSettingsGroup();
+        const globalGroup =
+            this.globalSettingsGroup.createGlobalSettingsGroup();
         this._page.add(globalGroup);
     }
-    
+
     /**
      * 加载关于组
      */
@@ -161,7 +175,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         const aboutGroup = this.aboutGroup.createAboutGroup();
         this._page.add(aboutGroup);
     }
-    
+
     /**
      * 完成加载
      */
@@ -176,7 +190,6 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
         }
     }
 
-    
     /**
      * 清理资源
      */
@@ -186,17 +199,20 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
             return;
         }
         this._isCleanedUp = true;
-        
+
         // 清理各个组件
         const componentsToCleanup = [
             { name: 'statsPanel', component: this.statsPanel },
             { name: 'apiProviderManager', component: this.apiProviderManager },
-            { name: 'globalSettingsGroup', component: this.globalSettingsGroup },
+            {
+                name: 'globalSettingsGroup',
+                component: this.globalSettingsGroup,
+            },
             { name: 'aboutGroup', component: this.aboutGroup },
             { name: 'notificationsGroup', component: this.notificationsGroup },
-            { name: 'settingsManager', component: this.settingsManager }
+            { name: 'settingsManager', component: this.settingsManager },
         ];
-        
+
         componentsToCleanup.forEach(({ name, component }) => {
             if (component && typeof component.cleanup === 'function') {
                 try {
@@ -206,7 +222,7 @@ export default class ClaudeCodeSwitcherPreferences extends ExtensionPreferences 
                 }
             }
         });
-        
+
         // 清理引用
         this._settings = null;
         this._window = null;

@@ -3,13 +3,17 @@ import Gtk from 'gi://Gtk';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 /**
- * API提供商管理器
- * 负责提供商的增删改查和UI展示
+ * @class ApiProviderManager
+ * @description Manages the UI for adding, editing, and removing API providers.
  */
 export class ApiProviderManager {
+    /**
+     * @param {Gio.Settings} settings - The GSettings object.
+     * @param {SettingsManager} settingsManager - The settings manager instance.
+     */
     constructor(settings, settingsManager) {
         this.settings = settings;
         this.settingsManager = settingsManager;
@@ -21,7 +25,7 @@ export class ApiProviderManager {
      */
     createApiGroup(parentWindow) {
         this.parentWindow = parentWindow;
-        
+
         this.apiGroup = new Adw.PreferencesGroup({
             title: _('API Providers'),
             description: _('Add and manage custom API providers'),
@@ -31,7 +35,7 @@ export class ApiProviderManager {
             title: _('Add New Provider'),
             subtitle: _('Add custom API endpoint and key'),
         });
-        
+
         const addButton = new Gtk.Button({
             icon_name: 'list-add-symbolic',
             valign: Gtk.Align.CENTER,
@@ -95,13 +99,17 @@ export class ApiProviderManager {
 
         // 大模型输入（非必填）
         const largeModelEntry = new Gtk.Entry({
-            placeholder_text: _('Large Model (optional, e.g.: claude-3-5-sonnet-20241022)'),
+            placeholder_text: _(
+                'Large Model (optional, e.g.: claude-3-5-sonnet-20241022)'
+            ),
         });
         box.append(largeModelEntry);
 
         // 小模型输入（非必填）
         const smallModelEntry = new Gtk.Entry({
-            placeholder_text: _('Small Model (optional, e.g.: claude-3-haiku-20240307)'),
+            placeholder_text: _(
+                'Small Model (optional, e.g.: claude-3-haiku-20240307)'
+            ),
         });
         box.append(smallModelEntry);
 
@@ -117,15 +125,32 @@ export class ApiProviderManager {
                 const key = keyEntry.get_text();
                 const largeModel = largeModelEntry.get_text() || '';
                 const smallModel = smallModelEntry.get_text() || '';
-                
+
                 if (name && url && key) {
                     // 保存到设置中
                     this._saveProvider(name, url, key, largeModel, smallModel);
                     // 动态添加新的提供商到界面
-                    this._addProviderToUI(name, url, key, largeModel, smallModel);
+                    this._addProviderToUI(
+                        name,
+                        url,
+                        key,
+                        largeModel,
+                        smallModel
+                    );
                     // 同步到本地文件
                     this.settingsManager.syncToLocalFile();
-                    console.log('Added provider: ' + name + ', URL: ' + url + ', Key: ' + key + ', Large Model: ' + largeModel + ', Small Model: ' + smallModel);
+                    console.log(
+                        'Added provider: ' +
+                            name +
+                            ', URL: ' +
+                            url +
+                            ', Key: ' +
+                            key +
+                            ', Large Model: ' +
+                            largeModel +
+                            ', Small Model: ' +
+                            smallModel
+                    );
                 }
             }
             dialog.destroy();
@@ -219,11 +244,11 @@ export class ApiProviderManager {
             apiKeyRow.set_text(originalValues.key);
             largeModelRow.set_text(originalValues.largeModel);
             smallModelRow.set_text(originalValues.smallModel);
-            
+
             // 更新标题和副标题
             providerRow.set_title(originalValues.name);
             providerRow.set_subtitle(originalValues.url);
-            
+
             // 自动收起展开行
             providerRow.set_expanded(false);
         });
@@ -238,19 +263,26 @@ export class ApiProviderManager {
 
             if (newName && newUrl && newKey) {
                 // 更新保存的配置
-                this._updateProvider(originalValues.name, newName, newUrl, newKey, newLargeModel, newSmallModel);
-                
+                this._updateProvider(
+                    originalValues.name,
+                    newName,
+                    newUrl,
+                    newKey,
+                    newLargeModel,
+                    newSmallModel
+                );
+
                 // 更新界面标题和副标题
                 providerRow.set_title(newName);
                 providerRow.set_subtitle(newUrl);
-                
+
                 // 更新原始值为新值
                 originalValues.name = newName;
                 originalValues.url = newUrl;
                 originalValues.key = newKey;
                 originalValues.largeModel = newLargeModel;
                 originalValues.smallModel = newSmallModel;
-                
+
                 // 同步到本地文件
                 this.settingsManager.syncToLocalFile();
                 console.log('Saved provider configuration: ' + newName);
@@ -266,11 +298,11 @@ export class ApiProviderManager {
             css_classes: ['flat', 'destructive-action'],
             tooltip_text: _('Delete this provider'),
         });
-        
+
         deleteButton.connect('clicked', () => {
             this._showDeleteConfirmDialog(name, providerRow);
         });
-        
+
         providerRow.add_suffix(deleteButton);
 
         // 将新提供商添加到API组中
@@ -284,19 +316,22 @@ export class ApiProviderManager {
         try {
             const providersJson = this.settings.get_string('api-providers');
             const providers = JSON.parse(providersJson);
-            
+
             if (providers.length === 0) {
                 return;
             }
-            
+
             // 优化：使用更高效的批量加载策略
             const BATCH_SIZE = 3; // 每批加载3个提供商
             let currentBatch = 0;
-            
+
             const loadBatch = () => {
                 const startIndex = currentBatch * BATCH_SIZE;
-                const endIndex = Math.min(startIndex + BATCH_SIZE, providers.length);
-                
+                const endIndex = Math.min(
+                    startIndex + BATCH_SIZE,
+                    providers.length
+                );
+
                 // 加载当前批次的提供商
                 for (let i = startIndex; i < endIndex; i++) {
                     const provider = providers[i];
@@ -309,12 +344,15 @@ export class ApiProviderManager {
                             provider.smallModel || ''
                         );
                     } catch (e) {
-                        console.error(`Error loading provider ${provider.name}:`, e);
+                        console.error(
+                            `Error loading provider ${provider.name}:`,
+                            e
+                        );
                     }
                 }
-                
+
                 currentBatch++;
-                
+
                 // 如果还有更多批次，继续加载
                 if (currentBatch * BATCH_SIZE < providers.length) {
                     GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
@@ -323,7 +361,7 @@ export class ApiProviderManager {
                     });
                 }
             };
-            
+
             // 开始加载第一批
             loadBatch();
         } catch (e) {
@@ -338,34 +376,50 @@ export class ApiProviderManager {
         try {
             const providersJson = this.settings.get_string('api-providers');
             const providers = JSON.parse(providersJson);
-            
+
             providers.push({ name, url, key, largeModel, smallModel });
-            
-            this.settings.set_string('api-providers', JSON.stringify(providers));
+
+            this.settings.set_string(
+                'api-providers',
+                JSON.stringify(providers)
+            );
         } catch (e) {
             // 如果解析失败，创建新数组
-            this.settings.set_string('api-providers', JSON.stringify([{ name, url, key, largeModel, smallModel }]));
+            this.settings.set_string(
+                'api-providers',
+                JSON.stringify([{ name, url, key, largeModel, smallModel }])
+            );
         }
     }
 
     /**
      * 更新提供商
      */
-    _updateProvider(oldName, newName, newUrl, newKey, newLargeModel = '', newSmallModel = '') {
+    _updateProvider(
+        oldName,
+        newName,
+        newUrl,
+        newKey,
+        newLargeModel = '',
+        newSmallModel = ''
+    ) {
         try {
             const providersJson = this.settings.get_string('api-providers');
             const providers = JSON.parse(providersJson);
-            
-            const index = providers.findIndex(p => p.name === oldName);
+
+            const index = providers.findIndex((p) => p.name === oldName);
             if (index !== -1) {
-                providers[index] = { 
-                    name: newName, 
-                    url: newUrl, 
-                    key: newKey, 
-                    largeModel: newLargeModel, 
-                    smallModel: newSmallModel 
+                providers[index] = {
+                    name: newName,
+                    url: newUrl,
+                    key: newKey,
+                    largeModel: newLargeModel,
+                    smallModel: newSmallModel,
                 };
-                this.settings.set_string('api-providers', JSON.stringify(providers));
+                this.settings.set_string(
+                    'api-providers',
+                    JSON.stringify(providers)
+                );
             }
         } catch (e) {
             console.log('Failed to update provider:', e);
@@ -379,9 +433,12 @@ export class ApiProviderManager {
         try {
             const providersJson = this.settings.get_string('api-providers');
             const providers = JSON.parse(providersJson);
-            
-            const filteredProviders = providers.filter(p => p.name !== name);
-            this.settings.set_string('api-providers', JSON.stringify(filteredProviders));
+
+            const filteredProviders = providers.filter((p) => p.name !== name);
+            this.settings.set_string(
+                'api-providers',
+                JSON.stringify(filteredProviders)
+            );
         } catch (e) {
             console.log('Failed to remove provider:', e);
         }
@@ -394,12 +451,18 @@ export class ApiProviderManager {
         const dialog = new Adw.MessageDialog({
             transient_for: this.apiGroup.get_root(),
             heading: _('Confirm Delete'),
-            body: _('Are you sure you want to delete provider \"') + providerName + _('\"\\n\\nThis action cannot be undone.'),
+            body:
+                _('Are you sure you want to delete provider \"') +
+                providerName +
+                _('\"\\n\\nThis action cannot be undone.'),
         });
 
         dialog.add_response('cancel', _('Cancel'));
         dialog.add_response('delete', _('Delete'));
-        dialog.set_response_appearance('delete', Adw.ResponseAppearance.DESTRUCTIVE);
+        dialog.set_response_appearance(
+            'delete',
+            Adw.ResponseAppearance.DESTRUCTIVE
+        );
         dialog.set_default_response('cancel');
         dialog.set_close_response('cancel');
 
@@ -414,7 +477,7 @@ export class ApiProviderManager {
 
         dialog.present();
     }
-    
+
     /**
      * 清理资源
      */

@@ -2,13 +2,17 @@ import Adw from 'gi://Adw';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk';
 
-import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 /**
- * 全局设置组件
- * 负责创建和管理全局扩展设置界面
+ * @class GlobalSettingsGroup
+ * @description Creates and manages the "Global Settings" section in the preferences window.
  */
 export class GlobalSettingsGroup {
+    /**
+     * @param {Gio.Settings} settings - The GSettings object.
+     * @param {SettingsManager} settingsManager - The settings manager instance.
+     */
     constructor(settings, settingsManager) {
         this._settings = settings;
         this.settingsManager = settingsManager;
@@ -31,8 +35,12 @@ export class GlobalSettingsGroup {
         });
         globalGroup.add(autoUpdateRow);
 
-        this._settings.bind('auto-update', autoUpdateRow, 'active',
-            Gio.SettingsBindFlags.DEFAULT);
+        this._settings.bind(
+            'auto-update',
+            autoUpdateRow,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
 
         // 代理设置
         this._setupProxySettings(globalGroup);
@@ -50,7 +58,7 @@ export class GlobalSettingsGroup {
     _setupProxySettings(globalGroup) {
         const proxyRow = new Adw.ExpanderRow({
             title: _('Proxy Settings'),
-            subtitle: _('Configure network proxy server'),
+            subtitle: _('Configure HTTP/HTTPS proxy server'),
         });
         globalGroup.add(proxyRow);
 
@@ -62,9 +70,9 @@ export class GlobalSettingsGroup {
                 proxyContentCreated = true;
             }
         });
-        
+
         // 初始化代理展开行的副标题
-        const {host, port} = this.settingsManager.getProxyInfo();
+        const { host, port } = this.settingsManager.getProxyInfo();
         if (host && port) {
             proxyRow.set_subtitle(_('Configured: ') + host + ':' + port);
         } else if (host) {
@@ -77,7 +85,7 @@ export class GlobalSettingsGroup {
      * @param {Adw.ExpanderRow} proxyRow 代理设置展开行
      */
     _createProxyContent(proxyRow) {
-        const {host, port} = this.settingsManager.getProxyInfo();
+        const { host, port } = this.settingsManager.getProxyInfo();
 
         // 代理主机输入
         const proxyHostRow = new Adw.EntryRow({
@@ -120,7 +128,7 @@ export class GlobalSettingsGroup {
         proxyRow.add_row(proxyActionRow);
 
         // 保存原始值
-        const originalValues = {host, port};
+        const originalValues = { host, port };
 
         // 取消按钮逻辑
         proxyCancelButton.connect('clicked', () => {
@@ -135,18 +143,20 @@ export class GlobalSettingsGroup {
             const newPort = proxyPortRow.get_text();
 
             this.settingsManager.setProxy(newHost, newPort);
-            
+
             originalValues.host = newHost;
             originalValues.port = newPort;
-            
+
             if (newHost && newPort) {
-                proxyRow.set_subtitle(_('Configured: ') + newHost + ':' + newPort);
+                proxyRow.set_subtitle(
+                    _('Configured: ') + newHost + ':' + newPort
+                );
             } else if (newHost) {
                 proxyRow.set_subtitle(_('Configured: ') + newHost);
             } else {
-                proxyRow.set_subtitle(_('Configure network proxy server'));
+                proxyRow.set_subtitle(_('Configure HTTP/HTTPS proxy server'));
             }
-            
+
             proxyRow.set_expanded(false);
             console.log('Saved proxy settings: ' + newHost + ':' + newPort);
         });
@@ -182,13 +192,18 @@ export class GlobalSettingsGroup {
     _showClearConfigDialog() {
         const dialog = new Adw.MessageDialog({
             heading: _('Clear Configuration'),
-            body: _('This will clear the Claude settings.json file to an empty state. All current configuration will be lost. Are you sure you want to continue?'),
+            body: _(
+                'This will clear the Claude settings.json file to an empty state. All current configuration will be lost. Are you sure you want to continue?'
+            ),
             modal: true,
         });
 
         dialog.add_response('cancel', _('Cancel'));
         dialog.add_response('clear', _('Clear Config'));
-        dialog.set_response_appearance('clear', Adw.ResponseAppearance.DESTRUCTIVE);
+        dialog.set_response_appearance(
+            'clear',
+            Adw.ResponseAppearance.DESTRUCTIVE
+        );
         dialog.set_default_response('cancel');
         dialog.set_close_response('cancel');
 
@@ -213,7 +228,7 @@ export class GlobalSettingsGroup {
      */
     _performClearConfig() {
         const success = this.settingsManager.clearClaudeConfig();
-        
+
         if (success) {
             this._showSuccessDialog();
         } else {
@@ -227,7 +242,9 @@ export class GlobalSettingsGroup {
     _showSuccessDialog() {
         const dialog = new Adw.MessageDialog({
             heading: _('Configuration Cleared'),
-            body: _('Claude settings.json has been successfully cleared to empty state.'),
+            body: _(
+                'Claude settings.json has been successfully cleared to empty state.'
+            ),
             modal: true,
         });
 
@@ -249,7 +266,9 @@ export class GlobalSettingsGroup {
     _showErrorDialog() {
         const dialog = new Adw.MessageDialog({
             heading: _('Error'),
-            body: _('Failed to clear Claude configuration. Please check the console for more details.'),
+            body: _(
+                'Failed to clear Claude configuration. Please check the console for more details.'
+            ),
             modal: true,
         });
 
@@ -276,7 +295,10 @@ export class GlobalSettingsGroup {
                 const parent = widget.get_parent();
                 if (!parent) break;
                 widget = parent;
-                if (widget instanceof Adw.PreferencesWindow || widget instanceof Gtk.Window) {
+                if (
+                    widget instanceof Adw.PreferencesWindow ||
+                    widget instanceof Gtk.Window
+                ) {
                     return widget;
                 }
             }

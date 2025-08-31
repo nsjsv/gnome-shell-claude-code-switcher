@@ -1,19 +1,22 @@
 import Adw from 'gi://Adw';
 
-import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 /**
- * 关于组件
- * 负责创建和管理关于扩展的信息界面
+ * @class AboutGroup
+ * @description Creates and manages the "About" section in the preferences window.
  */
 export class AboutGroup {
+    /**
+     * @param {object} metadata - The extension's metadata.json object.
+     */
     constructor(metadata) {
         this.metadata = metadata;
     }
 
     /**
-     * 创建关于组
-     * @returns {Adw.PreferencesGroup} 关于组
+     * Creates the "About" preferences group.
+     * @returns {Adw.PreferencesGroup} The created "About" group widget.
      */
     createAboutGroup() {
         const aboutGroup = new Adw.PreferencesGroup({
@@ -44,7 +47,6 @@ export class AboutGroup {
             });
             aboutGroup.add(authorRow);
         }
-
 
         return aboutGroup;
     }

@@ -16,24 +16,26 @@ A GNOME Shell extension for quickly switching Claude Code API providers.
 - Proxy and auto-update settings
 - Model size configuration
 - Task progress notifications
-- Telegram bot integration for remote notifications
+- Customizable notification messages and settings
 - Session history viewer with detailed conversation logs
 - API usage statistics and cost tracking
 
 ## Installation
 
 ### From GNOME Extensions Website
+
 Install directly from [extensions.gnome.org](https://extensions.gnome.org/extension/8424/claude-code-switcher/)
 
 ### Manual Installation
+
 1. Navigate to extensions directory:
-   ```bash
-   cd ~/.local/share/gnome-shell/extensions
-   ```
+    ```bash
+    cd ~/.local/share/gnome-shell/extensions
+    ```
 2. Clone this repository:
-   ```bash
-   git clone https://github.com/nsjsv/claude-code-switcher.git claude-code-switcher@nsjsv.github.io
-   ```
+    ```bash
+    git clone https://github.com/nsjsv/claude-code-switcher.git claude-code-switcher@nsjsv.github.io
+    ```
 3. Restart GNOME Shell (Alt+F2, type `r`, press Enter)
 4. Enable the extension in Extensions app
 
@@ -46,12 +48,13 @@ Install directly from [extensions.gnome.org](https://extensions.gnome.org/extens
 ## Configuration
 
 Open the extension preferences to:
+
 - Add new Anthropic-compatible API providers
 - Configure provider settings (API keys, models, etc.)
 - Set up proxy settings
 - Enable auto-update features
 - Configure task completion and interruption notifications
-- Set up Telegram bot for remote notifications
+- Configure notification preferences and custom messages
 - View session history and conversation details
 - Monitor API usage statistics and costs
 
@@ -72,6 +75,7 @@ This extension requires API providers that are compatible with Anthropic's API f
 ## Development
 
 This extension is built using:
+
 - GJS (GNOME JavaScript)
 - Adwaita UI components
 - GSettings for configuration storage
